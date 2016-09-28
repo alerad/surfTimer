@@ -472,6 +472,8 @@ public void db_createTables()
 	SQL_AddQuery(createTableTnx, sql_createCheckpoints);
 	SQL_AddQuery(createTableTnx, sql_createZones);
 	SQL_AddQuery(createTableTnx, sql_createMapTier);
+	SQL_AddQuery(createTableTnx, sql_createStageRecord);
+	SQL_AddQuery(createTableTnx, sql_createStageRecordIndex);
 	SQL_AddQuery(createTableTnx, sql_createSpawnLocations);
 	SQL_AddQuery(createTableTnx, sql_createPlayerFlags);
 	
