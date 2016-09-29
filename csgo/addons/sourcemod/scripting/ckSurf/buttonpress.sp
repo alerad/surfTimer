@@ -598,7 +598,7 @@ public void CL_OnEndStageTimerPress(int client)
 		g_stageSRVRecord[client] = false;
 		g_OldMapRankStage[zGroup][client] = g_MapRankStage[zGroup][client];	
 
-		diff = g_fPersonalRecordBonus[zGroup][client] - g_stageFinalTime[client];
+		diff = g_fPersonalRecordStage[zGroup][client] - g_stageFinalTime[client];
 		FormatTimeFloat(client, diff, 3, szDiff, sizeof(szDiff));
 		if (diff > 0.0)	{
 			Format(g_szStageTimeDifference[client], sizeof(szDiff), "-%s", szDiff);
@@ -623,7 +623,7 @@ public void CL_OnEndStageTimerPress(int client)
 			g_stageFastest[zGroup] = g_stageFinalTime[client];
 			Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);
-            PrintToChat(client, "[%cCK%c] Terminaste la stage %i en %s", MOSSGREEN, WHITE, g_doingStage[client], g_stageFinalTimeStr[client]);
+            PrintToChat(client, "[%cCK%c] Terminaste el stage %i en %s", MOSSGREEN, WHITE, g_doingStage[client], g_stageFinalTimeStr[client]);
 			g_stageSRVRecord[client] = true;
 			g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
 			db_insertStageRecord(client, g_szSteamID[client], szName, g_stageFinalTime[client], g_doingStage[client]);

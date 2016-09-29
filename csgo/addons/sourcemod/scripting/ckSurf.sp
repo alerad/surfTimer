@@ -284,6 +284,7 @@ float g_stageFastest[MAXZONEGROUPS]; 							// Fastest stage time in the current
 char g_szStageFastestTime[MAXZONEGROUPS][64]; 					// Fastest stage time in 00:00:00:00 format
 char g_szStageFastest[MAXZONEGROUPS][MAX_NAME_LENGTH]; 			// Name of the #1 in the current maps stage
 float g_fOldStageRecordTime[MAXZONEGROUPS];						// Old record time, for prints + counting
+int g_tmpStageCount[MAXZONEGROUPS];								// Used to make sure bonus finished prints are correct
 
 /*----------  Checkpoint variables  ----------*/
 float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT]; // Clients best run's times
@@ -364,6 +365,7 @@ ConVar g_hSlopeFixEnable;
 /*----------  Forwards  ----------*/
 Handle g_MapFinishForward;
 Handle g_BonusFinishForward;
+Handle g_StageFinishForward;
 Handle g_PracticeFinishForward;
 
 /*----------  CVars  ----------*/
@@ -532,6 +534,7 @@ char g_szRecordMapTime[64]; 									// Record map time in 00:00:00 format
 char g_szPersonalRecord[MAXPLAYERS + 1][64]; 					// Client's peronal record in 00:00:00 format
 float g_favg_maptime; 											// Average map time
 float g_fAvg_BonusTime[MAXZONEGROUPS]; 							// Average bonus times TODO: Combine with g_favg_maptime
+float g_fAvg_StageTime[MAXZONEGROUPS]; 							// Average bonus times TODO: Combine with g_favg_maptime
 bool g_bFirstTimerStart[MAXPLAYERS + 1];						// If timer is started for the first time, print avg times
 bool g_bPause[MAXPLAYERS + 1]; 									// Client has timer paused
 int g_MapTimesCount; 											// How many times the map has been beaten
@@ -2081,6 +2084,7 @@ public void OnPluginStart()
 	// Forwards
 	g_MapFinishForward = CreateGlobalForward("ckSurf_OnMapFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell);
 	g_BonusFinishForward = CreateGlobalForward("ckSurf_OnBonusFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
+	g_StageFinishForward = CreateGlobalForward("ckSurf_OnStageFinished", ET_Event, Param_Cell, Param_Float, Param_String, Param_Cell, Param_Cell, Param_Cell);
 	g_PracticeFinishForward = CreateGlobalForward("ckSurf_OnPracticeFinished", ET_Event, Param_Cell, Param_Float, Param_String);
 	
 	if (g_bLateLoaded)

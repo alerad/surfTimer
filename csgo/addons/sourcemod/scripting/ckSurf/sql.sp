@@ -59,8 +59,8 @@ char sql_selectStageRecordCount[] = "SELECT zonegroup, count(1) FROM ar_stage WH
 char sql_selectPersonalStageRecords[] = "SELECT runtime, zonegroup FROM ar_stage WHERE steamid = '%s' AND mapname = '%s' AND runtime > '0.0'";
 char sql_selectPlayerRankStage[] = "SELECT name FROM ar_stage WHERE runtime <= (SELECT runtime FROM ar_stage WHERE steamid = '%s' AND mapname= '%s' AND runtime > 0.0 AND zonegroup = %i) AND mapname = '%s' AND zonegroup = %i;";
 char sql_selectFastestStage[] = "SELECT name, MIN(runtime), zonegroup FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup;";
+char sql_selectAllStageTimesinMap[] = "SELECT zonegroup, runtime from ar_stage WHERE mapname = '%s';";
 char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
-char sql_selectAllStageTimesInMap[] = "SELECT zonegroup, runtime from ar_stage WHERE mapname = '%s';";
 char sql_selectTopStageSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ar_stage as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
 
 
@@ -4581,6 +4581,7 @@ public void db_viewStageRunRank(Handle owner, Handle hndl, const char[] error, a
 
 public void db_insertStageRecord(int client, char szSteamId[32], char szUName[32], float FinalTime, int zoneGrp)
 {
+	LogError("Invocando isnert stage record");
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
@@ -4648,10 +4649,10 @@ public void db_viewMapRankStageRecordCallback(Handle owner, Handle hndl, const c
 	{
 		case 1: {
 			g_iStageCount[zgroup]++;
-			PrintChatBonus(client, zgroup);
+			PrintChatStage(client, zgroup);
 		}
 		case 2: {
-			PrintChatBonus(client, zgroup);
+			PrintChatStage(client, zgroup);
 		}
 	}
 }
@@ -5685,6 +5686,51 @@ public void SQL_db_CalcAvgRunBonusTimeCallback(Handle owner, Handle hndl, const 
 		
 		for (int i = 1; i < MAXZONEGROUPS; i++)
 			g_fAvg_BonusTime[i] = runtime[i] / runtimes[i];
+	}
+	
+	if (!g_bServerDataLoaded)
+		db_CalculatePlayerCount();
+	
+	return;
+}
+
+public void db_CalcAvgRunTimeStage()
+{
+	char szQuery[256];
+	Format(szQuery, 256, sql_selectAllStageTimesinMap, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_db_CalcAvgRunBonusTimeCallback, szQuery, 1, DBPrio_Low);
+}
+
+public void SQL_db_CalcAvgRunStageTimeCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (SQL_db_CalcAvgRunTimeCallback): %s", error);
+		if (!g_bServerDataLoaded)
+			db_CalculatePlayerCount();
+		return;
+	}
+
+	for (int i = 1; i < MAXZONEGROUPS; i++)
+		g_fAvg_StageTime[i] = 0.0;
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		int zonegroup, runtimes[MAXZONEGROUPS];
+		float runtime[MAXZONEGROUPS], time;
+		while (SQL_FetchRow(hndl))
+		{
+			zonegroup = SQL_FetchInt(hndl, 0);
+			time = SQL_FetchFloat(hndl, 1);
+			if (time > 0.0)
+			{
+				runtime[zonegroup] += time;
+				runtimes[zonegroup]++;
+			}
+		}
+		
+		for (int i = 1; i < MAXZONEGROUPS; i++)
+			g_fAvg_StageTime[i] = runtime[i] / runtimes[i];
 	}
 	
 	if (!g_bServerDataLoaded)
