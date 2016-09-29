@@ -4575,13 +4575,13 @@ public void db_viewStageRunRank(Handle owner, Handle hndl, const char[] error, a
 		rank = SQL_FetchInt(hndl, 0);
 	}
 
+	LogError("Llega al wachin de printChatStage");
 	PrintChatStage(client, zGroup, rank);
 }
 
 
 public void db_insertStageRecord(int client, char szSteamId[32], char szUName[32], float FinalTime, int zoneGrp)
 {
-	LogError("Invocando isnert stage record");
 	char szQuery[1024];
 	char szName[MAX_NAME_LENGTH * 2 + 1];
 	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
@@ -4639,6 +4639,7 @@ public void db_viewMapRankStageRecordCallback(Handle owner, Handle hndl, const c
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		g_MapRankStage[zgroup][client] = SQL_GetRowCount(hndl);
+		LogError("MAP RANK STAGE IS %i", g_MapRankStage[zgroup][client]);
 	}
 	else
 	{
@@ -5259,6 +5260,14 @@ public void SQL_selectMapZonesCallback(Handle owner, Handle hndl, const char[] e
 					}
 					case 8: {
 						Format(g_mapZones[g_mapZonesCount][zoneName], 128, "Checker-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+					}
+					case 9: {
+						if (g_mapZones[g_mapZonesCount][zoneGroup] > 0){
+							Format(g_mapZones[g_mapZonesCount][zoneName], 128, "StageEnd-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
+							Format(g_szZoneGroupName[g_mapZones[g_mapZonesCount][zoneGroup]], 128, "STAGE %i", g_mapZones[g_mapZonesCount][zoneGroup]);
+						}
+						else
+							Format(g_mapZones[g_mapZonesCount][zoneName], 128, "End-%i", g_mapZones[g_mapZonesCount][zoneTypeId]);
 					}
 				}
 			}

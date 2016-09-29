@@ -1976,8 +1976,10 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 	char szRecordDiff[54], szName[MAX_NAME_LENGTH];
 
 	if (rank == 0)
-		rank = g_MapRankBonus[zGroup][client];
+		rank = g_MapRankStage[zGroup][client];
 	
+	LogError("%s", g_szZoneGroupName[zGroup]);
+
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 	if ((GetConVarInt(g_hAnnounceRecord) == 0 ||
 		(GetConVarInt(g_hAnnounceRecord) == 1 && g_stageSRVRecord[client] || g_stagePBRecord[client] || g_stageFirstRecord[client]) ||
@@ -1992,13 +1994,16 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
 		}
+		char szZoneGroupName[128];
+		Format(szZoneGroupName,128,"STAGE %i", g_szStageZone[client]);
+
 		if (g_stageFirstRecord[client] && g_stageSRVRecord[client])
 		{
 			PrintToChatAll("%t", "StageFinished2", MOSSGREEN, WHITE, LIMEGREEN, szName, YELLOW, g_szZoneGroupName[zGroup]);
 			if (g_tmpStageCount[zGroup] == 0)
-				PrintToChatAll("%t", "StageFinished3", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, YELLOW, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, WHITE, LIMEGREEN, g_szFinalTime[client], WHITE);
+				PrintToChatAll("%t", "StageFinished3", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, YELLOW, szZoneGroupName, GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, WHITE, LIMEGREEN, g_szFinalTime[client], WHITE);
 			else
-				PrintToChatAll("%t", "StageFinished4", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, YELLOW, g_szZoneGroupName[zGroup], GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, szRecordDiff, GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szFinalTime[client], WHITE);
+				PrintToChatAll("%t", "StageFinished4", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, YELLOW, szZoneGroupName, GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, szRecordDiff, GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szFinalTime[client], WHITE);
 		}
 		if (g_stagePBRecord[client] && g_stageSRVRecord[client])
 		{

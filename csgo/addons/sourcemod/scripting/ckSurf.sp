@@ -521,6 +521,7 @@ char g_szStageTimeDifference[MAXPLAYERS + 1];					// How many seconds were impro
 float g_fStartTime[MAXPLAYERS + 1]; 							// Time when run was started
 float g_fFinalTime[MAXPLAYERS + 1]; 							// Total time the run took
 char g_szFinalTime[MAXPLAYERS + 1][32]; 						// Total time the run took in 00:00:00 format
+int g_szStageZone[MAXPLAYERS + 1];								// Zone number
 float g_fPauseTime[MAXPLAYERS + 1]; 							// Time spent in !pause this run
 float g_fStartPauseTime[MAXPLAYERS + 1]; 						// Time when !pause started
 float g_fCurrentRunTime[MAXPLAYERS + 1]; 						// Current runtime
