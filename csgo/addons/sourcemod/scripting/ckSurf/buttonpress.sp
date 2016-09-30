@@ -562,27 +562,19 @@ public void CL_OnEndStageTimerPress(int client)
 	if (!IsValidClient(client))
 		return;
 
-	if (!g_stageTimerActivated[client])
-	{
-		ClientCommand(client, "play buttons\\button10.wav");
-		return;
-	}
-	else
-	{
-		PlayButtonSound(client);
-	}
-
 	// Get client name
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
 	// Get runtime and format it to a string
 	g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
+	g_fFinalTime[client] = g_stageFinalTime[client];
+
     FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
 	
 
 	// Get Zonegroup (Ejemplo bonus 1, 2, 3, etc)
-	int zGroup = g_iClientInZone[client][2];
+	int zGroup = g_doingStage[client];
 
 	//LO QUE NECESITO ES ZONETYPEID +1 Y CONSIGO EN QUE STAGE ESTA :D
 
@@ -613,7 +605,7 @@ public void CL_OnEndStageTimerPress(int client)
 		if (g_iStageCount[zGroup] > 0)
 		{  // If the server already has a stage record
 			if (g_stageFinalTime[client] < g_stageFastest[zGroup])
-			{  // New fastest time in current bonus
+			{  // New fastest time in current stage
 				g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
 				g_stageFastest[zGroup] = g_stageFinalTime[client];
 				Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
@@ -626,12 +618,33 @@ public void CL_OnEndStageTimerPress(int client)
 			g_stageFastest[zGroup] = g_stageFinalTime[client];
 			Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);
-            PrintToChat(client, "[%cCK%c] Terminaste el stage %i en %s", MOSSGREEN, WHITE, g_doingStage[client], g_stageFinalTimeStr[client]);
 			g_stageSRVRecord[client] = true;
 			g_stageFirstRecord[client] = true;
 			g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
-			db_insertStageRecord(client, g_szSteamID[client], szName, g_stageFinalTime[client], g_doingStage[client]);
 		}
+
+
+		if (g_fPersonalRecordStage[zGroup][client] == 0.0)
+		{  // Clients first record
+			g_fPersonalRecordStage[zGroup][client] = g_fFinalTime[client];
+			FormatTimeFloat(1, g_fPersonalRecordStage[zGroup][client], 3, g_szPersonalRecordStage[zGroup][client], 64);
+			
+			g_stageFirstRecord[client] = true;
+			g_pr_showmsg[client] = true;
+			db_insertStageRecord(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
+		}
+		else if (diff > 0.0)
+		{  // client's new record
+			g_fPersonalRecordStage[zGroup][client] = g_fFinalTime[client];
+			FormatTimeFloat(1, g_fPersonalRecordStage[zGroup][client], 3, g_szPersonalRecordStage[zGroup][client], 64);
+			
+			g_stagePBRecord[client] = true;
+			g_pr_showmsg[client] = true;
+			db_updateStageRecord(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
+		}
+
+        PrintToChat(client, "[%cCK%c] Terminaste el stage %i en %s", MOSSGREEN, WHITE, g_doingStage[client], g_stageFinalTimeStr[client]);
+		
 
 
 	}

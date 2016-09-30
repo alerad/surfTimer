@@ -278,6 +278,7 @@ bool g_bhasBonus;												// Does map have a bonus?
 /*----------  Stage variables 		----------*/
 int g_OldMapRankStage[MAXZONEGROUPS][MAXPLAYERS + 1];			// Old rank in Stage
 int g_MapRankStage[MAXZONEGROUPS][MAXPLAYERS + 1];				// Clients personal Stage rank in the current map
+char g_szPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1][64]; // Personal bonus record in 00:00:00 format
 float g_fPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1]; 	// Clients personal stage record in the current map
 int g_iStageCount[MAXZONEGROUPS]; 								// Amount of players that have passed the stage in current map
 float g_stageFastest[MAXZONEGROUPS]; 							// Fastest stage time in the current map

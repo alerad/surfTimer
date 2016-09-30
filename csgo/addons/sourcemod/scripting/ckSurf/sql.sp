@@ -61,6 +61,7 @@ char sql_selectPlayerRankStage[] = "SELECT name FROM ar_stage WHERE runtime <= (
 char sql_selectFastestStage[] = "SELECT name, MIN(runtime), zonegroup FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup;";
 char sql_selectAllStageTimesinMap[] = "SELECT zonegroup, runtime from ar_stage WHERE mapname = '%s';";
 char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
+char sql_selectStageCount[] = "SELECT zonegroup, count(1) FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup";
 char sql_selectTopStageSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ar_stage as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
 
 
@@ -1127,8 +1128,10 @@ public void sql_selectPlayerProCountCallback(Handle owner, Handle hndl, const ch
 	if (hndl == null)
 	{
 		LogError("[ckSurf] SQL Error (sql_selectPlayerProCountCallback): %s", error);
-		if (!g_bServerDataLoaded)
+		if (!g_bServerDataLoaded){
 			db_viewFastestBonus();
+			db_viewFastestStage();
+		}
 		return;
 	}
 	
@@ -1137,8 +1140,10 @@ public void sql_selectPlayerProCountCallback(Handle owner, Handle hndl, const ch
 	else
 		g_MapTimesCount = 0;
 	
-	if (!g_bServerDataLoaded)
+	if (!g_bServerDataLoaded){
 		db_viewFastestBonus();
+		db_viewFastestStage();
+	}
 	
 	return;
 }
@@ -4546,6 +4551,92 @@ public void SQL_selectBonusCountCallback(Handle owner, Handle hndl, const char[]
 ////////////////////////////
 ////   Stage Records   /////
 ////////////////////////////
+public void db_viewFastestStage()
+{
+	char szQuery[1024];
+	//SELECT name, MIN(runtime), zonegroup FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup;
+	Format(szQuery, 1024, sql_selectFastestStage, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_selectFastestStageCallback, szQuery, 1, DBPrio_High);
+}
+
+public void SQL_selectFastestStageCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (SQL_selectFastestStageCallback): %s", error);
+		
+		if (!g_bServerDataLoaded)
+			db_viewStageTotalCount();
+		return;
+	}
+	
+	for (int i = 0; i < MAXZONEGROUPS; i++)
+	{
+		Format(g_szStageFastestTime[i], 64, "N/A");
+		g_stageFastest[i] = 9999999.0;
+	}
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		int zonegroup;
+		while (SQL_FetchRow(hndl))
+		{
+			zonegroup = SQL_FetchInt(hndl, 2);
+			SQL_FetchString(hndl, 0, g_szStageFastest[zonegroup], MAX_NAME_LENGTH);
+			g_stageFastest[zonegroup] = SQL_FetchFloat(hndl, 1);
+			
+			FormatTimeFloat(1, g_stageFastest[zonegroup], 3, g_szStageFastestTime[zonegroup], 64);
+		}
+	}
+	
+	for (int i = 0; i < MAXZONEGROUPS; i++)
+	{
+		if (g_stageFastest[i] == 0.0)
+			g_stageFastest[i] = 9999999.0;
+	}
+	
+	if (!g_bServerDataLoaded)
+		db_viewStageTotalCount();
+	
+	return;
+}
+
+public void db_viewStageTotalCount()
+{
+	char szQuery[1024];
+	//"SELECT zonegroup, count(1) FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup";
+	Format(szQuery, 1024, sql_selectStageCount, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_selectStageTotalCountCallback, szQuery, 1, DBPrio_Low);
+}
+
+public void SQL_selectStageTotalCountCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (SQL_selectStageTotalCountCallback): %s", error);
+		if (!g_bServerDataLoaded)
+			db_selectMapTier();
+		return;
+	}
+	
+	for (int i = 1; i < MAXZONEGROUPS; i++)
+		g_iStageCount[i] = 0;
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		int zonegroup;
+		while (SQL_FetchRow(hndl))
+		{
+			zonegroup = SQL_FetchInt(hndl, 0);
+			g_iStageCount[zonegroup] = SQL_FetchInt(hndl, 1);
+		}
+	}
+	
+	if (!g_bServerDataLoaded)
+		db_selectMapTier();
+	
+	return;
+}
 
 public void db_currentStageRunRank(int client, int zGroup)
 {
@@ -4607,6 +4698,37 @@ public void SQL_insertStageRecordCallback(Handle owner, Handle hndl, const char[
 	
 	db_viewMapRankStageRecord(client, zgroup, 1);
 	// Change to update profile timer, if giving multiplier count or extra points for bonuses
+	CalculatePlayerRank(client);
+}
+
+public void db_updateStageRecord(int client, char szSteamId[32], char szUName[32], float FinalTime, int zoneGrp)
+{
+	char szQuery[1024];
+	char szName[MAX_NAME_LENGTH * 2 + 1];
+	Handle datapack = CreateDataPack();
+	WritePackCell(datapack, client);
+	WritePackCell(datapack, zoneGrp);
+	SQL_EscapeString(g_hDb, szUName, szName, MAX_NAME_LENGTH * 2 + 1);
+	Format(szQuery, 1024, sql_updateStageRecord, FinalTime, szName, szSteamId, g_szMapName, zoneGrp);
+	SQL_TQuery(g_hDb, SQL_updateStageRecordCallback, szQuery, datapack, DBPrio_Low);
+}
+
+
+public void SQL_updateStageRecordCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (SQL_updateBonusCallback): %s", error);
+		return;
+	}
+	
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	int zgroup = ReadPackCell(data);
+	CloseHandle(data);
+	
+	db_viewMapRankStageRecord(client, zgroup, 2);
+	
 	CalculatePlayerRank(client);
 }
 
