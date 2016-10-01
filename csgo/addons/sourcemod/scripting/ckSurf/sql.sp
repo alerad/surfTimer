@@ -63,7 +63,7 @@ char sql_selectAllStageTimesinMap[] = "SELECT zonegroup, runtime from ar_stage W
 char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
 char sql_selectStageCount[] = "SELECT zonegroup, count(1) FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup";
 char sql_selectTopStageSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ar_stage as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
-
+char sql_selectTotalStageCount[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 9 GROUP BY mapname, zonegroup;";
 
 
 //TABLE BONUS
@@ -1426,6 +1426,76 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 		}
 	}
 	
+	// Next up, calculate stage points:
+	char szQuery[512];
+	Format(szQuery, 512, "SELECT mapname, (SELECT count(1)+1 FROM ar_stage b WHERE a.mapname=b.mapname AND a.runtime > b.runtime AND a.zonegroup = b.zonegroup) AS rank, (SELECT count(1) FROM ar_stage b WHERE a.mapname = b.mapname AND a.zonegroup = b.zonegroup) as total FROM ar_stage a WHERE steamid = '%s';", szSteamId);
+	SQL_TQuery(g_hDb, sql_CountFinishedStageCallback, szQuery, client, DBPrio_Low);
+}
+
+// 4. Calculate points gained from bonuses
+// Fetched values
+// mapname, rank, total
+//
+public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (sql_CountFinishedBonusCallback): %s", error);
+		return;
+	}
+	
+	
+	char szMap[128], szSteamId[32], szMapName2[128];
+	int totalplayers, rank;
+	
+	getSteamIDFromClient(client, szSteamId, 32);
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		while (SQL_FetchRow(hndl))
+		{
+			// Total amount of players who have finished the bonus
+			totalplayers = SQL_FetchInt(hndl, 2);
+			rank = SQL_FetchInt(hndl, 1);
+			SQL_FetchString(hndl, 0, szMap, 128);
+			for (int i = 0; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
+			{
+				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
+				if (StrEqual(szMapName2, szMap, false))
+				{
+					LogError("Rank del wachin %i", rank);
+					float percentage = 1.0 + ((1.0 / float(totalplayers)) - (float(rank) / float(totalplayers)));
+					g_pr_points[client] += RoundToCeil(100.0 * percentage);
+					switch (rank)
+					{
+						case 1:g_pr_points[client] += 95;
+						case 2:g_pr_points[client] += 85;
+						case 3:g_pr_points[client] += 80;
+						case 4:g_pr_points[client] += 75;
+						case 5:g_pr_points[client] += 65;
+						case 6:g_pr_points[client] += 60;
+						case 7:g_pr_points[client] += 55;
+						case 8:g_pr_points[client] += 50;
+						case 9:g_pr_points[client] += 45;
+						case 10:g_pr_points[client] += 40;
+						case 11:g_pr_points[client] += 35;
+						case 12:g_pr_points[client] += 30;
+						case 13:g_pr_points[client] += 25;
+						case 14:g_pr_points[client] += 20;
+						case 15:g_pr_points[client] += 15;
+						case 16:g_pr_points[client] += 10;
+						case 17:g_pr_points[client] += 9;
+						case 18:g_pr_points[client] += 8;
+						case 19:g_pr_points[client] += 7;
+						case 20:g_pr_points[client] += 5;
+					}
+					break;
+				}
+			}
+		}
+	}
+	LogError("g_pr_points %i", g_pr_points[client]);
+	
 	// Next up: Points from maps
 	char szQuery[512];
 	Format(szQuery, 512, "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro) AS rank, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname) as total FROM ck_playertimes a where steamid = '%s';", szSteamId);
@@ -1444,6 +1514,8 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 		LogError("[ckSurf] SQL Error (sql_CountFinishedMapsCallback): %s", error);
 		return;
 	}
+
+	LogError("Entra en sql_CountFinishedMapsCallback");
 	
 	char szMap[128], szMapName2[128];
 	int finishedMaps = 0, totalplayers, rank;
@@ -4761,7 +4833,6 @@ public void db_viewMapRankStageRecordCallback(Handle owner, Handle hndl, const c
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
 	{
 		g_MapRankStage[zgroup][client] = SQL_GetRowCount(hndl);
-		LogError("MAP RANK STAGE IS %i", g_MapRankStage[zgroup][client]);
 	}
 	else
 	{
@@ -4817,61 +4888,6 @@ public void SQL_selectStageCountCallback(Handle owner, Handle hndl, const char[]
 	}
 	SetSkillGroups();
 }
-
-public void db_viewFastestStage()
-{
-	char szQuery[1024];
-	//SELECT name, MIN(runtime), zonegroup FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup;
-	Format(szQuery, 1024, sql_selectFastestStage, g_szMapName);
-	SQL_TQuery(g_hDb, SQL_selectFastestStageCallback, szQuery, 1, DBPrio_High);
-}
-
-public void SQL_selectFastestStageCallback(Handle owner, Handle hndl, const char[] error, any data)
-{
-	if (hndl == null)
-	{
-		LogError("[ckSurf] SQL Error (SQL_selectFastestStageCallback): %s", error);
-		
-		if (!g_bServerDataLoaded)
-			db_viewStageTotalCount();
-		return;
-	}
-	
-	for (int i = 0; i < MAXZONEGROUPS; i++)
-	{
-		Format(g_szStageFastestTime[i], 64, "N/A");
-		g_stageFastest[i] = 9999999.0;
-	}
-	
-	if (SQL_HasResultSet(hndl))
-	{
-		int zonegroup;
-		while (SQL_FetchRow(hndl))
-		{
-			zonegroup = SQL_FetchInt(hndl, 2);
-			SQL_FetchString(hndl, 0, g_szStageFastest[zonegroup], MAX_NAME_LENGTH);
-			g_stageFastest[zonegroup] = SQL_FetchFloat(hndl, 1);
-			
-			FormatTimeFloat(1, g_stageFastest[zonegroup], 3, g_szStageFastestTime[zonegroup], 64);
-		}
-	}
-	
-	for (int i = 0; i < MAXZONEGROUPS; i++)
-	{
-		if (g_stageFastest[i] == 0.0)
-			g_stageFastest[i] = 9999999.0;
-	}
-	
-	if (!g_bServerDataLoaded)
-		db_viewStageTotalCount();
-	
-	return;
-}
-
-
-
-
-
 
 
 ////////////////////////////

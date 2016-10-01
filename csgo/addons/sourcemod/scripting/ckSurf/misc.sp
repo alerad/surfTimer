@@ -1986,7 +1986,6 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 		(GetConVarInt(g_hAnnounceRecord) == 2 && g_stageSRVRecord[client])) &&
 		(rank <= GetConVarInt(g_hAnnounceRank) || GetConVarInt(g_hAnnounceRank) == 0))
 	{
-		LogError("g_stageFirstRecord %s, g_stageSRVRecord %s, g_stagePBRecord %s", g_stageFirstRecord[client] ? "true" : "false", g_stageSRVRecord[client] ? "true" : "false", g_stagePBRecord[client] ? "true" : "false");
 		if (g_stageSRVRecord[client])
 		{
 			PlayRecordSound(1);
@@ -2334,7 +2333,7 @@ public void SetSkillGroups()
 		mapcount = g_pr_MapCount;
 
 	g_pr_PointUnit = 1;
-	float MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 400.0) + (float(g_totalStageCount) * 150);
+	float MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 400.0) + (float(g_totalStageCount) * 175);
 	
 	// Load rank cfg
 	char sPath[PLATFORM_MAX_PATH];
