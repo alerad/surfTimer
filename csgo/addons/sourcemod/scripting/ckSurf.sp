@@ -286,6 +286,7 @@ char g_szStageFastestTime[MAXZONEGROUPS][64]; 					// Fastest stage time in 00:0
 char g_szStageFastest[MAXZONEGROUPS][MAX_NAME_LENGTH]; 			// Name of the #1 in the current maps stage
 float g_fOldStageRecordTime[MAXZONEGROUPS];						// Old record time, for prints + counting
 int g_tmpStageCount[MAXZONEGROUPS];								// Used to make sure bonus finished prints are correct
+int g_totalStageCount; 											// How many total bonuses there are
 
 /*----------  Checkpoint variables  ----------*/
 float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT]; // Clients best run's times

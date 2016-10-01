@@ -4780,7 +4780,93 @@ public void db_viewMapRankStageRecordCallback(Handle owner, Handle hndl, const c
 	}
 }
 
+public void db_selectStageCount()
+{
+	char szQuery[258];
+	Format(szQuery, 258, sql_selectTotalStageCount);
+	SQL_TQuery(g_hDb, SQL_selectStageCountCallback, szQuery, 1, DBPrio_Low);
+}
 
+public void SQL_selectStageCountCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (SQL_selectStageCountCallback): %s", error);
+		return;
+	}
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		char mapName[128];
+		char mapName2[128];
+		g_totalStageCount = 0;
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 0, mapName2, 128);
+			for (int i = 0; i < GetArraySize(g_MapList); i++)
+			{
+				GetArrayString(g_MapList, i, mapName, 128);
+				if (StrEqual(mapName, mapName2, false))
+					g_totalStageCount++;
+			}
+		}
+	}
+	else
+	{
+		g_totalStageCount = 0;
+	}
+	SetSkillGroups();
+}
+
+public void db_viewFastestStage()
+{
+	char szQuery[1024];
+	//SELECT name, MIN(runtime), zonegroup FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup;
+	Format(szQuery, 1024, sql_selectFastestStage, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_selectFastestStageCallback, szQuery, 1, DBPrio_High);
+}
+
+public void SQL_selectFastestStageCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (SQL_selectFastestStageCallback): %s", error);
+		
+		if (!g_bServerDataLoaded)
+			db_viewStageTotalCount();
+		return;
+	}
+	
+	for (int i = 0; i < MAXZONEGROUPS; i++)
+	{
+		Format(g_szStageFastestTime[i], 64, "N/A");
+		g_stageFastest[i] = 9999999.0;
+	}
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		int zonegroup;
+		while (SQL_FetchRow(hndl))
+		{
+			zonegroup = SQL_FetchInt(hndl, 2);
+			SQL_FetchString(hndl, 0, g_szStageFastest[zonegroup], MAX_NAME_LENGTH);
+			g_stageFastest[zonegroup] = SQL_FetchFloat(hndl, 1);
+			
+			FormatTimeFloat(1, g_stageFastest[zonegroup], 3, g_szStageFastestTime[zonegroup], 64);
+		}
+	}
+	
+	for (int i = 0; i < MAXZONEGROUPS; i++)
+	{
+		if (g_stageFastest[i] == 0.0)
+			g_stageFastest[i] = 9999999.0;
+	}
+	
+	if (!g_bServerDataLoaded)
+		db_viewStageTotalCount();
+	
+	return;
+}
 
 
 
@@ -5055,6 +5141,7 @@ public void SQLTxn_ZoneGroupRemovalSuccess(Handle db, any client, int numQueries
 	db_selectMapZones();
 	db_viewFastestBonus();
 	db_viewBonusTotalCount();
+	db_viewStageTotalCount();
 	db_viewRecordCheckpointInMap();
 
 	if (IsValidClient(client))

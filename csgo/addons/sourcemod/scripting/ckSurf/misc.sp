@@ -1248,7 +1248,7 @@ public void LimitSpeed(int client)
 	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0)
 		speedCap = GetConVarFloat(g_hBonusPreSpeed);
 	else
-		if (g_iClientInZone[client][0] == 1)
+		if (g_iClientInZone[client][0] == 1 && (GetEntityFlags(client) & FL_ONGROUND))
 			speedCap = GetConVarFloat(g_hStartPreSpeed);
 		else
 			if (g_iClientInZone[client][0] == 5)
@@ -2334,7 +2334,7 @@ public void SetSkillGroups()
 		mapcount = g_pr_MapCount;
 
 	g_pr_PointUnit = 1;
-	float MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 400.0);
+	float MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 400.0) + (float(g_totalStageCount) * 150);
 	
 	// Load rank cfg
 	char sPath[PLATFORM_MAX_PATH];
