@@ -1686,7 +1686,7 @@ public int CompareSelectMenuHandler(Menu menu, MenuAction action, int param1, in
 			if (IsValidClient(i) && i != param1)
 			{
 				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-				if (StrEqual(info, szPlayerName))
+					if (StrEqual(info, szPlayerName))
 				{
 					db_viewPlayerRank2(param1, g_szSteamID[param1]);
 				}
@@ -1893,6 +1893,68 @@ public Action Client_Ranks(int client, int args)
 			Format(ChatLine, 512, "%s%s%c (%ip)   ", ChatLine, RankValue[RankNameColored], WHITE, RankValue[PointReq]);
 		}
 		PrintToChat(client, ChatLine);
+	}
+	return Plugin_Handled;
+}
+
+/**
+* Displays client map stats panel, shows rank for each stage, bonus and map itself.
+*/
+public Action Client_MapStats(int client, int args)
+{
+	if (IsValidClient(client))
+	{
+		char szValue[128];
+		// char szTime[32];
+		char szSteamId[32];
+		getSteamIDFromClient(client, szSteamId, 32);
+		int i,b;
+
+		Menu mapInfoMenu = new Menu(MapMenuHandler1);
+		mapInfoMenu.Pagination = 10;
+
+		//Adds map time
+		Format(szValue, 128, "[Map Time]: %s | Rank: %i/%i", g_szPersonalRecord[client] ,g_MapRank[client] ,g_MapTimesCount);
+		mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
+
+		LogError("bonusCount %i", g_totalBonusCount);
+		int bonusCount = g_mapZoneGroupCount;
+		for (i= 1; i<=bonusCount; i++){
+			float bonusTime = g_fPersonalRecordBonus[i][client];
+			if (bonusTime>0) {
+				Format(szValue, 128, "[Bonus %i Time]: %s | Rank: %i/%i", i, g_szPersonalRecordBonus[i][client] ,g_MapRankBonus[i][client] ,g_iBonusCount[i]);
+				mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
+			} else{
+				Format(szValue, 128, "No times for Bonus %i", (i));
+				mapInfoMenu.AddItem(szValue, szValue);
+			}
+			
+		}
+
+		
+
+		// Counts stages and creates strings
+		int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3]);
+		Handle stringArray = CreateArray(stageCount);
+	
+		for (i= 1; i<=stageCount; i++){
+			float stageTime = g_fPersonalRecordStage[i][client];
+			LogError("Aca vamo a ver porque se ormpe todo %f, ITERATOR %i", stageTime, i);
+			// Format(szTime, 32, "Time: %f", stageTime);
+			if (stageTime>0){
+				Format(szValue, 128, "[Stage %i Time]: %s | Rank %i/%i", (i), g_szPersonalRecordStage[i][client], g_MapRankStage[i][client], g_iStageCount[i]);
+				mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
+			}
+			PushArrayString(stringArray, szValue);
+			b=i;
+		}
+
+		char title[64];
+		Format(title, 64, "Map Statistics");
+		mapInfoMenu.SetTitle(title);
+		mapInfoMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
+		mapInfoMenu.Display(client, MENU_TIME_FOREVER);
+		CloseHandle(stringArray);
 	}
 	return Plugin_Handled;
 }

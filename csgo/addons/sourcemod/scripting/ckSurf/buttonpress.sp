@@ -562,6 +562,12 @@ public void CL_OnEndStageTimerPress(int client)
 	if (!IsValidClient(client))
 		return;
 
+	int inStageEnd = g_iClientInZone[client][1]+1;
+	if (inStageEnd != g_doingStage[client]){
+		PrintToChat(client, "[%cCK%c] This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin.", MOSSGREEN, WHITE);
+		return;
+	}
+
 	// Get client name
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);

@@ -63,7 +63,7 @@ char sql_selectAllStageTimesinMap[] = "SELECT zonegroup, runtime from ar_stage W
 char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
 char sql_selectStageCount[] = "SELECT zonegroup, count(1) FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup";
 char sql_selectTopStageSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ar_stage as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
-char sql_selectTotalStageCount[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 9 GROUP BY mapname, zonegroup;";
+char sql_selectTotalStageCount[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 3 GROUP BY mapname, zonegroup;";
 
 
 //TABLE BONUS
@@ -1173,8 +1173,10 @@ public void db_viewMapRankProCallback(Handle owner, Handle hndl, const char[] er
 	{
 		g_MapRank[client] = SQL_GetRowCount(hndl);
 	}
-	if (!g_bSettingsLoaded[client])
+	if (!g_bSettingsLoaded[client]){
 		db_viewPersonalBonusRecords(client, g_szSteamID[client]);
+		db_viewPersonalStageRecords(client, g_szSteamID[client]);
+	}
 }
 
 //
@@ -3767,8 +3769,10 @@ public void SQL_selectPersonalRecordsCallback(Handle owner, Handle hndl, const c
 	if (hndl == null)
 	{
 		LogError("[ckSurf] SQL Error (SQL_selectPersonalRecordsCallback): %s", error);
-		if (!g_bSettingsLoaded[client])
+		if (!g_bSettingsLoaded[client]) {
 			db_viewPersonalBonusRecords(client, g_szSteamID[client]);
+			db_viewPersonalStageRecords(client, g_szSteamID[client]);
+		}
 		return;
 	}
 	
@@ -3790,8 +3794,10 @@ public void SQL_selectPersonalRecordsCallback(Handle owner, Handle hndl, const c
 			g_fPersonalRecord[client] = 0.0;
 		}
 	}
-	if (!g_bSettingsLoaded[client])
+	if (!g_bSettingsLoaded[client]){
 		db_viewPersonalBonusRecords(client, g_szSteamID[client]);
+		db_viewPersonalStageRecords(client, g_szSteamID[client]);
+	}
 	return;
 }
 
@@ -4890,6 +4896,56 @@ public void SQL_selectStageCountCallback(Handle owner, Handle hndl, const char[]
 }
 
 
+public void db_viewPersonalStageRecords(int client, char szSteamId[32])
+{
+	char szQuery[1024];
+	//"SELECT runtime, zonegroup FROM ck_Stage WHERE steamid = '%s' AND mapname = '%s' AND runtime > '0.0'"; 
+	Format(szQuery, 1024, sql_selectPersonalStageRecords, szSteamId, g_szMapName);
+	SQL_TQuery(g_hDb, SQL_selectPersonalStageRecordsCallback, szQuery, client, DBPrio_Low);
+}
+
+public void SQL_selectPersonalStageRecordsCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (SQL_selectPersonalStageRecordsCallback): %s", error);
+		if (!g_bSettingsLoaded[client])
+			db_viewPlayerPoints(client);
+		return;
+	}
+	
+	int zgroup;
+	
+	for (int i = 0; i < MAXZONEGROUPS; i++)
+	{
+		g_fPersonalRecordStage[i][client] = 0.0;
+		Format(g_szPersonalRecordStage[i][client], 64, "N/A");
+	}
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		while (SQL_FetchRow(hndl))
+		{
+			zgroup = SQL_FetchInt(hndl, 1);
+			g_fPersonalRecordStage[zgroup][client] = SQL_FetchFloat(hndl, 0);
+			
+			if (g_fPersonalRecordStage[zgroup][client] > 0.0)
+			{
+				FormatTimeFloat(client, g_fPersonalRecordStage[zgroup][client], 3, g_szPersonalRecordStage[zgroup][client], 64);
+				db_viewMapRankStageRecord(client, zgroup, 0); // get rank
+			}
+			else
+			{
+				Format(g_szPersonalRecordStage[zgroup][client], 64, "N/A");
+				g_fPersonalRecordStage[zgroup][client] = 0.0;
+			}
+		}
+	}
+	if (!g_bSettingsLoaded[client])
+		db_viewPlayerPoints(client);
+	return;
+}
+
 ////////////////////////////
 //// SQL Zones /////////////
 ////////////////////////////
@@ -5972,6 +6028,111 @@ public void SQL_db_CalcAvgRunStageTimeCallback(Handle owner, Handle hndl, const 
 	
 	return;
 }
+
+public void db_selectStageTopSurfers(int client, char mapname[128], int zGrp)
+{
+	char szQuery[1024];
+	Format(szQuery, 1024, sql_selectTopStageSurfers, PERCENT, mapname, PERCENT, zGrp);
+	Handle pack = CreateDataPack();
+	WritePackCell(pack, client);
+	WritePackString(pack, mapname);
+	WritePackCell(pack, zGrp);
+	SQL_TQuery(g_hDb, sql_selectTopStageSurfersCallback, szQuery, pack, DBPrio_Low);
+}
+
+public void sql_selectTopStageSurfersCallback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (sql_selectTopStageSurfersCallback): %s", error);
+		return;
+	}
+	
+	ResetPack(data);
+	int client = ReadPackCell(data);
+	char szMap[128];
+	ReadPackString(data, szMap, 128);
+	int zGrp = ReadPackCell(data);
+	CloseHandle(data);
+	
+	char szFirstMap[128], szValue[128], szName[64], szSteamID[32], lineBuf[256], title[256];
+	float time;
+	bool bduplicat = false;
+	Handle stringArray = CreateArray(100);
+	Menu topMenu;
+	
+	if (StrEqual(szMap, g_szMapName))
+		topMenu = new Menu(MapMenuHandler1);
+	else
+		topMenu = new Menu(MapTopMenuHandler2);
+	
+	topMenu.Pagination = 5;
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		int i = 1;
+		while (SQL_FetchRow(hndl))
+		{
+			bduplicat = false;
+			SQL_FetchString(hndl, 0, szSteamID, 32);
+			SQL_FetchString(hndl, 1, szName, 64);
+			time = SQL_FetchFloat(hndl, 2);
+			SQL_FetchString(hndl, 4, szMap, 128);
+			if (i == 1 || (i > 1 && StrEqual(szFirstMap, szMap)))
+			{
+				int stringArraySize = GetArraySize(stringArray);
+				for (int x = 0; x < stringArraySize; x++)
+				{
+					GetArrayString(stringArray, x, lineBuf, sizeof(lineBuf));
+					if (StrEqual(lineBuf, szName, false))
+						bduplicat = true;
+				}
+				if (bduplicat == false && i < 51)
+				{
+					char szTime[32];
+					FormatTimeFloat(client, time, 3, szTime, sizeof(szTime));
+					if (time < 3600.0)
+						Format(szTime, 32, "   %s", szTime);
+					if (i == 100)
+						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+					if (i >= 10)
+						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+					else
+						Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
+					topMenu.AddItem(szSteamID, szValue, ITEMDRAW_DEFAULT);
+					PushArrayString(stringArray, szName);
+					if (i == 1)
+						Format(szFirstMap, 128, "%s", szMap);
+					i++;
+				}
+			}
+		}
+		if (i == 1)
+		{
+			PrintToChat(client, "%t", "NoTopRecords", MOSSGREEN, WHITE, szMap);
+		}
+	}
+	else
+		PrintToChat(client, "%t", "NoTopRecords", MOSSGREEN, WHITE, szMap);
+	Format(title, 256, "Top 50 Times on %s (B %i) \n    Rank    Time               Player", szFirstMap, zGrp);
+	topMenu.SetTitle(title);
+	topMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
+	topMenu.Display(client, MENU_TIME_FOREVER);
+	CloseHandle(stringArray);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 public void db_GetDynamicTimelimit()
 {

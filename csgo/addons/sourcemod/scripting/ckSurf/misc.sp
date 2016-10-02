@@ -2333,7 +2333,7 @@ public void SetSkillGroups()
 		mapcount = g_pr_MapCount;
 
 	g_pr_PointUnit = 1;
-	float MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 400.0) + (float(g_totalStageCount) * 175);
+	float MaxPoints = (float(mapcount) * 700.0) + (float(g_totalBonusCount) * 400.0) + (float(g_totalStageCount) * 185);
 	
 	// Load rank cfg
 	char sPath[PLATFORM_MAX_PATH];

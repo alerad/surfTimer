@@ -103,7 +103,7 @@
 // Zone definitions
 #define ZONE_MODEL "models/props/de_train/barrel.mdl"
 #define ZONEAMOUNT 10		// The amount of different type of zones	-	Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
-#define MAXZONEGROUPS 11	// Maximum amount of zonegroups in a map
+#define MAXZONEGROUPS 40	// Maximum amount of zonegroups in a map
 #define MAXZONES 128		// Maximum amount of zones in a map
 
 // Ranking definitions
@@ -278,8 +278,8 @@ bool g_bhasBonus;												// Does map have a bonus?
 /*----------  Stage variables 		----------*/
 int g_OldMapRankStage[MAXZONEGROUPS][MAXPLAYERS + 1];			// Old rank in Stage
 int g_MapRankStage[MAXZONEGROUPS][MAXPLAYERS + 1];				// Clients personal Stage rank in the current map
-char g_szPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1][64]; // Personal bonus record in 00:00:00 format
-float g_fPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1]; 	// Clients personal stage record in the current map
+char g_szPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1][64];// Personal bonus record in 00:00:00 format
+float g_fPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1]; 				// Clients personal stage record in the current map
 int g_iStageCount[MAXZONEGROUPS]; 								// Amount of players that have passed the stage in current map
 float g_stageFastest[MAXZONEGROUPS]; 							// Fastest stage time in the current map
 char g_szStageFastestTime[MAXZONEGROUPS][64]; 					// Fastest stage time in 00:00:00:00 format
@@ -1914,6 +1914,7 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_btop", Client_BonusTop, "[ckSurf] displays top rankings of the bonus");
 	RegConsoleCmd("sm_stop", Client_Stop, "[ckSurf] stops your timer");
 	RegConsoleCmd("sm_ranks", Client_Ranks, "[ckSurf] prints in chat the available player ranks");
+	RegConsoleCmd("sm_mapstats", Client_MapStats, "[ckSurf] displays panel with map ranks information");
 	RegConsoleCmd("sm_pause", Client_Pause, "[ckSurf] on/off pause (timer on hold and movement frozen)");
 	RegConsoleCmd("sm_showsettings", Client_Showsettings, "[ckSurf] shows ckSurf server settings");
 	RegConsoleCmd("sm_latest", Client_Latest, "[ckSurf] shows latest map records");
