@@ -552,6 +552,24 @@ public int MenuHandler_SelectBonusTop(Menu sMenu, MenuAction action, int client,
 	}
 }
 
+public int MenuHandler_SelectStageTop(Menu sMenu, MenuAction action, int client, int item)
+{
+	switch (action)
+	{
+		case MenuAction_Select:
+		{
+			char aID[3];
+			GetMenuItem(sMenu, item, aID, sizeof(aID));
+			int zoneGrp = StringToInt(aID);
+			db_selectStageTopSurfers(client, g_szMapName, zoneGrp);
+		}
+		case MenuAction_End:
+		{
+			delete sMenu;
+		}
+	}
+}
+
 
 public int MenuHandler_SelectBonus(Menu sMenu, MenuAction action, int client, int item)
 {
@@ -631,12 +649,13 @@ public void ListStages(int client, int zonegroup)
 	SetMenuTitle(sMenu, "Stage selector");
 	int amount = 0;
 	char StageName[64], ZoneInfo[6];
+	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 	
 	int StageIds[MAXZONES] =  { -1, ... };
 	
-	if (g_mapZonesCount > 0)
+	if (stageCount > 0)
 	{
-		for (int i = 0; i <= g_mapZonesCount; i++)
+		for (int i = 0; i <= stageCount; i++)
 		{
 			if (g_mapZones[i][zoneType] == 3 && g_mapZones[i][zoneGroup] == zonegroup)
 			{
@@ -1423,6 +1442,83 @@ public Action Client_BonusTop(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Client_StageTop(int client, int args)
+{
+	char szArg[128], zGrp;
+	
+	if (!IsValidClient(client))
+		return Plugin_Handled;
+	
+	switch (args) {
+		case 0: {  // !btop
+			if (g_mapZoneGroupCount == 1)
+			{
+				PrintToChat(client, "[%cCK%c] No stage found on this map.", MOSSGREEN, WHITE);
+				PrintToChat(client, "[%cCK%c] Usage: !stagetop <stage number> <mapname>", MOSSGREEN, WHITE);
+				return Plugin_Handled;
+			}
+			if (g_mapZoneGroupCount == 2)
+			{
+				zGrp = 1;
+				Format(szArg, 128, "%s", g_szMapName);
+			}
+			if (g_mapZoneGroupCount > 2)
+			{
+				ListStageRecords(client, 2);
+				return Plugin_Handled;
+			}
+		}
+		case 1: {  //!btop <mapname> / <bonus id>
+			// 1st check if bonus id or mapname
+			GetCmdArg(1, szArg, 128);
+			if (StringToInt(szArg) == 0 && szArg[0] != '0') // passes, if not a number (argument is mapname)
+			{
+				db_selectStagesInMap(client, szArg);
+				return Plugin_Handled;
+			}
+			else // argument is a bonus id (Use current map)
+			{
+				zGrp = StringToInt(szArg);
+				if (0 < zGrp < MAXZONEGROUPS)
+				{
+					Format(szArg, 128, "%s", g_szMapName);
+				}
+				else
+				{
+					PrintToChat(client, "[%cCK%c] Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+					return Plugin_Handled;
+				}
+			}
+		}
+		case 2: {
+			GetCmdArg(1, szArg, 128);
+			if (StringToInt(szArg) != 0 && szArg[0] != '0') // passes, if not a number (argument is mapname)
+			{
+				char szZGrp[128];
+				GetCmdArg(2, szZGrp, 128);
+				zGrp = StringToInt(szZGrp);
+			}
+			else // argument is a bonus id
+			{
+				zGrp = StringToInt(szArg);
+				GetCmdArg(2, szArg, 128);
+			}
+			
+			if (0 > zGrp || zGrp > MAXZONEGROUPS)
+			{
+				PrintToChat(client, "[%cCK%c] Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+				return Plugin_Handled;
+			}
+		}
+		default: {
+			PrintToChat(client, "[%cCK%c] Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
+			return Plugin_Handled;
+		}
+	}
+	db_selectStageTopSurfers(client, szArg, zGrp);
+	return Plugin_Handled;
+}
+
 
 public Action Client_Spec(int client, int args)
 {
@@ -1900,6 +1996,45 @@ public Action Client_Ranks(int client, int args)
 /**
 * Displays client map stats panel, shows rank for each stage, bonus and map itself.
 */
+public Action Client_StageStats(int client, int args)
+{
+
+	char szValue[128];
+	// char szTime[32];
+	char szSteamId[32];
+	getSteamIDFromClient(client, szSteamId, 32);
+	int i,b;
+	char szPlayerName[MAX_NAME_LENGTH];
+	GetClientName(client, szPlayerName, MAX_NAME_LENGTH);
+	Menu mapInfoMenu = new Menu(MapMenuHandler1);
+	mapInfoMenu.Pagination = 10;
+	// Counts stages and creates strings
+	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+	Handle stringArray = CreateArray(stageCount);
+
+	for (i= 1; i<=stageCount; i++){
+		float stageTime = g_fPersonalRecordStage[i][client];
+		LogError("Aca vamo a ver porque se ormpe todo %f, ITERATOR %i", stageTime, i);
+		// Format(szTime, 32, "Time: %f", stageTime);
+		if (stageTime>0){
+			Format(szValue, 128, "[Stage %i Time]: %s | Rank %i/%i", (i), g_szPersonalRecordStage[i][client], g_MapRankStage[i][client], g_iStageCount[i]);
+			mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
+		}
+		PushArrayString(stringArray, szValue);
+		b=i;
+	}
+
+	char title[64];
+	Format(title, 64, "Stage Statistics (%s)", szPlayerName);
+	mapInfoMenu.SetTitle(title);
+	mapInfoMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
+	mapInfoMenu.Display(client, MENU_TIME_FOREVER);
+	CloseHandle(stringArray);
+}
+
+/**
+* Displays client map stats panel, shows rank for each stage, bonus and map itself.
+*/
 public Action Client_MapStats(int client, int args)
 {
 	if (IsValidClient(client))
@@ -1934,7 +2069,7 @@ public Action Client_MapStats(int client, int args)
 		
 
 		// Counts stages and creates strings
-		int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3]);
+		int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 		Handle stringArray = CreateArray(stageCount);
 	
 		for (i= 1; i<=stageCount; i++){
@@ -1957,6 +2092,43 @@ public Action Client_MapStats(int client, int args)
 		CloseHandle(stringArray);
 	}
 	return Plugin_Handled;
+}
+
+public void ListStageRecords(int client, int type)
+{
+	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+	char buffer[3];
+	Menu listStagesMenu;
+	if (type == 1)
+	{
+		listStagesMenu = new Menu(MenuHandler_SelectStage);
+	}
+	else
+	{
+		listStagesMenu = new Menu(MenuHandler_SelectStageTop);
+	}
+	
+	listStagesMenu.SetTitle("Choose a Stage");
+	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+
+	if (stageCount > 1)
+	{
+		for (int i = 1; i <= stageCount; i++)
+		{
+			IntToString(i, buffer, 3);
+			char stageName[64];
+			Format(stageName, 64, "Stage %i", i);
+			listStagesMenu.AddItem(buffer, stageName);
+		}
+	}
+	else
+	{
+		PrintToChat(client, "[%cCK%c] This map is linear.", MOSSGREEN, WHITE);
+		return;
+	}
+	
+	listStagesMenu.ExitButton = true;
+	listStagesMenu.Display(client, 60);
 }
 
 public Action Client_Profile(int client, int args)
@@ -2324,6 +2496,7 @@ public void ckTopMenu(int client)
 	AddMenuItem(cktopmenu, "Map Top", "Map Top");
 	
 	AddMenuItem(cktopmenu, "Bonus Top", "Bonus Top", !g_bhasBonus);
+	AddMenuItem(cktopmenu, "Stage Top", "Stage Top", !g_bhasStages);
 	
 	SetMenuOptionFlags(cktopmenu, MENUFLAG_BUTTON_EXIT);
 	DisplayMenu(cktopmenu, client, MENU_TIME_FOREVER);
@@ -2341,6 +2514,7 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 				case 1:db_selectTopChallengers(param1);
 				case 2:db_selectTopSurfers(param1, g_szMapName);
 				case 3:BonusTopMenu(param1);
+				case 4:StageTopMenu(param1);
 			}
 		}
 		else
@@ -2351,6 +2525,7 @@ public int TopMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 				case 1:db_selectTopProRecordHolders(param1);
 				case 2:db_selectTopSurfers(param1, g_szMapName);
 				case 3:BonusTopMenu(param1);
+				case 4:StageTopMenu(param1);
 			}
 		}
 	}
@@ -2386,6 +2561,38 @@ public void BonusTopMenu(int client)
 	}
 	else {
 		db_selectBonusTopSurfers(client, g_szMapName, 1);
+	}
+}
+
+public void StageTopMenu(int client)
+{
+	if (g_mapZoneGroupCount > 2)
+	{
+		char buffer[3];
+		Menu sMenu = new Menu(BonusTopMenuHandler);
+		sMenu.SetTitle("Bonus selector");
+		int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+		if (stageCount > 1)
+		{
+			for (int i = 1; i < stageCount; i++)
+			{
+				IntToString(i, buffer, 3);
+				char stageName[64];
+				Format(stageName, 64, "Stage %i", i);
+				sMenu.AddItem(buffer, stageName);
+			}
+		}
+		else
+		{
+			PrintToChat(client, "[%cCK%c] This map is linear.", MOSSGREEN, WHITE);
+			return;
+		}
+		
+		sMenu.ExitButton = true;
+		sMenu.Display(client, 60);
+	}
+	else {
+		db_selectStageTopSurfers(client, g_szMapName, 1);
 	}
 }
 

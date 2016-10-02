@@ -1907,14 +1907,18 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_help", Client_Help, "[ckSurf] help menu which displays all ckSurf commands");
 	RegConsoleCmd("sm_profile", Client_Profile, "[ckSurf] opens a player profile");
 	RegConsoleCmd("sm_rank", Client_Profile, "[ckSurf] opens a player profile");
+	RegConsoleCmd("sm_stagerank", Client_StageStats, "[ckSurf] opens a player stage records");
 	RegConsoleCmd("sm_options", Client_OptionMenu, "[ckSurf] opens options menu");
 	RegConsoleCmd("sm_top", Client_Top, "[ckSurf] displays top rankings (Top 100 Players, Top 50 overall)");
 	RegConsoleCmd("sm_topSurfers", Client_Top, "[ckSurf] displays top rankings (Top 100 Players, Top 50 overall)");
 	RegConsoleCmd("sm_bonustop", Client_BonusTop, "[ckSurf] displays top rankings of the bonus");
+	RegConsoleCmd("sm_stagetop", Client_StageTop, "[ckSurf] displays top rankings of the stage");
+	RegConsoleCmd("sm_st", Client_StageTop, "[ckSurf] displays top rankings of the stage");
 	RegConsoleCmd("sm_btop", Client_BonusTop, "[ckSurf] displays top rankings of the bonus");
 	RegConsoleCmd("sm_stop", Client_Stop, "[ckSurf] stops your timer");
 	RegConsoleCmd("sm_ranks", Client_Ranks, "[ckSurf] prints in chat the available player ranks");
 	RegConsoleCmd("sm_mapstats", Client_MapStats, "[ckSurf] displays panel with map ranks information");
+	RegConsoleCmd("sm_ms", Client_MapStats, "[ckSurf] displays panel with map ranks information");
 	RegConsoleCmd("sm_pause", Client_Pause, "[ckSurf] on/off pause (timer on hold and movement frozen)");
 	RegConsoleCmd("sm_showsettings", Client_Showsettings, "[ckSurf] shows ckSurf server settings");
 	RegConsoleCmd("sm_latest", Client_Latest, "[ckSurf] shows latest map records");

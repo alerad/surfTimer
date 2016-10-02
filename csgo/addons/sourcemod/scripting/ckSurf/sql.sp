@@ -64,7 +64,7 @@ char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
 char sql_selectStageCount[] = "SELECT zonegroup, count(1) FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup";
 char sql_selectTopStageSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ar_stage as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
 char sql_selectTotalStageCount[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 3 GROUP BY mapname, zonegroup;";
-
+char sql_selectStagesInMap[] = "SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;";
 
 //TABLE BONUS
 char sql_createBonus[] = "CREATE TABLE IF NOT EXISTS ck_bonus (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), runtime FLOAT NOT NULL DEFAULT '-1.0', zonegroup INT(12) NOT NULL DEFAULT 1, PRIMARY KEY(steamid, mapname, zonegroup));";
@@ -2956,6 +2956,74 @@ public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[
 		return;
 	}
 }
+
+public void db_selectStagesInMap(int client, char mapname[128])
+{
+	// SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;
+	char szQuery[512];
+	Format(szQuery, 512, sql_selectStagesInMap, PERCENT, mapname, PERCENT);
+	SQL_TQuery(g_hDb, db_selectStagesInMapCallback, szQuery, client, DBPrio_Low);
+}
+
+public void db_selectStagesInMapCallback(Handle owner, Handle hndl, const char[] error, any client)
+{
+	if (hndl == null)
+	{
+		LogError("[ckSurf] SQL Error (db_selectStagesInMapCallback): %s", error);
+		return;
+	}
+	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
+	{
+		char mapname[128], MenuTitle[248], StageName[128], MenuID[248];
+		int zGrp;
+		
+		if (SQL_GetRowCount(hndl) == 1)
+		{
+			SQL_FetchString(hndl, 0, mapname, 128);
+			db_selectStageTopSurfers(client, mapname, SQL_FetchInt(hndl, 1));
+			return;
+		}
+		
+		Menu listStagesinMapMenu = new Menu(MenuHandler_SelectBonusinMap);
+		
+		SQL_FetchString(hndl, 0, mapname, 128);
+		zGrp = SQL_FetchInt(hndl, 1);
+		Format(MenuTitle, 248, "Choose a Stage in %s", mapname);
+		listStagesinMapMenu.SetTitle(MenuTitle);
+		
+		SQL_FetchString(hndl, 2, StageName, 128);
+		
+		if (!StageName[0])
+			Format(StageName, 128, "Stage %i", zGrp);
+		
+		Format(MenuID, 248, "%s-%i", mapname, zGrp);
+		
+		listStagesinMapMenu.AddItem(MenuID, StageName);
+		
+		
+		while (SQL_FetchRow(hndl))
+		{
+			SQL_FetchString(hndl, 2, StageName, 128);
+			zGrp = SQL_FetchInt(hndl, 1);
+			
+			if (StrEqual(StageName, "NULL", false))
+				Format(StageName, 128, "Stage %i", zGrp);
+			
+			Format(MenuID, 248, "%s-%i", mapname, zGrp);
+			
+			listStagesinMapMenu.AddItem(MenuID, StageName);
+		}
+		
+		listStagesinMapMenu.ExitButton = true;
+		listStagesinMapMenu.Display(client, 60);
+	}
+	else
+	{
+		PrintToChat(client, "[%cCK%c] No Stages found.", MOSSGREEN, WHITE);
+		return;
+	}
+}
+
 
 public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int client, int item)
 {
@@ -6094,11 +6162,11 @@ public void sql_selectTopStageSurfersCallback(Handle owner, Handle hndl, const c
 					if (time < 3600.0)
 						Format(szTime, 32, "   %s", szTime);
 					if (i == 100)
-						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[%i.] %s  |   %s", i, szTime, szName);
 					if (i >= 10)
-						Format(szValue, 128, "[%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[%i.] %s  |   %s", i, szTime, szName);
 					else
-						Format(szValue, 128, "[0%i.] %s |    » %s", i, szTime, szName);
+						Format(szValue, 128, "[0%i.] %s  |  %s", i, szTime, szName);
 					topMenu.AddItem(szSteamID, szValue, ITEMDRAW_DEFAULT);
 					PushArrayString(stringArray, szName);
 					if (i == 1)
@@ -6114,7 +6182,7 @@ public void sql_selectTopStageSurfersCallback(Handle owner, Handle hndl, const c
 	}
 	else
 		PrintToChat(client, "%t", "NoTopRecords", MOSSGREEN, WHITE, szMap);
-	Format(title, 256, "Top 50 Times on %s (B %i) \n    Rank    Time               Player", szFirstMap, zGrp);
+	Format(title, 256, "Top times on %s (Stage %i) \n    Rank     Time            Player", szFirstMap, zGrp);
 	topMenu.SetTitle(title);
 	topMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
 	topMenu.Display(client, MENU_TIME_FOREVER);
