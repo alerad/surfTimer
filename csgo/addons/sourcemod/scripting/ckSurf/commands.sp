@@ -2426,7 +2426,7 @@ public Action Client_Stop(int client, int args)
 	{
 		//PlayerPanel(client);
 		g_stageTimerActivated[client] = false;
-        g_stageStartTime[client] = 0.0;
+        g_stageStartTime[client] = -1.0;
 		g_bTimeractivated[client] = false;
 		g_fStartTime[client] = -1.0;
 		g_fCurrentRunTime[client] = -1.0;

@@ -178,8 +178,13 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 2) // End Zone
 		{
-			if (g_iClientInZone[client][2] == action[2]) //  Cant end bonus timer in this zone && in the having the same timer on
+			if (g_iClientInZone[client][2] == action[2]) {//  Cant end bonus timer in this zone && in the having the same timer on
+				// CL_OnEndStageTimerPress(client);
 				CL_OnEndTimerPress(client);
+			  	// g_stageStartTime[client] = GetGameTime();
+      //           g_stageFinalTime[client] = 0.0;
+      //           g_stageTimerActivated[client] = false;
+			}
 			else
 			{
 				Client_Stop(client, 1);
@@ -213,6 +218,9 @@ public void StartTouch(int client, int action[3])
 					g_Stage[g_iClientInZone[client][2]][client] = (action[1] + 2);
 					Checkpoint(client, action[1], g_iClientInZone[client][2]);
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
+					if (g_stageTimerActivated[client]){
+						CL_OnEndStageTimerPress(client);
+					}
 				}
 			}
 		}
@@ -238,7 +246,7 @@ public void StartTouch(int client, int action[3])
 			if (!g_bValidRun[client])
 				Command_Teleport(client, 1);
 		}
-		if (action[0] == 9){
+		if (action[0] == 9){ //Stage End
             if (!g_bPracticeMode[client] && g_stageTimerActivated[client]){
                 // Get runtime and format it to a string
                 CL_OnEndStageTimerPress(client);

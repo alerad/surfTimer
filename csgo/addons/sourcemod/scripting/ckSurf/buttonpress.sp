@@ -39,6 +39,7 @@ public void CL_OnStageTimerPress(int client){
             return;
     }
 
+    LogError("Sale de la zona y se ejecuta onstageTimerPress");
     //Reset stage variables for client
     g_stageStartTime[client] = GetGameTime();
     g_stageFinalTime[client] = 0.0;
@@ -118,6 +119,10 @@ public void CL_OnStartTimerPress(int client)
 			// Set missed record time variables
 			if (g_iClientInZone[client][2] == 0)
 			{
+				g_stageStartTime[client] = GetGameTime();
+			    g_stageFinalTime[client] = 0.0;
+			    g_stageTimerActivated[client] = true;
+			    g_doingStage[client]=1;
 				if (g_fPersonalRecord[client] > 0.0)
 					g_bMissedMapBest[client] = false;
 			}
@@ -131,11 +136,16 @@ public void CL_OnStartTimerPress(int client)
 			// If starting the timer for the first time, print average times
 			if (g_bFirstTimerStart[client])
 			{
+				g_stageStartTime[client] = GetGameTime();
+			    g_stageFinalTime[client] = 0.0;
+			    g_stageTimerActivated[client] = true;
+			    g_doingStage[client]=1;
 				g_bFirstTimerStart[client] = false;
 				Client_Avg(client, 0);
 			}
 		}
 	}
+	
 	
 	// Play start sound
 	PlayButtonSound(client);
@@ -563,8 +573,9 @@ public void CL_OnEndStageTimerPress(int client)
 		return;
 
 	int inStageEnd = g_iClientInZone[client][1]+1;
-	if (inStageEnd != g_doingStage[client]){
-		PrintToChat(client, "[%cCK%c] This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin.", MOSSGREEN, WHITE);
+	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+	if (inStageEnd != g_doingStage[client] && stageCount != g_doingStage[client]){
+		PrintToChat(client, "[%cCK%c] This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client]);
 		return;
 	}
 
@@ -648,11 +659,6 @@ public void CL_OnEndStageTimerPress(int client)
 			g_pr_showmsg[client] = true;
 			db_updateStageRecord(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
 		}
-
-        PrintToChat(client, "[%cCK%c] Terminaste el stage %i en %s", MOSSGREEN, WHITE, g_doingStage[client], g_stageFinalTimeStr[client]);
-		
-
-
 	}
 
 

@@ -1988,8 +1988,6 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 	{
 		if (g_stageSRVRecord[client])
 		{
-			PlayRecordSound(1);
-
 			RecordDiff = g_fOldStageRecordTime[zGroup] - g_fFinalTime[client];
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
@@ -2013,22 +2011,21 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 		if (g_stagePBRecord[client] && !g_stageSRVRecord[client])
 		{
 			PlayUnstoppableSound(client);
-			PrintToChatAll("%t", "StageFinished6", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, ORANGE, szZoneGroupName, GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_szStageTimeDifference[client], GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szStageFastestTime[zGroup], WHITE);
+			PrintToChat(client, "%t", "StageFinished6", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, ORANGE, szZoneGroupName, GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_szStageTimeDifference[client], GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szStageFastestTime[zGroup], WHITE);
 		}
 		if (g_stageFirstRecord[client] && !g_stageSRVRecord[client])
 		{
-			PrintToChatAll("%t", "StageFinished7", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, ORANGE, szZoneGroupName, GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szStageFastestTime[zGroup], WHITE);
+			PrintToChat(client, "%t", "StageFinished7", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, ORANGE, szZoneGroupName, GRAY, LIMEGREEN, g_szFinalTime[client], GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szStageFastestTime[zGroup], WHITE);
 		}
 		if (!g_stageSRVRecord[client] && !g_stageFirstRecord[client] && !g_stagePBRecord[client])
 		{
- 			PrintToChatAll("%t", "StageFinished1", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, ORANGE, szZoneGroupName, GRAY, RED, g_szFinalTime[client], GRAY, RED, g_szStageTimeDifference[client], GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szStageFastestTime[zGroup], GRAY);
+ 			PrintToChat(client, "%t", "StageFinished1", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, ORANGE, szZoneGroupName, GRAY, RED, g_szFinalTime[client], GRAY, RED, g_szStageTimeDifference[client], GRAY, LIMEGREEN, g_MapRankStage[zGroup][client], GRAY, g_iStageCount[zGroup], LIMEGREEN, g_szStageFastestTime[zGroup], GRAY);
 		}
 	}
 	else
 	{
 		if (g_stageSRVRecord[client])
 		{
-			PlayRecordSound(1);
 			RecordDiff = g_fOldStageRecordTime[zGroup] - g_fFinalTime[client];
 			FormatTimeFloat(client, RecordDiff, 3, szRecordDiff, 54);
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);

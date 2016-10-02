@@ -1434,7 +1434,7 @@ public void sql_CountFinishedBonusCallback(Handle owner, Handle hndl, const char
 	SQL_TQuery(g_hDb, sql_CountFinishedStageCallback, szQuery, client, DBPrio_Low);
 }
 
-// 4. Calculate points gained from bonuses
+// 4. Calculate points gained from stages
 // Fetched values
 // mapname, rank, total
 //
@@ -1462,31 +1462,32 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 			SQL_FetchString(hndl, 0, szMap, 128);
 			for (int i = 0; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
 			{
+				LogError("g_pr_points %i", g_pr_points[client]);
 				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
+				LogError("szMapname %s", szMapName2);
 				if (StrEqual(szMapName2, szMap, false))
 				{
-					LogError("Rank del wachin %i", rank);
 					float percentage = 1.0 + ((1.0 / float(totalplayers)) - (float(rank) / float(totalplayers)));
-					g_pr_points[client] += RoundToCeil(100.0 * percentage);
+					g_pr_points[client] += RoundToCeil(60.0 * percentage);
 					switch (rank)
 					{
-						case 1:g_pr_points[client] += 95;
-						case 2:g_pr_points[client] += 85;
-						case 3:g_pr_points[client] += 80;
-						case 4:g_pr_points[client] += 75;
-						case 5:g_pr_points[client] += 65;
-						case 6:g_pr_points[client] += 60;
-						case 7:g_pr_points[client] += 55;
-						case 8:g_pr_points[client] += 50;
-						case 9:g_pr_points[client] += 45;
-						case 10:g_pr_points[client] += 40;
-						case 11:g_pr_points[client] += 35;
-						case 12:g_pr_points[client] += 30;
-						case 13:g_pr_points[client] += 25;
-						case 14:g_pr_points[client] += 20;
-						case 15:g_pr_points[client] += 15;
+						case 1:g_pr_points[client] += 55;
+						case 2:g_pr_points[client] += 45;
+						case 3:g_pr_points[client] += 40;
+						case 4:g_pr_points[client] += 38;
+						case 5:g_pr_points[client] += 36;
+						case 6:g_pr_points[client] += 34;
+						case 7:g_pr_points[client] += 32;
+						case 8:g_pr_points[client] += 30;
+						case 9:g_pr_points[client] += 28;
+						case 10:g_pr_points[client] += 25;
+						case 11:g_pr_points[client] += 20;
+						case 12:g_pr_points[client] += 18;
+						case 13:g_pr_points[client] += 16;
+						case 14:g_pr_points[client] += 14;
+						case 15:g_pr_points[client] += 12;
 						case 16:g_pr_points[client] += 10;
-						case 17:g_pr_points[client] += 9;
+						case 17:g_pr_points[client] += 9 ;
 						case 18:g_pr_points[client] += 8;
 						case 19:g_pr_points[client] += 7;
 						case 20:g_pr_points[client] += 5;
@@ -1496,7 +1497,6 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 			}
 		}
 	}
-	LogError("g_pr_points %i", g_pr_points[client]);
 	
 	// Next up: Points from maps
 	char szQuery[512];
