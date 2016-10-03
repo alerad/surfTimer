@@ -298,7 +298,7 @@ public void StartVoteExtend(int client)
 {
 	char szPlayerName[MAX_NAME_LENGTH];	
 	GetClientName(client, szPlayerName, MAX_NAME_LENGTH);
-	CPrintToChatAll("[{olive}CK{default}] Vote to Extend started by {green}%s{default}", szPlayerName);
+	CPrintToChatAll("[{olive}SurfLatam{default} | Vote to Extend started by {green}%s{default}", szPlayerName);
 
 	g_szUsedVoteExtend[g_VoteExtends] = g_szSteamID[client];	// Add the user's steam ID to the list
 	g_VoteExtends++;	// Increment the total number of vote extends so far
@@ -347,12 +347,12 @@ public void H_VoteExtendCallback(Menu menu, int num_votes, int num_clients, cons
 
 	if (votesYes > votesNo) // A tie is a failure
 	{
-		CPrintToChatAll("[{olive}CK{default}] Vote to Extend succeeded - Votes Yes: %i | Votes No: %i", votesYes, votesNo);
+		CPrintToChatAll("[{olive}SurfLatam{default} | Vote to Extend succeeded - Votes Yes: %i | Votes No: %i", votesYes, votesNo);
 		ExtendMapTimeLimit(RoundToFloor(GetConVarFloat(g_hVoteExtendTime)*60));
 	} 
 	else
 	{
-		CPrintToChatAll("[{olive}CK{default}] Vote to Extend failed - Votes Yes: %i | Votes No: %i", votesYes, votesNo);
+		CPrintToChatAll("[{olive}SurfLatam{default} | Vote to Extend failed - Votes Yes: %i | Votes No: %i", votesYes, votesNo);
 	}
 }
 
