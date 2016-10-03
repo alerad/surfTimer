@@ -320,7 +320,7 @@ public Action Timer_Countdown(Handle timer, any client)
 {
 	if (IsValidClient(client) && g_bChallenge[client] && !IsFakeClient(client))
 	{
-		PrintToChat(client, "[%cCK%c] %c%i", RED, WHITE, YELLOW, g_CountdownTime[client]);
+		PrintToChat(client, "%cSurfLatam%c |  %c%i", RED, WHITE, YELLOW, g_CountdownTime[client]);
 		g_CountdownTime[client]--;
 		if (g_CountdownTime[client] <= 0)
 		{

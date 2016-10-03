@@ -571,7 +571,7 @@ public void SQLTxn_RenameSuccess(Handle db, any data, int numQueries, Handle[] r
 {
 	g_bRenaming = false;
 	revertServerHibernateSettings();
-	PrintToChatAll("[%cCK%c] Database changes done succesfully, reloading the map...");
+	PrintToChatAll("%cSurfLatam%c |  Database changes done succesfully, reloading the map...");
 	ForceChangeLevel(g_szMapName, "Database Renaming Done. Restarting Map.");
 }
 
@@ -921,7 +921,7 @@ public void db_checkChangesInTitleCallback(Handle owner, Handle hndl, const char
 				{
 					g_bflagTitles_orig[client][i] = g_bflagTitles[client][i];
 					if (g_bflagTitles[client][i])
-						PrintToChat(client, "[%cCK%c] Congratulations! You have gained the VIP privileges!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  Congratulations! You have gained the VIP privileges!", MOSSGREEN, WHITE);
 					else
 					{
 						if (g_iTitleInUse[client] == i)
@@ -931,7 +931,7 @@ public void db_checkChangesInTitleCallback(Handle owner, Handle hndl, const char
 						}
 						
 						g_bTrailOn[client] = false;
-						PrintToChat(client, "[%cCK%c] You have lost your VIP privileges!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  You have lost your VIP privileges!", MOSSGREEN, WHITE);
 					}
 					break;
 				}
@@ -940,7 +940,7 @@ public void db_checkChangesInTitleCallback(Handle owner, Handle hndl, const char
 					
 					g_bflagTitles_orig[client][i] = g_bflagTitles[client][i];
 					if (g_bflagTitles[client][i])
-						PrintToChat(client, "[%cCK%c] Congratulations! You have gained the custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
+						PrintToChat(client, "%cSurfLatam%c |  Congratulations! You have gained the custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
 					else
 					{
 						if (g_iTitleInUse[client] == i)
@@ -949,7 +949,7 @@ public void db_checkChangesInTitleCallback(Handle owner, Handle hndl, const char
 							db_updatePlayerTitleInUse(-1, steamid);
 						}
 						
-						PrintToChat(client, "[%cCK%c] You have lost your custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
+						PrintToChat(client, "%cSurfLatam%c |  You have lost your custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
 					}
 					break;
 				}
@@ -974,7 +974,7 @@ public void SQL_insertFlagCallback(Handle owner, Handle hndl, const char[] error
 	}
 	
 	if (IsValidClient(data))
-		PrintToChat(data, "[%cCK%c] Succesfully granted title to a player", MOSSGREEN, WHITE);
+		PrintToChat(data, "%cSurfLatam%c |  Succesfully granted title to a player", MOSSGREEN, WHITE);
 	
 	db_checkChangesInTitle(g_iAdminSelectedClient[data], g_szAdminSelectedSteamID[data]);
 }
@@ -995,7 +995,7 @@ public void SQL_updatePlayerFlagsCallback(Handle owner, Handle hndl, const char[
 	}
 	
 	if (IsValidClient(data))
-		PrintToChat(data, "[%cCK%c] Succesfully updated player's titles", MOSSGREEN, WHITE);
+		PrintToChat(data, "%cSurfLatam%c |  Succesfully updated player's titles", MOSSGREEN, WHITE);
 	
 	if (g_iAdminSelectedClient[data] != -1)
 		db_checkChangesInTitle(g_iAdminSelectedClient[data], g_szAdminSelectedSteamID[data]);
@@ -1030,7 +1030,7 @@ public void SQL_deletePlayerTitlesCallback(Handle owner, Handle hndl, const char
 		return;
 	}
 	
-	PrintToChat(data, "[%cCK%c] Succesfully deleted player's titles.", MOSSGREEN, WHITE);
+	PrintToChat(data, "%cSurfLatam%c |  Succesfully deleted player's titles.", MOSSGREEN, WHITE);
 	db_checkChangesInTitle(g_iAdminSelectedClient[data], g_szAdminSelectedSteamID[data]);
 }
 
@@ -2468,7 +2468,7 @@ public void db_viewChallengeHistory(int client, char szSteamId[32])
 	}
 	else
 		if (IsClientInGame(client))
-		PrintToChat(client, "[%cCK%c] Invalid SteamID found.", RED, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Invalid SteamID found.", RED, WHITE);
 	ProfileMenu(client, -1);
 }
 
@@ -2552,7 +2552,7 @@ public void sql_selectChallengesCallback(Handle owner, Handle hndl, const char[]
 	if (!bHeader)
 	{
 		ProfileMenu(client, -1);
-		PrintToChat(client, "[%cCK%c] No challenges found.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  No challenges found.", MOSSGREEN, WHITE);
 	}
 }
 
@@ -2669,40 +2669,40 @@ public void sql_selectChallengesCompareCallback(Handle owner, Handle hndl, const
 		if (winratio > 0)
 		{
 			if (pointratio > 0)
-				PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, GREEN, szWinRatio, GRAY, GREEN, szPointsRatio, GRAY);
+				PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, GREEN, szWinRatio, GRAY, GREEN, szPointsRatio, GRAY);
 			else
 				if (pointratio < 0)
-					PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, GREEN, szWinRatio, GRAY, RED, szPointsRatio, GRAY);
+					PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, GREEN, szWinRatio, GRAY, RED, szPointsRatio, GRAY);
 				else
-					PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, GREEN, szWinRatio, GRAY, YELLOW, szPointsRatio, GRAY);
+					PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, GREEN, szWinRatio, GRAY, YELLOW, szPointsRatio, GRAY);
 		}
 		else
 		{
 			if (winratio < 0)
 			{
 				if (pointratio > 0)
-					PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, RED, szWinRatio, GRAY, GREEN, szPointsRatio, GRAY);
+					PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, RED, szWinRatio, GRAY, GREEN, szPointsRatio, GRAY);
 				else
 					if (pointratio < 0)
-						PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, RED, szWinRatio, GRAY, RED, szPointsRatio, GRAY);
+						PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, RED, szWinRatio, GRAY, RED, szPointsRatio, GRAY);
 					else
-						PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, RED, szWinRatio, GRAY, YELLOW, szPointsRatio, GRAY);
+						PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, RED, szWinRatio, GRAY, YELLOW, szPointsRatio, GRAY);
 				
 			}
 			else
 			{
 				if (pointratio > 0)
-					PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, YELLOW, szWinRatio, GRAY, GREEN, szPointsRatio, GRAY);
+					PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, YELLOW, szWinRatio, GRAY, GREEN, szPointsRatio, GRAY);
 				else
 					if (pointratio < 0)
-						PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, YELLOW, szWinRatio, GRAY, RED, szPointsRatio, GRAY);
+						PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, YELLOW, szWinRatio, GRAY, RED, szPointsRatio, GRAY);
 					else
-						PrintToChat(client, "[%cCK%c] %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, YELLOW, szWinRatio, GRAY, YELLOW, szPointsRatio, GRAY);
+						PrintToChat(client, "%cSurfLatam%c |  %cYou have played %c%i%c challenges against %c%s%c (win/loss ratio: %c%s%c, points ratio: %c%s%c)", MOSSGREEN, WHITE, GRAY, PURPLE, challenges, GRAY, PURPLE, szName, GRAY, YELLOW, szWinRatio, GRAY, YELLOW, szPointsRatio, GRAY);
 			}
 		}
 	}
 	else
-		PrintToChat(client, "[%cCK%c] No challenges againgst %s found", szName);
+		PrintToChat(client, "%cSurfLatam%c |  No challenges againgst %s found", szName);
 }
 
 public void db_insertPlayerChallenge(int client)
@@ -2986,7 +2986,7 @@ public void db_selectBonusesInMapCallback(Handle owner, Handle hndl, const char[
 	}
 	else
 	{
-		PrintToChat(client, "[%cCK%c] No bonuses found.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  No bonuses found.", MOSSGREEN, WHITE);
 		return;
 	}
 }
@@ -3053,7 +3053,7 @@ public void db_selectStagesInMapCallback(Handle owner, Handle hndl, const char[]
 	}
 	else
 	{
-		PrintToChat(client, "[%cCK%c] No Stages found.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  No Stages found.", MOSSGREEN, WHITE);
 		return;
 	}
 }
@@ -3653,7 +3653,7 @@ public void db_viewAllRecords(int client, char szSteamId[32])
 		SQL_TQuery(g_hDb, SQL_ViewAllRecordsCallback, szQuery, client, DBPrio_Low);
 	else
 		if (IsClientInGame(client))
-		PrintToChat(client, "[%cCK%c] Invalid SteamID found.", RED, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Invalid SteamID found.", RED, WHITE);
 	ProfileMenu(client, -1);
 }
 
@@ -4309,7 +4309,7 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 				g_bTierFound[i] = true;
 				if (i == 0)
 				{
-					Format(g_sTierString[0], 512, " [%cCK%c] %cMap: %c%s %c| ", MOSSGREEN, WHITE, GREEN, LIMEGREEN, g_szMapName, GREEN);
+					Format(g_sTierString[0], 512, " %cSurfLatam%c |  %cMap: %c%s %c| ", MOSSGREEN, WHITE, GREEN, LIMEGREEN, g_szMapName, GREEN);
 					switch (tier)
 					{
 						case 1:Format(g_sTierString[0], 512, "%s%cTier %i %c| ", g_sTierString[0], GRAY, tier, GREEN);
@@ -4335,12 +4335,12 @@ public void SQL_selectMapTierCallback(Handle owner, Handle hndl, const char[] er
 				{
 					switch (tier)
 					{
-						case 1:Format(g_sTierString[i], 512, "[%cCK%c] &c%s Tier: %i", MOSSGREEN, WHITE, GRAY, g_szZoneGroupName[i], tier);
-						case 2:Format(g_sTierString[i], 512, "[%cCK%c] &c%s Tier: %i", MOSSGREEN, WHITE, LIGHTBLUE, g_szZoneGroupName[i], tier);
-						case 3:Format(g_sTierString[i], 512, "[%cCK%c] &c%s Tier: %i", MOSSGREEN, WHITE, BLUE, g_szZoneGroupName[i], tier);
-						case 4:Format(g_sTierString[i], 512, "[%cCK%c] &c%s Tier: %i", MOSSGREEN, WHITE, DARKBLUE, g_szZoneGroupName[i], tier);
-						case 5:Format(g_sTierString[i], 512, "[%cCK%c] &c%s Tier: %i", MOSSGREEN, WHITE, RED, g_szZoneGroupName[i], tier);
-						case 6:Format(g_sTierString[i], 512, "[%cCK%c] &c%s Tier: %i", MOSSGREEN, WHITE, DARKRED, g_szZoneGroupName[i], tier);
+						case 1:Format(g_sTierString[i], 512, "%cSurfLatam%c |  &c%s Tier: %i", MOSSGREEN, WHITE, GRAY, g_szZoneGroupName[i], tier);
+						case 2:Format(g_sTierString[i], 512, "%cSurfLatam%c |  &c%s Tier: %i", MOSSGREEN, WHITE, LIGHTBLUE, g_szZoneGroupName[i], tier);
+						case 3:Format(g_sTierString[i], 512, "%cSurfLatam%c |  &c%s Tier: %i", MOSSGREEN, WHITE, BLUE, g_szZoneGroupName[i], tier);
+						case 4:Format(g_sTierString[i], 512, "%cSurfLatam%c |  &c%s Tier: %i", MOSSGREEN, WHITE, DARKBLUE, g_szZoneGroupName[i], tier);
+						case 5:Format(g_sTierString[i], 512, "%cSurfLatam%c |  &c%s Tier: %i", MOSSGREEN, WHITE, RED, g_szZoneGroupName[i], tier);
+						case 6:Format(g_sTierString[i], 512, "%cSurfLatam%c |  &c%s Tier: %i", MOSSGREEN, WHITE, DARKRED, g_szZoneGroupName[i], tier);
 					}
 				}
 			}
@@ -5089,7 +5089,7 @@ public void sql_setZoneNamesCallback(Handle owner, Handle hndl, const char[] err
 	
 	if (IsValidClient(client))
 	{
-		PrintToChat(client, "[%cCK%c] Bonus name succesfully changed.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Bonus name succesfully changed.", MOSSGREEN, WHITE);
 		ListBonusSettings(client);
 	}
 	db_selectMapZones();
@@ -5201,7 +5201,7 @@ public void SQL_insertZonesCheapCallback(Handle owner, Handle hndl, const char[]
 {
 	if (hndl == null)
 	{
-		PrintToChatAll("[%cCK%c] Failed to create a zone, attempting a fix... Recreate the zone, please.", MOSSGREEN, WHITE);
+		PrintToChatAll("%cSurfLatam%c |  Failed to create a zone, attempting a fix... Recreate the zone, please.", MOSSGREEN, WHITE);
 		db_checkAndFixZoneIds();
 		return;
 	}
@@ -5229,7 +5229,7 @@ public void SQL_insertZonesCallback(Handle owner, Handle hndl, const char[] erro
 	if (hndl == null)
 	{
 		
-		PrintToChatAll("[%cCK%c] Failed to create a zone, attempting a fix... Recreate the zone, please.", MOSSGREEN, WHITE);
+		PrintToChatAll("%cSurfLatam%c |  Failed to create a zone, attempting a fix... Recreate the zone, please.", MOSSGREEN, WHITE);
 		db_checkAndFixZoneIds();
 		return;
 	}
@@ -5321,7 +5321,7 @@ public void SQLTxn_ZoneGroupRemovalSuccess(Handle db, any client, int numQueries
 	if (IsValidClient(client))
 	{
 		ZoneMenu(client);
-		PrintToChat(client, "[%cCK%c] Zone group deleted.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Zone group deleted.", MOSSGREEN, WHITE);
 	}
 	return;
 }
@@ -5329,7 +5329,7 @@ public void SQLTxn_ZoneGroupRemovalSuccess(Handle db, any client, int numQueries
 public void SQLTxn_ZoneGroupRemovalFailed(Handle db, any client, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	if(IsValidClient(client))
-		PrintToChat(client, "[%cCK%c] Zonegroup removal failed! (Error: %s)", MOSSGREEN, WHITE, error);
+		PrintToChat(client, "%cSurfLatam%c |  Zonegroup removal failed! (Error: %s)", MOSSGREEN, WHITE, error);
 
 	PrintToServer("[CK] Zonegroup removal failed (Error: %s)", error);
 	return;
@@ -5832,14 +5832,14 @@ public void db_deleteZone(int client, int zoneid)
 public void SQLTxn_ZoneRemovalSuccess(Handle db, any client, int numQueries, Handle[] results, any[] queryData)
 {
 	if (IsValidClient(client))
-		PrintToChat(client, "[%cCK%c] Zone Removed Succesfully", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Zone Removed Succesfully", MOSSGREEN, WHITE);
 	PrintToServer("[ckSurf] Zone Removed Succesfully");
 }
 
 public void SQLTxn_ZoneRemovalFailed(Handle db, any client, int numQueries, const char[] error, int failIndex, any[] queryData)
 {
 	if (IsValidClient(client))
-		PrintToChat(client, "[%cCK%c] %cZone Removal Failed! Error:%c %s", MOSSGREEN, WHITE, RED, WHITE, error);
+		PrintToChat(client, "%cSurfLatam%c |  %cZone Removal Failed! Error:%c %s", MOSSGREEN, WHITE, RED, WHITE, error);
 	PrintToServer("[ckSurf] Zone Removal Failed. Error: %s", error);
 	return;
 }
@@ -5960,7 +5960,7 @@ public void sql_selectLatestRecordsCallback(Handle owner, Handle hndl, const cha
 	else
 		PrintToConsole(data, "No records found.");
 	PrintToConsole(data, "----------------------------------------------------------------------------------------------------");
-	PrintToChat(data, "[%cCK%c] See console for output!", MOSSGREEN, WHITE);
+	PrintToChat(data, "%cSurfLatam%c |  See console for output!", MOSSGREEN, WHITE);
 }
 
 
@@ -7145,7 +7145,7 @@ public int ProfileMenuHandler(Handle menu, MenuAction action, int client, int it
 			{
 				if (g_bRecalcRankInProgess[client])
 				{
-					PrintToChat(client, "[%cCK%c] %cRecalculation in progress. Please wait!", MOSSGREEN, WHITE, GRAY);
+					PrintToChat(client, "%cSurfLatam%c |  %cRecalculation in progress. Please wait!", MOSSGREEN, WHITE, GRAY);
 				}
 				else
 				{

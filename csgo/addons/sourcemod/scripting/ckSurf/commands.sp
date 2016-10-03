@@ -14,7 +14,7 @@ public Action Command_Vip(int client, int args)
 	
 	if (!g_bflagTitles[client][0])
 	{
-		PrintToChat(client, "[%cCK%c] This command requires the VIP title.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  This command requires the VIP title.", MOSSGREEN, WHITE);
 		return Plugin_Handled;
 	}
 	
@@ -87,14 +87,14 @@ public Action Command_MutePlayer (int client, int args)
 
 	if (!GetConVarBool(g_hAllowVipMute))
 	{
-		ReplyToCommand(client, "[%cCK%c] VIP muting has been disabled on this server.", MOSSGREEN, WHITE);
+		ReplyToCommand(client, "%cSurfLatam%c |  VIP muting has been disabled on this server.", MOSSGREEN, WHITE);
 		return Plugin_Handled;
 	}
 
 
 	if (!g_bflagTitles[client][0])
 	{
-		ReplyToCommand(client, "[%cCK%c] This command requires the VIP title.", MOSSGREEN, WHITE);
+		ReplyToCommand(client, "%cSurfLatam%c |  This command requires the VIP title.", MOSSGREEN, WHITE);
 		return Plugin_Handled;
 	}
 
@@ -110,18 +110,18 @@ public Action Command_MutePlayer (int client, int args)
 			if (BaseComm_IsClientMuted(target))
 			{
 				if (BaseComm_SetClientMute(target, false))
-					PrintToChatAll("[%cCK%c] %s was unmuted by a VIP.", MOSSGREEN, WHITE, szBuffer);
+					PrintToChatAll("%cSurfLatam%c |  %s was unmuted by a VIP.", MOSSGREEN, WHITE, szBuffer);
 			}
 			else
 			{
 				if (BaseComm_SetClientMute(target, true))
-					PrintToChatAll("[%cCK%c] %s was muted by a VIP.", MOSSGREEN, WHITE, szBuffer);
+					PrintToChatAll("%cSurfLatam%c |  %s was muted by a VIP.", MOSSGREEN, WHITE, szBuffer);
 			}
 			return Plugin_Handled;
 		}
 		else
 		{
-			PrintToChat(client, "[%cCK%c] Could not find a player with the name of %s.", MOSSGREEN, WHITE, szName);
+			PrintToChat(client, "%cSurfLatam%c |  Could not find a player with the name of %s.", MOSSGREEN, WHITE, szName);
 			return Plugin_Handled;
 		}
 	}
@@ -150,7 +150,7 @@ public Action Command_MutePlayer (int client, int args)
 	}
 	if (count == 0)
 	{
-		ReplyToCommand(client, "[%cCK%c] No valid players found.", MOSSGREEN, WHITE);
+		ReplyToCommand(client, "%cSurfLatam%c |  No valid players found.", MOSSGREEN, WHITE);
 		CloseHandle(mMutePlayers);
 		return Plugin_Handled;
 	}
@@ -175,12 +175,12 @@ public int h_MutePlayers(Menu tMenu, MenuAction action, int client, int item)
 				if (BaseComm_IsClientMuted(clientID))
 				{
 					if (BaseComm_SetClientMute(clientID, false))
-						PrintToChatAll("[%cCK%c] %s was unmuted by a VIP.", MOSSGREEN, WHITE, szName);
+						PrintToChatAll("%cSurfLatam%c |  %s was unmuted by a VIP.", MOSSGREEN, WHITE, szName);
 				}
 				else
 				{
 					if (BaseComm_SetClientMute(clientID, true))
-						PrintToChatAll("[%cCK%c] %s was muted by a VIP.", MOSSGREEN, WHITE, szName);
+						PrintToChatAll("%cSurfLatam%c |  %s was muted by a VIP.", MOSSGREEN, WHITE, szName);
 
 				}
 			}
@@ -199,7 +199,7 @@ public Action Command_SetTitle(int client, int args)
 	
 	if (!g_bHasTitle[client])
 	{
-		PrintToChat(client, "[%cCK%c] You don't have access to any custom titles.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  You don't have access to any custom titles.", MOSSGREEN, WHITE);
 		return Plugin_Handled;
 	}
 	Menu playersTitles = CreateMenu(H_PlayersTitles);
@@ -526,7 +526,7 @@ public void ListBonuses(int client, int type)
 	}
 	else
 	{
-		PrintToChat(client, "[%cCK%c] There are no bonuses in this map.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  There are no bonuses in this map.", MOSSGREEN, WHITE);
 		return;
 	}
 	
@@ -598,10 +598,10 @@ public Action Command_ToBonus(int client, int args)
 	// If not enough arguments, or there is more than one bonus
 	if (args < 1 && g_mapZoneGroupCount > 2) // Tell player to select specific bonus
 	{
-		/*PrintToChat(client, "[%cCK%c] Usage: !b <bonus number>", MOSSGREEN, WHITE);
+		/*PrintToChat(client, "%cSurfLatam%c |  Usage: !b <bonus number>", MOSSGREEN, WHITE);
 		if (g_mapZoneGroupCount > 1)
 		{
-			PrintToChat(client, "[%cCK%c] Available bonuses:", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  Available bonuses:", MOSSGREEN, WHITE);
 			for (int i = 1; i < g_mapZoneGroupCount; i++)
 			{
 				PrintToChat(client, "[%c%i.%c] %s", YELLOW, i, WHITE, g_szZoneGroupName[i]);
@@ -740,7 +740,7 @@ public Action Command_ToEnd(int client, int args)
 		
 	if (!GetConVarBool(g_hCommandToEnd))
 	{
-		ReplyToCommand(client, "[%cCK%c] Teleportation to the end zone has been disabled on this server.", MOSSGREEN, WHITE);
+		ReplyToCommand(client, "%cSurfLatam%c |  Teleportation to the end zone has been disabled on this server.", MOSSGREEN, WHITE);
 		return Plugin_Handled;
 	}
 	teleportClient(client, g_iClientInZone[client][2], -1, true);
@@ -759,7 +759,7 @@ public Action Command_Restart(int client, int args)
 		{
 			g_fClientRestarting[client] = GetGameTime();
 			g_bClientRestarting[client] = true;
-			PrintToChat(client, "[%cCK%c] Are you sure you want to restart your run? Use %c!r%c again to restart.", MOSSGREEN, WHITE, GREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  Are you sure you want to restart your run? Use %c!r%c again to restart.", MOSSGREEN, WHITE, GREEN, WHITE);
 			ClientCommand(client, "play ambient/misc/clank4");
 			return Plugin_Handled;
 		}
@@ -889,7 +889,7 @@ public Action Command_bTier(int client, int args)
 	{
 		if (g_mapZoneGroupCount == 1)
 		{
-			PrintToChat(client, "[%cCK%c] There are no bonuses in this map.", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  There are no bonuses in this map.", MOSSGREEN, WHITE);
 			return;
 		}
 		
@@ -905,7 +905,7 @@ public Action Command_bTier(int client, int args)
 		
 		if (found == 0)
 		{
-			PrintToChat(client, "[%cCK%c] Bonus tiers have not been set on this map.", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  Bonus tiers have not been set on this map.", MOSSGREEN, WHITE);
 		}
 	}
 }
@@ -1108,12 +1108,12 @@ public Action Client_Abort(int client, int args)
 		if (g_bChallenge_Abort[client])
 		{
 			g_bChallenge_Abort[client] = false;
-			PrintToChat(client, "[%cCK%c] You have disagreed to abort the challenge.", RED, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  You have disagreed to abort the challenge.", RED, WHITE);
 		}
 		else
 		{
 			g_bChallenge_Abort[client] = true;
-			PrintToChat(client, "[%cCK%c] You have agreed to abort the challenge. Waiting for your opponent..", RED, WHITE, GREEN);
+			PrintToChat(client, "%cSurfLatam%c |  You have agreed to abort the challenge. Waiting for your opponent..", RED, WHITE, GREEN);
 		}
 	}
 	return Plugin_Handled;
@@ -1161,8 +1161,8 @@ public Action Client_Accept(int client, int args)
 				else
 					Format(szCP, sizeof(szCP), "Forbidden");
 				int points = g_Challenge_Bet[i] * 2 * g_pr_PointUnit;
-				PrintToChatAll("[%cCK%c] Challenge: %c%s%c vs. %c%s%c", RED, WHITE, MOSSGREEN, szPlayer1, WHITE, MOSSGREEN, szPlayer2, WHITE);
-				PrintToChatAll("[%cCK%c] Checkpoints: %c%s%c, Pot: %c%ip", RED, WHITE, GRAY, szCP, WHITE, GRAY, points);
+				PrintToChatAll("%cSurfLatam%c |  Challenge: %c%s%c vs. %c%s%c", RED, WHITE, MOSSGREEN, szPlayer1, WHITE, MOSSGREEN, szPlayer2, WHITE);
+				PrintToChatAll("%cSurfLatam%c |  Checkpoints: %c%s%c, Pot: %c%ip", RED, WHITE, GRAY, szCP, WHITE, GRAY, points);
 				
 				int r1 = GetRandomInt(55, 255);
 				int r2 = GetRandomInt(55, 255);
@@ -1262,7 +1262,7 @@ public Action Client_Surrender(int client, int args)
 						int lostpoints = g_Challenge_Bet[client] * g_pr_PointUnit;
 						for (int j = 1; j <= MaxClients; j++)
 							if (IsValidClient(j) && IsValidEntity(j))
-								PrintToChat(j, "[%cCK%c] %c%s%c has lost %c%i %cpoints!", MOSSGREEN, WHITE, PURPLE, szName, GRAY, RED, lostpoints, GRAY);
+								PrintToChat(j, "%cSurfLatam%c |  %c%s%c has lost %c%i %cpoints!", MOSSGREEN, WHITE, PURPLE, szName, GRAY, RED, lostpoints, GRAY);
 					}
 					//db update
 					CreateTimer(0.0, UpdatePlayerProfile, i, TIMER_FLAG_NO_MAPCHANGE);
@@ -1323,7 +1323,7 @@ public Action Command_ckNoClip(int client, int args)
 
 	if(!IsPlayerAlive(client))
 	{
-		ReplyToCommand(client, "[%cCK%c] You cannot use NoClip while you are dead", MOSSGREEN, WHITE);
+		ReplyToCommand(client, "%cSurfLatam%c |  You cannot use NoClip while you are dead", MOSSGREEN, WHITE);
 	}
 	else
 	{
@@ -1376,8 +1376,8 @@ public Action Client_BonusTop(int client, int args)
 		case 0: {  // !btop
 			if (g_mapZoneGroupCount == 1)
 			{
-				PrintToChat(client, "[%cCK%c] No bonus found on this map.", MOSSGREEN, WHITE);
-				PrintToChat(client, "[%cCK%c] Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
+				PrintToChat(client, "%cSurfLatam%c |  No bonus found on this map.", MOSSGREEN, WHITE);
+				PrintToChat(client, "%cSurfLatam%c |  Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
 				return Plugin_Handled;
 			}
 			if (g_mapZoneGroupCount == 2)
@@ -1408,7 +1408,7 @@ public Action Client_BonusTop(int client, int args)
 				}
 				else
 				{
-					PrintToChat(client, "[%cCK%c] Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+					PrintToChat(client, "%cSurfLatam%c |  Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
 					return Plugin_Handled;
 				}
 			}
@@ -1429,12 +1429,12 @@ public Action Client_BonusTop(int client, int args)
 			
 			if (0 > zGrp || zGrp > MAXZONEGROUPS)
 			{
-				PrintToChat(client, "[%cCK%c] Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+				PrintToChat(client, "%cSurfLatam%c |  Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
 				return Plugin_Handled;
 			}
 		}
 		default: {
-			PrintToChat(client, "[%cCK%c] Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
 			return Plugin_Handled;
 		}
 	}
@@ -1453,8 +1453,8 @@ public Action Client_StageTop(int client, int args)
 		case 0: {  // !btop
 			if (g_mapZoneGroupCount == 1)
 			{
-				PrintToChat(client, "[%cCK%c] No stage found on this map.", MOSSGREEN, WHITE);
-				PrintToChat(client, "[%cCK%c] Usage: !stagetop <stage number> <mapname>", MOSSGREEN, WHITE);
+				PrintToChat(client, "%cSurfLatam%c |  No stage found on this map.", MOSSGREEN, WHITE);
+				PrintToChat(client, "%cSurfLatam%c |  Usage: !stagetop <stage number> <mapname>", MOSSGREEN, WHITE);
 				return Plugin_Handled;
 			}
 			if (g_mapZoneGroupCount == 2)
@@ -1485,7 +1485,7 @@ public Action Client_StageTop(int client, int args)
 				}
 				else
 				{
-					PrintToChat(client, "[%cCK%c] Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+					PrintToChat(client, "%cSurfLatam%c |  Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
 					return Plugin_Handled;
 				}
 			}
@@ -1506,12 +1506,12 @@ public Action Client_StageTop(int client, int args)
 			
 			if (0 > zGrp || zGrp > MAXZONEGROUPS)
 			{
-				PrintToChat(client, "[%cCK%c] Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+				PrintToChat(client, "%cSurfLatam%c |  Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
 				return Plugin_Handled;
 			}
 		}
 		default: {
-			PrintToChat(client, "[%cCK%c] Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
 			return Plugin_Handled;
 		}
 	}
@@ -1725,7 +1725,7 @@ public void CompareMenu(int client, int args)
 			DisplayMenu(menu, client, MENU_TIME_FOREVER);
 		}
 		else
-			PrintToChat(client, "[%cCK%c] No valid players found", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  No valid players found", MOSSGREEN, WHITE);
 		return;
 	}
 	else
@@ -1975,7 +1975,7 @@ public Action Client_Ranks(int client, int args)
 	if (IsValidClient(client))
 	{
 		char ChatLine[512];
-		Format(ChatLine, 512, "[%cCK%c] ", MOSSGREEN, WHITE);
+		Format(ChatLine, 512, "%cSurfLatam%c |  ", MOSSGREEN, WHITE);
 		int i, RankValue[SkillGroup];
 		for (i = 0; i < GetArraySize(g_hSkillGroups); i++)
 		{
@@ -2123,7 +2123,7 @@ public void ListStageRecords(int client, int type)
 	}
 	else
 	{
-		PrintToChat(client, "[%cCK%c] This map is linear.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  This map is linear.", MOSSGREEN, WHITE);
 		return;
 	}
 	
@@ -2145,7 +2145,7 @@ public Action Client_Compare(int client, int args)
 
 public Action Client_RankingSystem(int client, int args)
 {
-	PrintToChat(client, "[%cCK%c]%c Loading html page.. (requires cl_disablehtmlmotd 0)", MOSSGREEN, WHITE, LIMEGREEN);
+	PrintToChat(client, "%cSurfLatam%c | %c Loading html page.. (requires cl_disablehtmlmotd 0)", MOSSGREEN, WHITE, LIMEGREEN);
 	ShowMOTDPanel(client, "ckSurf - Ranking System", "http://koti.kapsi.fi/~mukavajoni/ranking/index.html", MOTDPANEL_TYPE_URL);
 	return Plugin_Handled;
 }
@@ -2552,7 +2552,7 @@ public void BonusTopMenu(int client)
 		}
 		else
 		{
-			PrintToChat(client, "[%cCK%c] There are no bonuses in this map.", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  There are no bonuses in this map.", MOSSGREEN, WHITE);
 			return;
 		}
 		
@@ -2584,7 +2584,7 @@ public void StageTopMenu(int client)
 		}
 		else
 		{
-			PrintToChat(client, "[%cCK%c] This map is linear.", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  This map is linear.", MOSSGREEN, WHITE);
 			return;
 		}
 		
@@ -2799,7 +2799,7 @@ public void ShowSrvSettings(int client)
 	PrintToConsole(client, "sv_staminajumpcost %.2f", flStamJump);
 	PrintToConsole(client, "sv_wateraccelerate %.1f", flWaterA);
 	PrintToConsole(client, "-------------------------------------");
-	PrintToChat(client, "[%cCK%c] See console for output!", MOSSGREEN, WHITE);
+	PrintToChat(client, "%cSurfLatam%c |  See console for output!", MOSSGREEN, WHITE);
 }
 
 public void OptionMenu(int client)

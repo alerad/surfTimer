@@ -279,7 +279,7 @@ public void EndTouch(int client, int action[3])
 					// NoClip check
 					if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0))
 					{
-						PrintToChat(client, "[%cCK%c] You are noclipping or have noclipped recently, timer disabled.", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  You are noclipping or have noclipped recently, timer disabled.", MOSSGREEN, WHITE);
 						ClientCommand(client, "play buttons\\button10.wav");
 					}
 					else
@@ -294,7 +294,7 @@ public void EndTouch(int client, int action[3])
 		    if (!g_bPracticeMode[client]) {
 		        if (g_bNoClip[client] || (!g_bNoClip[client] && (GetGameTime() - g_fLastTimeNoClipUsed[client]) < 3.0))
                 {
-                    PrintToChat(client, "[%cCK%c] You are noclipping or have noclipped recently, timer disabled.", MOSSGREEN, WHITE);
+                    PrintToChat(client, "%cSurfLatam%c |  You are noclipping or have noclipped recently, timer disabled.", MOSSGREEN, WHITE);
                     ClientCommand(client, "play buttons\\button10.wav");
                 } else {
                 	g_doingStage[client] = action[1] + 2;
@@ -662,7 +662,7 @@ public void ZoneMenu(int client)
 	
 	if (!(GetUserFlagBits(client) & g_ZoneMenuFlag) && !(GetUserFlagBits(client) & ADMFLAG_ROOT))
 	{
-		PrintToChat(client, "[%cCK%c] You don't have access to the zones menu.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  You don't have access to the zones menu.", MOSSGREEN, WHITE);
 		return;
 	}
 	
@@ -966,7 +966,7 @@ public void renameBonusGroup(int client)
 	if (!IsValidClient(client))
 		return;
 	
-	PrintToChat(client, "[%cCK%c] Please write the bonus name in chat or use %c!cancel%c to stop.", MOSSGREEN, WHITE, MOSSGREEN, WHITE);
+	PrintToChat(client, "%cSurfLatam%c |  Please write the bonus name in chat or use %c!cancel%c to stop.", MOSSGREEN, WHITE, MOSSGREEN, WHITE);
 	g_ClientRenamingZone[client] = true;
 }
 // Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
@@ -1103,7 +1103,7 @@ public int H_CreateBonusFirst(Handle tMenu, MenuAction action, int client, int i
 						return;
 					
 					g_Editing[client] = 2;
-					PrintToChat(client, "[%cCK%c] Bonus Start Zone Created", MOSSGREEN, WHITE);
+					PrintToChat(client, "%cSurfLatam%c |  Bonus Start Zone Created", MOSSGREEN, WHITE);
 					EndBonusZoneCreation(client);
 				}
 			}
@@ -1181,10 +1181,10 @@ public void SaveBonusZones(int client)
 		int id2 = g_mapZonesCount + 1;
 		db_insertZone(g_mapZonesCount, 1, 0, g_fBonusStartPos[client][0][0], g_fBonusStartPos[client][0][1], g_fBonusStartPos[client][0][2], g_fBonusStartPos[client][1][0], g_fBonusStartPos[client][1][1], g_fBonusStartPos[client][1][2], 0, 0, g_mapZoneGroupCount);
 		db_insertZone(id2, 2, 0, g_fBonusEndPos[client][0][0], g_fBonusEndPos[client][0][1], g_fBonusEndPos[client][0][2], g_fBonusEndPos[client][1][0], g_fBonusEndPos[client][1][1], g_fBonusEndPos[client][1][2], 0, 0, g_mapZoneGroupCount);
-		PrintToChat(client, "[%cCK%c] Bonus Saved!", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Bonus Saved!", MOSSGREEN, WHITE);
 	}
 	else
-		PrintToChat(client, "[%cCK%c] Failed to Save Bonus, error in coordinates", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Failed to Save Bonus, error in coordinates", MOSSGREEN, WHITE);
 	
 	resetSelection(client);
 	ZoneMenu(client);

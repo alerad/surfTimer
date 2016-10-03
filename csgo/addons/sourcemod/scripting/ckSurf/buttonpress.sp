@@ -8,7 +8,7 @@ public void CL_OnStageTimerPress(int client){
             {
                 if (GetGameTime() - g_fErrorMessage[client] > 1.0)
                 {
-                    PrintToChat(client, "[%cCK%c] The server hasn't finished loading it's settings, please wait.", MOSSGREEN, WHITE);
+                    PrintToChat(client, "%cSurfLatam%c |  The server hasn't finished loading it's settings, please wait.", MOSSGREEN, WHITE);
                     ClientCommand(client, "play buttons\\button10.wav");
                     g_fErrorMessage[client] = GetGameTime();
                 }
@@ -18,7 +18,7 @@ public void CL_OnStageTimerPress(int client){
             {
                 if (GetGameTime() - g_fErrorMessage[client] > 1.0)
                 {
-                    PrintToChat(client, "[%cCK%c] Your settings are currently being loaded, please wait.", MOSSGREEN, WHITE);
+                    PrintToChat(client, "%cSurfLatam%c |  Your settings are currently being loaded, please wait.", MOSSGREEN, WHITE);
                     ClientCommand(client, "play buttons\\button10.wav");
                     g_fErrorMessage[client] = GetGameTime();
                 }
@@ -28,7 +28,7 @@ public void CL_OnStageTimerPress(int client){
             {
                 if (GetGameTime() - g_fErrorMessage[client] > 1.0)
                 {
-                    PrintToChat(client, "[%cCK%c] The server hasn't finished loading your settings, please wait.", MOSSGREEN, WHITE);
+                    PrintToChat(client, "%cSurfLatam%c |  The server hasn't finished loading your settings, please wait.", MOSSGREEN, WHITE);
                     ClientCommand(client, "play buttons\\button10.wav");
                     g_fErrorMessage[client] = GetGameTime();
                 }
@@ -59,7 +59,7 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (GetGameTime() - g_fErrorMessage[client] > 1.0)
 				{
-					PrintToChat(client, "[%cCK%c] The server hasn't finished loading it's settings, please wait.", MOSSGREEN, WHITE);
+					PrintToChat(client, "%cSurfLatam%c |  The server hasn't finished loading it's settings, please wait.", MOSSGREEN, WHITE);
 					ClientCommand(client, "play buttons\\button10.wav");
 					g_fErrorMessage[client] = GetGameTime();
 				}
@@ -69,7 +69,7 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (GetGameTime() - g_fErrorMessage[client] > 1.0)
 				{
-					PrintToChat(client, "[%cCK%c] Your settings are currently being loaded, please wait.", MOSSGREEN, WHITE);
+					PrintToChat(client, "%cSurfLatam%c |  Your settings are currently being loaded, please wait.", MOSSGREEN, WHITE);
 					ClientCommand(client, "play buttons\\button10.wav");
 					g_fErrorMessage[client] = GetGameTime();
 				}
@@ -79,7 +79,7 @@ public void CL_OnStartTimerPress(int client)
 			{
 				if (GetGameTime() - g_fErrorMessage[client] > 1.0)
 				{
-					PrintToChat(client, "[%cCK%c] The server hasn't finished loading your settings, please wait.", MOSSGREEN, WHITE);
+					PrintToChat(client, "%cSurfLatam%c |  The server hasn't finished loading your settings, please wait.", MOSSGREEN, WHITE);
 					ClientCommand(client, "play buttons\\button10.wav");
 					g_fErrorMessage[client] = GetGameTime();
 				}
@@ -226,9 +226,9 @@ public void CL_OnEndTimerPress(int client)
 	if (g_bPracticeMode[client])
 	{
 		if (g_iClientInZone[client][2] > 0)
-			PrintToChat(client, "[%cCK%c] %c%s %cfinished the bonus with a time of [%c%s%c] in practice mode!", MOSSGREEN, WHITE, MOSSGREEN, szName, WHITE, LIGHTBLUE, g_szFinalTime[client], WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  %c%s %cfinished the bonus with a time of [%c%s%c] in practice mode!", MOSSGREEN, WHITE, MOSSGREEN, szName, WHITE, LIGHTBLUE, g_szFinalTime[client], WHITE);
 		else
-			PrintToChat(client, "[%cCK%c] %c%s %cfinished the map with a time of [%c%s%c] in practice mode!", MOSSGREEN, WHITE, MOSSGREEN, szName, WHITE, LIGHTBLUE, g_szFinalTime[client], WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  %c%s %cfinished the map with a time of [%c%s%c] in practice mode!", MOSSGREEN, WHITE, MOSSGREEN, szName, WHITE, LIGHTBLUE, g_szFinalTime[client], WHITE);
 		
 		/* Start function call */
 		Call_StartForward(g_PracticeFinishForward);
@@ -575,7 +575,7 @@ public void CL_OnEndStageTimerPress(int client)
 	int inStageEnd = g_iClientInZone[client][1];
 	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 	if (inStageEnd != g_doingStage[client]){
-		PrintToChat(client, "[%cCK%c] This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i) (inStageEnd %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
+		PrintToChat(client, "%cSurfLatam%c |  This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i) (inStageEnd %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
 		return;
 	}
 
@@ -677,7 +677,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	int inStageEnd = g_iClientInZone[client][1]+1;
 	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 	if (inStageEnd != g_doingStage[client]){
-		PrintToChat(client, "[%cCK%c] This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i) (inStageEnd %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
+		PrintToChat(client, "%cSurfLatam%c |  This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i) (inStageEnd %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
 		return;
 	}
 

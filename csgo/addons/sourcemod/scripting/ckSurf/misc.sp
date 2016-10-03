@@ -126,7 +126,7 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 		return;
 	if (!IsValidZonegroup(zonegroup))
 	{
-		PrintToChat(client, "[%cCK%c] Zonegroup not found.", MOSSGREEN, WHITE);
+		PrintToChat(client, "%cSurfLatam%c |  Zonegroup not found.", MOSSGREEN, WHITE);
 		return;
 	}
 
@@ -199,10 +199,10 @@ public void teleportClient(int client, int zonegroup, int zone, bool stopTime)
 				}
 			}
 			else
-				PrintToChat(client, "[%cCK%c] Destination zone not found!", MOSSGREEN, WHITE);
+				PrintToChat(client, "%cSurfLatam%c |  Destination zone not found!", MOSSGREEN, WHITE);
 		}
 		else
-			PrintToChat(client, "[%cCK%c] No zones found in the map.", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  No zones found in the map.", MOSSGREEN, WHITE);
 	}
 	return;
 }
@@ -771,36 +771,36 @@ public void checkChangesInTitle(int client)
 				{
 					g_bflagTitles_orig[client][i] = g_bflagTitles[client][i];
 					if (g_bflagTitles[client][i])
-						PrintToChat(client, "[%cCK%c] Congratulations! You have gained the VIP privileges!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  Congratulations! You have gained the VIP privileges!", MOSSGREEN, WHITE);
 					else
-						PrintToChat(client, "[%cCK%c] You have lost your VIP privileges!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  You have lost your VIP privileges!", MOSSGREEN, WHITE);
 					break;
 				}
 				case 1:
 				{
 					g_bflagTitles_orig[client][i] = g_bflagTitles[client][i];
 					if (g_bflagTitles[client][i])
-						PrintToChat(client, "[%cCK%c] Congratulations! You have gained the Mapper title!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  Congratulations! You have gained the Mapper title!", MOSSGREEN, WHITE);
 					else
-						PrintToChat(client, "[%cCK%c] You have lost your Mapper title!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  You have lost your Mapper title!", MOSSGREEN, WHITE);
 					break;
 				}
 				case 2:
 				{
 					g_bflagTitles_orig[client][i] = g_bflagTitles[client][i];
 					if (g_bflagTitles[client][i])
-						PrintToChat(client, "[%cCK%c] Congratulations! You have gained the Teacher title!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  Congratulations! You have gained the Teacher title!", MOSSGREEN, WHITE);
 					else
-						PrintToChat(client, "[%cCK%c] You have lost your Teacher title!", MOSSGREEN, WHITE);
+						PrintToChat(client, "%cSurfLatam%c |  You have lost your Teacher title!", MOSSGREEN, WHITE);
 					break;
 				}
 				default:
 				{
 					g_bflagTitles_orig[client][i] = g_bflagTitles[client][i];
 					if (g_bflagTitles[client][i])
-						PrintToChat(client, "[%cCK%c] Congratulations! You have gained the custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
+						PrintToChat(client, "%cSurfLatam%c |  Congratulations! You have gained the custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
 					else
-						PrintToChat(client, "[%cCK%c] You have lost your custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
+						PrintToChat(client, "%cSurfLatam%c |  You have lost your custom title \"%s\"!", MOSSGREEN, WHITE, g_szflagTitle_Colored[i]);
 					break;
 				}
 			}
@@ -982,7 +982,7 @@ public bool checkSpam(int client)
 	
 	
 	if (4 < g_messages[client] < 8)
-		PrintToChat(client, "[%cCK%c] %cStop spamming or you will get kicked!", MOSSGREEN, WHITE, RED);
+		PrintToChat(client, "%cSurfLatam%c |  %cStop spamming or you will get kicked!", MOSSGREEN, WHITE, RED);
 	else
 		if (g_messages[client] >= 8)
 	{
@@ -1401,7 +1401,7 @@ public void toggleTrail(int client)
 	
 	if (!g_bTrailOn[client])
 	{
-		PrintToChat(client, "[%cCK%c] Player trail %cenabled", MOSSGREEN, WHITE, MOSSGREEN);
+		PrintToChat(client, "%cSurfLatam%c |  Player trail %cenabled", MOSSGREEN, WHITE, MOSSGREEN);
 		g_bTrailOn[client] = true;
 		
 		if (!g_bTrailApplied[client])
@@ -1409,7 +1409,7 @@ public void toggleTrail(int client)
 	}
 	else
 	{
-		PrintToChat(client, "[%cCK%c] Player trail %cdisabled", MOSSGREEN, WHITE, RED);
+		PrintToChat(client, "%cSurfLatam%c |  Player trail %cdisabled", MOSSGREEN, WHITE, RED);
 		g_bTrailOn[client] = false;
 	}
 }
@@ -1826,7 +1826,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		}
 		
 		if (g_MapRank[client] == 99999 && IsValidClient(client))
-			PrintToChat(client, "[%cCK%c] %cFailed to save your data correctly! Please contact an admin.", MOSSGREEN, WHITE, DARKRED, RED, DARKRED);
+			PrintToChat(client, "%cSurfLatam%c |  %cFailed to save your data correctly! Please contact an admin.", MOSSGREEN, WHITE, DARKRED, RED, DARKRED);
 		
 		CreateTimer(0.0, UpdatePlayerProfile, client, TIMER_FLAG_NO_MAPCHANGE);
 		
@@ -1962,7 +1962,7 @@ stock void PrintChatBonus (int client, int zGroup, int rank = 0)
 	db_CalcAvgRunTimeBonus();
 	
 	if (rank == 9999999 && IsValidClient(client))
-		PrintToChat(client, "[%cCK%c] %cFailed to save your data correctly! Please contact an admin.", MOSSGREEN, WHITE, DARKRED, RED, DARKRED);
+		PrintToChat(client, "%cSurfLatam%c |  %cFailed to save your data correctly! Please contact an admin.", MOSSGREEN, WHITE, DARKRED, RED, DARKRED);
 	
 	return;
 }
@@ -2078,7 +2078,7 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 	db_CalcAvgRunTimeStage();
 	
 	if (rank == 9999999 && IsValidClient(client))
-		PrintToChat(client, "[%cCK%c] %cFailed to save your data correctly! Please contact an admin.", MOSSGREEN, WHITE, DARKRED, RED, DARKRED);
+		PrintToChat(client, "%cSurfLatam%c |  %cFailed to save your data correctly! Please contact an admin.", MOSSGREEN, WHITE, DARKRED, RED, DARKRED);
 	
 	return;
 }
@@ -2699,7 +2699,7 @@ public void CheckRun(int client)
 				if (g_fPersonalRecordBonus[g_iClientInZone[client][2]][client] > 0.0)
 				{
 					g_bMissedBonusBest[client] = true;
-					PrintToChat(client, "[%cCK%c] %cYou have missed your best bonus time of (%c%s%c)", MOSSGREEN, WHITE, GRAY, YELLOW, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client], GRAY);
+					PrintToChat(client, "%cSurfLatam%c |  %cYou have missed your best bonus time of (%c%s%c)", MOSSGREEN, WHITE, GRAY, YELLOW, g_szPersonalRecordBonus[g_iClientInZone[client][2]][client], GRAY);
 					EmitSoundToClient(client, "buttons/button18.wav", client);
 				}
 			}
