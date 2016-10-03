@@ -39,7 +39,6 @@ public void CL_OnStageTimerPress(int client){
             return;
     }
 
-    LogError("Sale de la zona y se ejecuta onstageTimerPress");
     //Reset stage variables for client
     g_stageStartTime[client] = GetGameTime();
     g_stageFinalTime[client] = 0.0;

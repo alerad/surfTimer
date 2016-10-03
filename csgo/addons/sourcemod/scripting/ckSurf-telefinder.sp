@@ -17,7 +17,7 @@ int g_iEntIndex[MAXPLAYERS + 1];
 
 public Plugin myinfo = 
 {
-	name = "[ckSurf] Teleport Destination Finder",
+	name = "[SurfLatam] Teleport Destination Finder",
 	author = PLUGIN_AUTHOR,
 	description = "Teleports clients using !cktele to info_teleport_destinations",
 	version = PLUGIN_VERSION,
@@ -32,7 +32,7 @@ public void OnPluginStart()
 		SetFailState("This plugin is for CSGO/CSS only.");	
 	}
 	
-	RegAdminCmd("sm_cktele", TeleToInfo, ADMFLAG_ROOT, "[ckSurf] Teleport client to a teleport destination in the map");
+	RegAdminCmd("sm_cktele", TeleToInfo, ADMFLAG_ROOT, "[SurfLatam] Teleport client to a teleport destination in the map");
 
 }
 

@@ -4,7 +4,7 @@ void disableServerHibernate()
 	g_iServerHibernationValue = GetConVarInt(hServerHibernate);
 	if (g_iServerHibernationValue > 0)
 	{
-		PrintToServer("[ckSurf] Disabling server hibernation.");
+		PrintToServer("[SurfLatam] Disabling server hibernation.");
 		SetConVarInt(hServerHibernate, 0, false, false);
 	}
 	CloseHandle(hServerHibernate);
@@ -16,7 +16,7 @@ void revertServerHibernateSettings()
 	Handle hServerHibernate = FindConVar("sv_hibernate_when_empty");
 	if (GetConVarInt(hServerHibernate) != g_iServerHibernationValue)
 	{
-		PrintToServer("[ckSurf] Resetting Server Hibernation CVar");
+		PrintToServer("[SurfLatam] Resetting Server Hibernation CVar");
 		SetConVarInt(hServerHibernate, g_iServerHibernationValue, false, false);
 	}
 	CloseHandle(hServerHibernate);
@@ -498,7 +498,7 @@ public void readMultiServerMapcycle()
 		}
 	}
 	else
-		SetFailState("[ckSurf] %s is empty or does not exist.", MULTI_SERVER_MAPCYCLE);
+		SetFailState("[SurfLatam] %s is empty or does not exist.", MULTI_SERVER_MAPCYCLE);
 
 	if (fileHandle != null)
 		CloseHandle(fileHandle);
@@ -520,7 +520,7 @@ public void readMapycycle()
 	{
 		if (mapListSerial == -1)
 		{
-			SetFailState("[ckSurf] mapcycle.txt is empty or does not exist.");
+			SetFailState("[SurfLatam] mapcycle.txt is empty or does not exist.");
 		}
 	}
 	for (int i = 0; i < GetArraySize(g_MapList); i++)
@@ -564,7 +564,7 @@ public bool loadHiddenChatCommands()
 		}
 	}
 	else
-		LogError("[ckSurf] %s is empty or does not exist.", BLOCKED_LIST_PATH);
+		LogError("[SurfLatam] %s is empty or does not exist.", BLOCKED_LIST_PATH);
 		
 	if (fileHandle != null)
 		CloseHandle(fileHandle);
@@ -2388,7 +2388,7 @@ public void SetSkillGroups()
 			CloseHandle(hKeyValues);
 	}
 	else
-		SetFailState("[ckSurf] %s not found.", SKILLGROUP_PATH);
+		SetFailState("[SurfLatam] %s not found.", SKILLGROUP_PATH);
 
 }
 

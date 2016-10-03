@@ -1010,7 +1010,7 @@ public void SQLTxn_TierInsertFailed(Handle db, any data, int numQueries, const c
 		PrintToChat(data, "%cSurfLatam%c |  Inserting map tiers %cfailed!%c. Check error logs.", MOSSGREEN, WHITE, RED, WHITE);
 	
 	g_insertingInformation = false;
-	LogError("[ckSurf] SQL Tier insertion failed! Index: %i Error: %s", failIndex, error);
+	LogError("[SurfLatam] SQL Tier insertion failed! Index: %i Error: %s", failIndex, error);
 }
 
 public void SQLTxn_TierInsertSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)
@@ -1141,7 +1141,7 @@ public void SQLTxn_ZoneInsertFailed(Handle db, any data, int numQueries, const c
 		PrintToChat(data, "%cSurfLatam%c |  Inserting zones %cfailed!%c. Check error logs.", MOSSGREEN, WHITE, RED, WHITE);
 	
 	g_insertingInformation = false;
-	LogError("[ckSurf] SQL Zone insertion failed! Index: %i Error: %s", failIndex, error);
+	LogError("[SurfLatam] SQL Zone insertion failed! Index: %i Error: %s", failIndex, error);
 }
 
 public void SQLTxn_ZoneInsertSuccess(Handle db, any data, int numQueries, Handle[] results, any[] queryData)

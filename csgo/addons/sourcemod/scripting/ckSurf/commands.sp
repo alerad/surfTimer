@@ -634,6 +634,17 @@ public Action Command_ToBonus(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Command_GoBack(int client, int args)
+{
+	char arg1[3];
+	GetCmdArg(1, arg1, sizeof(arg1));
+	int StageId = StringToInt(arg1);
+	int previousStage = g_iClientInZone[client][2]-1;
+	
+	teleportClient(client, previousStage, StageId, true);
+	return Plugin_Handled;
+}
+
 public Action Command_SelectStage(int client, int args)
 {
 	if (IsValidClient(client))

@@ -1621,7 +1621,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		g_bAutoVIPFlag = FindFlagByChar(newValue[0], flag);
 		g_AutoVIPFlag = FlagToBit(flag);
 		if (!g_bAutoVIPFlag)
-			PrintToServer("[ckSurf] Invalid flag for ck_autovip_flag");
+			PrintToServer("[SurfLatam] Invalid flag for ck_autovip_flag");
 	}
 	else if (convar == g_hZoneMenuFlag) {
 		AdminFlag flag;
@@ -1630,7 +1630,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		
 		if (!validFlag)
 		{
-			PrintToServer("[ckSurf] Invalid flag for ck_zonemenu_flag");
+			PrintToServer("[SurfLatam] Invalid flag for ck_zonemenu_flag");
 			g_ZoneMenuFlag = ADMFLAG_ROOT;
 		}
 		else
@@ -1643,7 +1643,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 		
 		if (!validFlag)
 		{
-			PrintToServer("[ckSurf] Invalid flag for ck_adminmenu_flag");
+			PrintToServer("[SurfLatam] Invalid flag for ck_adminmenu_flag");
 			g_AdminMenuFlag = ADMFLAG_GENERIC;
 		}
 		else
@@ -1858,7 +1858,7 @@ public void OnPluginStart()
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		PrintToServer("[ckSurf] Invalid flag for ck_adminmenu_flag.");
+		PrintToServer("[SurfLatam] Invalid flag for ck_adminmenu_flag.");
 		g_AdminMenuFlag = ADMFLAG_GENERIC;
 	}
 	else
@@ -1870,7 +1870,7 @@ public void OnPluginStart()
 	validFlag = FindFlagByChar(szFlag[0], bufferFlag);
 	if (!validFlag)
 	{
-		PrintToServer("[ckSurf] Invalid flag for ck_zonemenu_flag.");
+		PrintToServer("[SurfLatam] Invalid flag for ck_zonemenu_flag.");
 		g_ZoneMenuFlag = ADMFLAG_ROOT;
 	}
 	else
@@ -1879,139 +1879,141 @@ public void OnPluginStart()
 
 	db_setupDatabase();
 
-	//RegConsoleCmd("sm_rtimes", Command_rTimes, "[ckSurf] spawns a usp silencer");
+	//RegConsoleCmd("sm_rtimes", Command_rTimes, "[SurfLatam] spawns a usp silencer");
 
 	//client commands
-	RegConsoleCmd("sm_usp", Client_Usp, "[ckSurf] spawns a usp silencer");
-	RegConsoleCmd("sm_avg", Client_Avg, "[ckSurf] prints in chat the average time of the current map");
-	RegConsoleCmd("sm_accept", Client_Accept, "[ckSurf] allows you to accept a challenge request");
-	RegConsoleCmd("sm_hidechat", Client_HideChat, "[ckSurf] hides your ingame chat");
-	RegConsoleCmd("sm_hideweapon", Client_HideWeapon, "[ckSurf] hides your weapon model");
-	RegConsoleCmd("sm_disarm", Client_HideWeapon, "[ckSurf] hides your weapon model");
-	RegConsoleCmd("sm_goto", Client_GoTo, "[ckSurf] teleports you to a selected player");
-	RegConsoleCmd("sm_sound", Client_QuakeSounds, "[ckSurf] on/off quake sounds");
-	RegConsoleCmd("sm_surrender", Client_Surrender, "[ckSurf] surrender your current challenge");
-	RegConsoleCmd("sm_bhop", Client_AutoBhop, "[ckSurf] on/off autobhop");
-	RegConsoleCmd("sm_help2", Client_RankingSystem, "[ckSurf] Explanation of the ckSurf ranking system");
-	RegConsoleCmd("sm_flashlight", Client_Flashlight, "[ckSurf] on/off flashlight");
-	RegConsoleCmd("sm_maptop", Client_MapTop, "[ckSurf] displays local map top for a given map");
-	RegConsoleCmd("sm_hidespecs", Client_HideSpecs, "[ckSurf] hides spectators from menu/panel");
-	RegConsoleCmd("sm_compare", Client_Compare, "[ckSurf] compare your challenge results");
-	RegConsoleCmd("sm_wr", Client_Wr, "[ckSurf] prints records in chat");
-	RegConsoleCmd("sm_abort", Client_Abort, "[ckSurf] abort your current challenge");
-	RegConsoleCmd("sm_spec", Client_Spec, "[ckSurf] chooses a player who you want to spectate and switch you to spectators");
-	RegConsoleCmd("sm_watch", Client_Spec, "[ckSurf] chooses a player who you want to spectate and switch you to spectators");
-	RegConsoleCmd("sm_spectate", Client_Spec, "[ckSurf] chooses a player who you want to spectate and switch you to spectators");
-	RegConsoleCmd("sm_challenge", Client_Challenge, "[ckSurf] allows you to start a race against others");
-	RegConsoleCmd("sm_helpmenu", Client_Help, "[ckSurf] help menu which displays all ckSurf commands");
-	RegConsoleCmd("sm_help", Client_Help, "[ckSurf] help menu which displays all ckSurf commands");
-	RegConsoleCmd("sm_profile", Client_Profile, "[ckSurf] opens a player profile");
-	RegConsoleCmd("sm_rank", Client_Profile, "[ckSurf] opens a player profile");
-	RegConsoleCmd("sm_stagerank", Client_StageStats, "[ckSurf] opens a player stage records");
-	RegConsoleCmd("sm_options", Client_OptionMenu, "[ckSurf] opens options menu");
-	RegConsoleCmd("sm_top", Client_Top, "[ckSurf] displays top rankings (Top 100 Players, Top 50 overall)");
-	RegConsoleCmd("sm_topSurfers", Client_Top, "[ckSurf] displays top rankings (Top 100 Players, Top 50 overall)");
-	RegConsoleCmd("sm_bonustop", Client_BonusTop, "[ckSurf] displays top rankings of the bonus");
-	RegConsoleCmd("sm_stagetop", Client_StageTop, "[ckSurf] displays top rankings of the stage");
-	RegConsoleCmd("sm_st", Client_StageTop, "[ckSurf] displays top rankings of the stage");
-	RegConsoleCmd("sm_btop", Client_BonusTop, "[ckSurf] displays top rankings of the bonus");
-	RegConsoleCmd("sm_stop", Client_Stop, "[ckSurf] stops your timer");
-	RegConsoleCmd("sm_ranks", Client_Ranks, "[ckSurf] prints in chat the available player ranks");
-	RegConsoleCmd("sm_mapstats", Client_MapStats, "[ckSurf] displays panel with map ranks information");
-	RegConsoleCmd("sm_ms", Client_MapStats, "[ckSurf] displays panel with map ranks information");
-	RegConsoleCmd("sm_pause", Client_Pause, "[ckSurf] on/off pause (timer on hold and movement frozen)");
-	RegConsoleCmd("sm_showsettings", Client_Showsettings, "[ckSurf] shows ckSurf server settings");
-	RegConsoleCmd("sm_latest", Client_Latest, "[ckSurf] shows latest map records");
-	RegConsoleCmd("sm_showtime", Client_Showtime, "[ckSurf] on/off - timer text in panel/menu");
-	RegConsoleCmd("sm_hide", Client_Hide, "[ckSurf] on/off - hides other players");
-	RegConsoleCmd("sm_togglecheckpoints", ToggleCheckpoints, "[ckSurf] on/off - Enable player checkpoints");
-	RegConsoleCmd("+noclip", NoClip, "[ckSurf] Player noclip on");
-	RegConsoleCmd("-noclip", UnNoClip, "[ckSurf] Player noclip off");
-	RegConsoleCmd("sm_nc", Command_ckNoClip, "[ckSurf] Player noclip on/off");
+	RegConsoleCmd("sm_usp", Client_Usp, "[SurfLatam] spawns a usp silencer");
+	RegConsoleCmd("sm_avg", Client_Avg, "[SurfLatam] prints in chat the average time of the current map");
+	RegConsoleCmd("sm_accept", Client_Accept, "[SurfLatam] allows you to accept a challenge request");
+	RegConsoleCmd("sm_hidechat", Client_HideChat, "[SurfLatam] hides your ingame chat");
+	RegConsoleCmd("sm_hideweapon", Client_HideWeapon, "[SurfLatam] hides your weapon model");
+	RegConsoleCmd("sm_disarm", Client_HideWeapon, "[SurfLatam] hides your weapon model");
+	RegConsoleCmd("sm_goto", Client_GoTo, "[SurfLatam] teleports you to a selected player");
+	RegConsoleCmd("sm_sound", Client_QuakeSounds, "[SurfLatam] on/off quake sounds");
+	RegConsoleCmd("sm_surrender", Client_Surrender, "[SurfLatam] surrender your current challenge");
+	RegConsoleCmd("sm_bhop", Client_AutoBhop, "[SurfLatam] on/off autobhop");
+	RegConsoleCmd("sm_help2", Client_RankingSystem, "[SurfLatam] Explanation of the ckSurf ranking system");
+	RegConsoleCmd("sm_flashlight", Client_Flashlight, "[SurfLatam] on/off flashlight");
+	RegConsoleCmd("sm_maptop", Client_MapTop, "[SurfLatam] displays local map top for a given map");
+	RegConsoleCmd("sm_hidespecs", Client_HideSpecs, "[SurfLatam] hides spectators from menu/panel");
+	RegConsoleCmd("sm_compare", Client_Compare, "[SurfLatam] compare your challenge results");
+	RegConsoleCmd("sm_wr", Client_Wr, "[SurfLatam] prints records in chat");
+	RegConsoleCmd("sm_abort", Client_Abort, "[SurfLatam] abort your current challenge");
+	RegConsoleCmd("sm_spec", Client_Spec, "[SurfLatam] chooses a player who you want to spectate and switch you to spectators");
+	RegConsoleCmd("sm_watch", Client_Spec, "[SurfLatam] chooses a player who you want to spectate and switch you to spectators");
+	RegConsoleCmd("sm_spectate", Client_Spec, "[SurfLatam] chooses a player who you want to spectate and switch you to spectators");
+	RegConsoleCmd("sm_challenge", Client_Challenge, "[SurfLatam] allows you to start a race against others");
+	RegConsoleCmd("sm_helpmenu", Client_Help, "[SurfLatam] help menu which displays all ckSurf commands");
+	RegConsoleCmd("sm_help", Client_Help, "[SurfLatam] help menu which displays all ckSurf commands");
+	RegConsoleCmd("sm_profile", Client_Profile, "[SurfLatam] opens a player profile");
+	RegConsoleCmd("sm_rank", Client_Profile, "[SurfLatam] opens a player profile");
+	RegConsoleCmd("sm_stagerank", Client_StageStats, "[SurfLatam] opens a player stage records");
+	RegConsoleCmd("sm_options", Client_OptionMenu, "[SurfLatam] opens options menu");
+	RegConsoleCmd("sm_top", Client_Top, "[SurfLatam] displays top rankings (Top 100 Players, Top 50 overall)");
+	RegConsoleCmd("sm_topSurfers", Client_Top, "[SurfLatam] displays top rankings (Top 100 Players, Top 50 overall)");
+	RegConsoleCmd("sm_bonustop", Client_BonusTop, "[SurfLatam] displays top rankings of the bonus");
+	RegConsoleCmd("sm_stagetop", Client_StageTop, "[SurfLatam] displays top rankings of the stage");
+	RegConsoleCmd("sm_st", Client_StageTop, "[SurfLatam] displays top rankings of the stage");
+	RegConsoleCmd("sm_btop", Client_BonusTop, "[SurfLatam] displays top rankings of the bonus");
+	RegConsoleCmd("sm_stop", Client_Stop, "[SurfLatam] stops your timer");
+	RegConsoleCmd("sm_ranks", Client_Ranks, "[SurfLatam] prints in chat the available player ranks");
+	RegConsoleCmd("sm_mapstats", Client_MapStats, "[SurfLatam] displays panel with map ranks information");
+	RegConsoleCmd("sm_ms", Client_MapStats, "[SurfLatam] displays panel with map ranks information");
+	RegConsoleCmd("sm_pause", Client_Pause, "[SurfLatam] on/off pause (timer on hold and movement frozen)");
+	RegConsoleCmd("sm_showsettings", Client_Showsettings, "[SurfLatam] shows ckSurf server settings");
+	RegConsoleCmd("sm_latest", Client_Latest, "[SurfLatam] shows latest map records");
+	RegConsoleCmd("sm_showtime", Client_Showtime, "[SurfLatam] on/off - timer text in panel/menu");
+	RegConsoleCmd("sm_hide", Client_Hide, "[SurfLatam] on/off - hides other players");
+	RegConsoleCmd("sm_togglecheckpoints", ToggleCheckpoints, "[SurfLatam] on/off - Enable player checkpoints");
+	RegConsoleCmd("+noclip", NoClip, "[SurfLatam] Player noclip on");
+	RegConsoleCmd("-noclip", UnNoClip, "[SurfLatam] Player noclip off");
+	RegConsoleCmd("sm_nc", Command_ckNoClip, "[SurfLatam] Player noclip on/off");
+	RegConsoleCmd("sm_gb", Command_GoBack, "[SurfLatam] Go back 1 stage without loosing your time.");
+
 	
 	// Teleportation commands
-	RegConsoleCmd("sm_stages", Command_SelectStage, "[ckSurf] Opens up the stage selector");
-	RegConsoleCmd("sm_r", Command_Restart, "[ckSurf] Teleports player back to the start");
-	RegConsoleCmd("sm_restart", Command_Restart, "[ckSurf] Teleports player back to the start");
-	RegConsoleCmd("sm_start", Command_Restart, "[ckSurf] Teleports player back to the start");
-	RegConsoleCmd("sm_b", Command_ToBonus, "[ckSurf] Teleports player back to the start");
-	RegConsoleCmd("sm_bonus", Command_ToBonus, "[ckSurf] Teleports player back to the start");
-	RegConsoleCmd("sm_bonuses", Command_ListBonuses, "[ckSurf] Displays a list of bonuses in current map");
-	RegConsoleCmd("sm_s", Command_ToStage, "[ckSurf] Teleports player to the selected stage");
-	RegConsoleCmd("sm_stage", Command_ToStage, "[ckSurf] Teleports player to the selected stage");
-	RegConsoleCmd("sm_end", Command_ToEnd, "[ckSurf] Teleports player to the end zone");
+	RegConsoleCmd("sm_stages", Command_SelectStage, "[SurfLatam] Opens up the stage selector");
+	RegConsoleCmd("sm_r", Command_Restart, "[SurfLatam] Teleports player back to the start");
+	RegConsoleCmd("sm_restart", Command_Restart, "[SurfLatam] Teleports player back to the start");
+	RegConsoleCmd("sm_start", Command_Restart, "[SurfLatam] Teleports player back to the start");
+	RegConsoleCmd("sm_b", Command_ToBonus, "[SurfLatam] Teleports player back to the start");
+	RegConsoleCmd("sm_bonus", Command_ToBonus, "[SurfLatam] Teleports player back to the start");
+	RegConsoleCmd("sm_bonuses", Command_ListBonuses, "[SurfLatam] Displays a list of bonuses in current map");
+	RegConsoleCmd("sm_s", Command_ToStage, "[SurfLatam] Teleports player to the selected stage");
+	RegConsoleCmd("sm_stage", Command_ToStage, "[SurfLatam] Teleports player to the selected stage");
+	RegConsoleCmd("sm_end", Command_ToEnd, "[SurfLatam] Teleports player to the end zone");
 	
 	// Titles
-	RegConsoleCmd("sm_title", Command_SetTitle, "[ckSurf] Displays player's titles");
-	RegConsoleCmd("sm_titles", Command_SetTitle, "[ckSurf] Displays player's titles");
+	RegConsoleCmd("sm_title", Command_SetTitle, "[SurfLatam] Displays player's titles");
+	RegConsoleCmd("sm_titles", Command_SetTitle, "[SurfLatam] Displays player's titles");
 	
 	if(GetConVarBool(g_hServerVipCommand))
 	{
-		RegConsoleCmd("sm_vip", Command_Vip, "[ckSurf] VIP's commands and effects.");
-		RegConsoleCmd("sm_effects", Command_Vip, "[ckSurf] VIP's commands and effects.");
-		RegConsoleCmd("sm_effect", Command_Vip, "[ckSurf] VIP's commands and effects.");
+		RegConsoleCmd("sm_vip", Command_Vip, "[SurfLatam] VIP's commands and effects.");
+		RegConsoleCmd("sm_effects", Command_Vip, "[SurfLatam] VIP's commands and effects.");
+		RegConsoleCmd("sm_effect", Command_Vip, "[SurfLatam] VIP's commands and effects.");
 	}
 	
 	// MISC
-	RegConsoleCmd("sm_tier", Command_Tier, "[ckSurf] Prints information on the current map");
-	RegConsoleCmd("sm_maptier", Command_Tier, "[ckSurf] Prints information on the current map");
-	RegConsoleCmd("sm_mapinfo", Command_Tier, "[ckSurf] Prints information on the current map");
-	RegConsoleCmd("sm_mi", Command_Tier, "[ckSurf] Prints information on the current map");
-	RegConsoleCmd("sm_m", Command_Tier, "[ckSurf] Prints information on the current map");
-	RegConsoleCmd("sm_difficulty", Command_Tier, "[ckSurf] Prints information on the current map");
-	RegConsoleCmd("sm_btier", Command_bTier, "[ckSurf] Prints tier information on current map's bonuses");
-	RegConsoleCmd("sm_bonusinfo", Command_bTier, "[ckSurf] Prints tier information on current map's bonuses");
-	RegConsoleCmd("sm_bi", Command_bTier, "[ckSurf] Prints tier information on current map's bonuses");
-	RegConsoleCmd("sm_howto", Command_HowTo, "[ckSurf] Displays a youtube video on how to surf");
-	RegConsoleCmd("sm_ve", Command_VoteExtend, "[ckSurf] Vote to extend the map");
-	RegConsoleCmd("sm_vmute", Command_MutePlayer, "[ckSurf] Mute a player");
+	RegConsoleCmd("sm_tier", Command_Tier, "[SurfLatam] Prints information on the current map");
+	RegConsoleCmd("sm_maptier", Command_Tier, "[SurfLatam] Prints information on the current map");
+	RegConsoleCmd("sm_mapinfo", Command_Tier, "[SurfLatam] Prints information on the current map");
+	RegConsoleCmd("sm_mi", Command_Tier, "[SurfLatam] Prints information on the current map");
+	RegConsoleCmd("sm_m", Command_Tier, "[SurfLatam] Prints information on the current map");
+	RegConsoleCmd("sm_difficulty", Command_Tier, "[SurfLatam] Prints information on the current map");
+	RegConsoleCmd("sm_btier", Command_bTier, "[SurfLatam] Prints tier information on current map's bonuses");
+	RegConsoleCmd("sm_bonusinfo", Command_bTier, "[SurfLatam] Prints tier information on current map's bonuses");
+	RegConsoleCmd("sm_bi", Command_bTier, "[SurfLatam] Prints tier information on current map's bonuses");
+	RegConsoleCmd("sm_howto", Command_HowTo, "[SurfLatam] Displays a youtube video on how to surf");
+	RegConsoleCmd("sm_ve", Command_VoteExtend, "[SurfLatam] Vote to extend the map");
+	RegConsoleCmd("sm_vmute", Command_MutePlayer, "[SurfLatam] Mute a player");
 
 
 	// Teleport to the start of the stage
-	RegConsoleCmd("sm_stuck", Command_Teleport, "[ckSurf] Teleports player back to the start of the stage");
-	RegConsoleCmd("sm_back", Command_Teleport, "[ckSurf] Teleports player back to the start of the stage");
-	RegConsoleCmd("sm_rs", Command_Teleport, "[ckSurf] Teleports player back to the start of the stage");
-	RegConsoleCmd("sm_play", Command_Teleport, "[ckSurf] Teleports player back to the start");
-	RegConsoleCmd("sm_spawn", Command_Teleport, "[ckSurf] Teleports player back to the start");
+	RegConsoleCmd("sm_stuck", Command_Teleport, "[SurfLatam] Teleports player back to the start of the stage");
+	RegConsoleCmd("sm_back", Command_Teleport, "[SurfLatam] Teleports player back to the start of the stage");
+	RegConsoleCmd("sm_rs", Command_Teleport, "[SurfLatam] Teleports player back to the start of the stage");
+	RegConsoleCmd("sm_play", Command_Teleport, "[SurfLatam] Teleports player back to the start");
+	RegConsoleCmd("sm_spawn", Command_Teleport, "[SurfLatam] Teleports player back to the start");
 	
 	// Player Checkpoints
-	RegConsoleCmd("sm_teleport", Command_goToPlayerCheckpoint, "[ckSurf] Teleports player to his last checkpoint");
-	RegConsoleCmd("sm_tele", Command_goToPlayerCheckpoint, "[ckSurf] Teleports player to his last checkpoint");
-	RegConsoleCmd("sm_prac", Command_goToPlayerCheckpoint, "[ckSurf] Teleports player to his last checkpoint");
-	RegConsoleCmd("sm_practice", Command_goToPlayerCheckpoint, "[ckSurf] Teleports player to his last checkpoint");
+	RegConsoleCmd("sm_teleport", Command_goToPlayerCheckpoint, "[SurfLatam] Teleports player to his last checkpoint");
+	RegConsoleCmd("sm_tele", Command_goToPlayerCheckpoint, "[SurfLatam] Teleports player to his last checkpoint");
+	RegConsoleCmd("sm_prac", Command_goToPlayerCheckpoint, "[SurfLatam] Teleports player to his last checkpoint");
+	RegConsoleCmd("sm_practice", Command_goToPlayerCheckpoint, "[SurfLatam] Teleports player to his last checkpoint");
 	
-	RegConsoleCmd("sm_cp", Command_createPlayerCheckpoint, "[ckSurf] Creates a checkpoint, where the player can teleport back to");
-	RegConsoleCmd("sm_checkpoint", Command_createPlayerCheckpoint, "[ckSurf] Creates a eckpoint, where the player can teleport back to");
-	RegConsoleCmd("sm_undo", Command_undoPlayerCheckpoint, "[ckSurf] Undoes the players lchast checkpoint.");
-	RegConsoleCmd("sm_normal", Command_normalMode, "[ckSurf] Switches player back to normal mode.");
-	RegConsoleCmd("sm_n", Command_normalMode, "[ckSurf] Switches player back to normal mode.");
+	RegConsoleCmd("sm_cp", Command_createPlayerCheckpoint, "[SurfLatam] Creates a checkpoint, where the player can teleport back to");
+	RegConsoleCmd("sm_checkpoint", Command_createPlayerCheckpoint, "[SurfLatam] Creates a eckpoint, where the player can teleport back to");
+	RegConsoleCmd("sm_undo", Command_undoPlayerCheckpoint, "[SurfLatam] Undoes the players lchast checkpoint.");
+	RegConsoleCmd("sm_normal", Command_normalMode, "[SurfLatam] Switches player back to normal mode.");
+	RegConsoleCmd("sm_n", Command_normalMode, "[SurfLatam] Switches player back to normal mode.");
 	
-	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[ckSurf] Displays the ckSurf menu panel");
-	RegAdminCmd("sm_refreshprofile", Admin_RefreshProfile, g_AdminMenuFlag, "[ckSurf] Recalculates player profile for given steam id");
-	RegAdminCmd("sm_resetchallenges", Admin_DropChallenges, ADMFLAG_ROOT, "[ckSurf] Resets all player challenges (drops table challenges) - requires z flag");
-	RegAdminCmd("sm_resettimes", Admin_DropAllMapRecords, ADMFLAG_ROOT, "[ckSurf] Resets all player times (drops table playertimes) - requires z flag");
-	RegAdminCmd("sm_resetranks", Admin_DropPlayerRanks, ADMFLAG_ROOT, "[ckSurf] Resets the all player points  (drops table playerrank - requires z flag)");
-	RegAdminCmd("sm_resetmaptimes", Admin_ResetMapRecords, ADMFLAG_ROOT, "[ckSurf] Resets player times for given map - requires z flag");
-	RegAdminCmd("sm_resetplayerchallenges", Admin_ResetChallenges, ADMFLAG_ROOT, "[ckSurf] Resets (won) challenges for given steamid - requires z flag");
-	RegAdminCmd("sm_resetplayertimes", Admin_ResetRecords, ADMFLAG_ROOT, "[ckSurf] Resets pro map times (+extrapoints) for given steamid with or without given map - requires z flag");
-	RegAdminCmd("sm_resetplayermaptime", Admin_ResetMapRecord, ADMFLAG_ROOT, "[ckSurf] Resets pro map time for given steamid and map - requires z flag");
-	RegAdminCmd("sm_deleteproreplay", Admin_DeleteMapReplay, ADMFLAG_ROOT, "[ckSurf] Deletes pro replay for a given map - requires z flag");
-	RegAdminCmd("sm_resetextrapoints", Admin_ResetExtraPoints, ADMFLAG_ROOT, "[ckSurf] Resets given extra points for all players with or without given steamid");
-	RegAdminCmd("sm_deletecheckpoints", Admin_DeleteCheckpoints, ADMFLAG_ROOT, "[ckSurf] Reset checkpoints on the current map");
-	RegAdminCmd("sm_insertmaptiers", Admin_InsertMapTiers, ADMFLAG_ROOT, "[ckSurf] Insert premade maptier information into the database (ONLY RUN THIS ONCE)");
-	RegAdminCmd("sm_insertmapzones", Admin_InsertMapZones, ADMFLAG_ROOT, "[ckSurf] Insert premade map zones into the database (ONLY RUN THIS ONCE)");
-	RegAdminCmd("sm_zones", Command_Zones, g_ZoneMenuFlag, "[ckSurf] Opens up the zone creation menu.");
-	RegAdminCmd("sm_admintitles", Admin_giveTitle, ADMFLAG_ROOT, "[ckSurf] Gives a player a title");
-	RegAdminCmd("sm_admintitle", Admin_giveTitle, ADMFLAG_ROOT, "[ckSurf] Gives a player a title");
-	RegAdminCmd("sm_givetitle", Admin_giveTitle, ADMFLAG_ROOT, "[ckSurf] Gives a player a title");
-	RegAdminCmd("sm_removetitles", Admin_deleteTitles, ADMFLAG_ROOT, "[ckSurf] Removes player's all titles");
-	RegAdminCmd("sm_removetitle", Admin_deleteTitle, ADMFLAG_ROOT, "[ckSurf] Removes specific title from a player");
+	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[SurfLatam] Displays the ckSurf menu panel");
+	RegAdminCmd("sm_refreshprofile", Admin_RefreshProfile, g_AdminMenuFlag, "[SurfLatam] Recalculates player profile for given steam id");
+	RegAdminCmd("sm_resetchallenges", Admin_DropChallenges, ADMFLAG_ROOT, "[SurfLatam] Resets all player challenges (drops table challenges) - requires z flag");
+	RegAdminCmd("sm_resettimes", Admin_DropAllMapRecords, ADMFLAG_ROOT, "[SurfLatam] Resets all player times (drops table playertimes) - requires z flag");
+	RegAdminCmd("sm_resetranks", Admin_DropPlayerRanks, ADMFLAG_ROOT, "[SurfLatam] Resets the all player points  (drops table playerrank - requires z flag)");
+	RegAdminCmd("sm_resetmaptimes", Admin_ResetMapRecords, ADMFLAG_ROOT, "[SurfLatam] Resets player times for given map - requires z flag");
+	RegAdminCmd("sm_resetplayerchallenges", Admin_ResetChallenges, ADMFLAG_ROOT, "[SurfLatam] Resets (won) challenges for given steamid - requires z flag");
+	RegAdminCmd("sm_resetplayertimes", Admin_ResetRecords, ADMFLAG_ROOT, "[SurfLatam] Resets pro map times (+extrapoints) for given steamid with or without given map - requires z flag");
+	RegAdminCmd("sm_resetplayermaptime", Admin_ResetMapRecord, ADMFLAG_ROOT, "[SurfLatam] Resets pro map time for given steamid and map - requires z flag");
+	RegAdminCmd("sm_deleteproreplay", Admin_DeleteMapReplay, ADMFLAG_ROOT, "[SurfLatam] Deletes pro replay for a given map - requires z flag");
+	RegAdminCmd("sm_resetextrapoints", Admin_ResetExtraPoints, ADMFLAG_ROOT, "[SurfLatam] Resets given extra points for all players with or without given steamid");
+	RegAdminCmd("sm_deletecheckpoints", Admin_DeleteCheckpoints, ADMFLAG_ROOT, "[SurfLatam] Reset checkpoints on the current map");
+	RegAdminCmd("sm_insertmaptiers", Admin_InsertMapTiers, ADMFLAG_ROOT, "[SurfLatam] Insert premade maptier information into the database (ONLY RUN THIS ONCE)");
+	RegAdminCmd("sm_insertmapzones", Admin_InsertMapZones, ADMFLAG_ROOT, "[SurfLatam] Insert premade map zones into the database (ONLY RUN THIS ONCE)");
+	RegAdminCmd("sm_zones", Command_Zones, g_ZoneMenuFlag, "[SurfLatam] Opens up the zone creation menu.");
+	RegAdminCmd("sm_admintitles", Admin_giveTitle, ADMFLAG_ROOT, "[SurfLatam] Gives a player a title");
+	RegAdminCmd("sm_admintitle", Admin_giveTitle, ADMFLAG_ROOT, "[SurfLatam] Gives a player a title");
+	RegAdminCmd("sm_givetitle", Admin_giveTitle, ADMFLAG_ROOT, "[SurfLatam] Gives a player a title");
+	RegAdminCmd("sm_removetitles", Admin_deleteTitles, ADMFLAG_ROOT, "[SurfLatam] Removes player's all titles");
+	RegAdminCmd("sm_removetitle", Admin_deleteTitle, ADMFLAG_ROOT, "[SurfLatam] Removes specific title from a player");
 	
-	RegAdminCmd("sm_addmaptier", Admin_insertMapTier, g_AdminMenuFlag, "[ckSurf] Changes maps tier");
-	RegAdminCmd("sm_amt", Admin_insertMapTier, g_AdminMenuFlag, "[ckSurf] Changes maps tier");
-	RegAdminCmd("sm_addspawn", Admin_insertSpawnLocation, g_AdminMenuFlag, "[ckSurf] Changes the position !r takes players to");
-	RegAdminCmd("sm_delspawn", Admin_deleteSpawnLocation, g_AdminMenuFlag, "[ckSurf] Removes custom !r position");
-	RegAdminCmd("sm_clearassists", Admin_ClearAssists, g_AdminMenuFlag, "[ckSurf] Clears assist points (map progress) from all players");
+	RegAdminCmd("sm_addmaptier", Admin_insertMapTier, g_AdminMenuFlag, "[SurfLatam] Changes maps tier");
+	RegAdminCmd("sm_amt", Admin_insertMapTier, g_AdminMenuFlag, "[SurfLatam] Changes maps tier");
+	RegAdminCmd("sm_addspawn", Admin_insertSpawnLocation, g_AdminMenuFlag, "[SurfLatam] Changes the position !r takes players to");
+	RegAdminCmd("sm_delspawn", Admin_deleteSpawnLocation, g_AdminMenuFlag, "[SurfLatam] Removes custom !r position");
+	RegAdminCmd("sm_clearassists", Admin_ClearAssists, g_AdminMenuFlag, "[SurfLatam] Clears assist points (map progress) from all players");
 	
 	
 	//chat command listener

@@ -211,7 +211,7 @@ public void LoadReplays()
 		{
 			BuildPath(Path_SM, newPath, sizeof(newPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_mapZones[zId][zoneGroup]);
 			if (RenameFile(newPath, sPath))
-				PrintToServer("[ckSurf] Succesfully renamed bonus record file to: %s", newPath);
+				PrintToServer("[SurfLatam] Succesfully renamed bonus record file to: %s", newPath);
 		}
 		CloseHandle(hFilex);
 	}
