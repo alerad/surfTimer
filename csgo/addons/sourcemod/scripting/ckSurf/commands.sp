@@ -2619,6 +2619,8 @@ public void HelpPanel(int client)
 	DrawPanelText(panel, "!top - top menu");
 	DrawPanelText(panel, "!latest - prints in console the last map records");
 	DrawPanelText(panel, "!profile/!ranks - opens your profile");
+	DrawPanelText(panel, "!ms/!mapstats - opens your map statistics");
+	DrawPanelText(panel, "!st/!stagetop - opens stage top menu");
 	DrawPanelText(panel, " ");
 	DrawPanelItem(panel, "next page");
 	DrawPanelItem(panel, "exit");
