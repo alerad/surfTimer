@@ -636,13 +636,11 @@ public Action Command_ToBonus(int client, int args)
 
 public Action Command_GoBack(int client, int args)
 {
-	char arg1[3];
-	GetCmdArg(1, arg1, sizeof(arg1));
-	int StageId = StringToInt(arg1);
-	int previousStage = g_iClientInZone[client][2]-1;
-	
-	teleportClient(client, previousStage, StageId, true);
-	return Plugin_Handled;
+  int StageId = g_iClientInZone[client][1];
+  int previousStage = g_Stage[g_iClientInZone[client][2]][client]-1;
+  g_stageTimerActivated[client] = false;
+  teleportClient(client, 0, previousStage, false);
+  return Plugin_Handled;
 }
 
 public Action Command_SelectStage(int client, int args)
@@ -2053,56 +2051,68 @@ public Action Client_MapStats(int client, int args)
 		char szValue[128];
 		// char szTime[32];
 		char szSteamId[32];
-		getSteamIDFromClient(client, szSteamId, 32);
-		int i,b;
-
-		Menu mapInfoMenu = new Menu(MapMenuHandler1);
-		mapInfoMenu.Pagination = 10;
-
-		//Adds map time
-		Format(szValue, 128, "[Map Time]: %s | Rank: %i/%i", g_szPersonalRecord[client] ,g_MapRank[client] ,g_MapTimesCount);
-		mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
-
-		LogError("bonusCount %i", g_totalBonusCount);
-		int bonusCount = g_mapZoneGroupCount;
-		for (i= 1; i<=bonusCount; i++){
-			float bonusTime = g_fPersonalRecordBonus[i][client];
-			if (bonusTime>0) {
-				Format(szValue, 128, "[Bonus %i Time]: %s | Rank: %i/%i", i, g_szPersonalRecordBonus[i][client] ,g_MapRankBonus[i][client] ,g_iBonusCount[i]);
-				mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
-			} else{
-				Format(szValue, 128, "No times for Bonus %i", (i));
-				mapInfoMenu.AddItem(szValue, szValue);
-			}
+		char szArg[128];
+		
+		if (args>0){
+			GetCmdArg(1, szArg, 128);
+			
+		} else {
 			
 		}
 
-		
 
-		// Counts stages and creates strings
-		int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
-		Handle stringArray = CreateArray(stageCount);
-	
-		for (i= 1; i<=stageCount; i++){
-			float stageTime = g_fPersonalRecordStage[i][client];
-			LogError("Aca vamo a ver porque se ormpe todo %f, ITERATOR %i", stageTime, i);
-			// Format(szTime, 32, "Time: %f", stageTime);
-			if (stageTime>0){
-				Format(szValue, 128, "[Stage %i Time]: %s | Rank %i/%i", (i), g_szPersonalRecordStage[i][client], g_MapRankStage[i][client], g_iStageCount[i]);
-				mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
-			}
-			PushArrayString(stringArray, szValue);
-			b=i;
-		}
-
-		char title[64];
-		Format(title, 64, "Map Statistics");
-		mapInfoMenu.SetTitle(title);
-		mapInfoMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
-		mapInfoMenu.Display(client, MENU_TIME_FOREVER);
-		CloseHandle(stringArray);
+		getSteamIDFromClient(client, szSteamId, 32);
+		DisplayMapStats(client)
 	}
 	return Plugin_Handled;
+}
+
+public void DisplayMapStats(int client){
+	Menu mapInfoMenu = new Menu(MapMenuHandler1);
+	mapInfoMenu.Pagination = 10;
+
+	//Adds map time
+	Format(szValue, 128, "[Map Time]: %s | Rank: %i/%i", g_szPersonalRecord[client] ,g_MapRank[client] ,g_MapTimesCount);
+	mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
+
+	int bonusCount = g_mapZoneGroupCount;
+	int i,b;
+	for (i= 1; i<=bonusCount; i++){
+		float bonusTime = g_fPersonalRecordBonus[i][client];
+		if (bonusTime>0) {
+			Format(szValue, 128, "[Bonus %i Time]: %s | Rank: %i/%i", i, g_szPersonalRecordBonus[i][client] ,g_MapRankBonus[i][client] ,g_iBonusCount[i]);
+			mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
+		} else{
+			Format(szValue, 128, "No times for Bonus %i", (i));
+			mapInfoMenu.AddItem(szValue, szValue);
+		}
+		
+	}
+
+	
+
+	// Counts stages and creates strings
+	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+	Handle stringArray = CreateArray(stageCount);
+
+	for (i= 1; i<=stageCount; i++){
+		float stageTime = g_fPersonalRecordStage[i][client];
+		LogError("Aca vamo a ver porque se ormpe todo %f, ITERATOR %i", stageTime, i);
+		// Format(szTime, 32, "Time: %f", stageTime);
+		if (stageTime>0){
+			Format(szValue, 128, "[Stage %i Time]: %s | Rank %i/%i", (i), g_szPersonalRecordStage[i][client], g_MapRankStage[i][client], g_iStageCount[i]);
+			mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
+		}
+		PushArrayString(stringArray, szValue);
+		b=i;
+	}
+
+	char title[64];
+	Format(title, 64, "Map Statistics");
+	mapInfoMenu.SetTitle(title);
+	mapInfoMenu.OptionFlags = MENUFLAG_BUTTON_EXIT;
+	mapInfoMenu.Display(client, MENU_TIME_FOREVER);
+	CloseHandle(stringArray);
 }
 
 public void ListStageRecords(int client, int type)

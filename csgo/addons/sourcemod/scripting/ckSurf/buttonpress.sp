@@ -662,9 +662,6 @@ public void CL_OnEndStageTimerPress(int client)
 
 
 	g_stageTimerActivated[client] = false;
-	//set mvp star
-	g_MVPStars[client] += 1;
-	CS_SetMVPCount(client, g_MVPStars[client]);
 } 
 
 // End timer
@@ -764,7 +761,4 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 
 
 	g_stageTimerActivated[client] = false;
-	//set mvp star
-	g_MVPStars[client] += 1;
-	CS_SetMVPCount(client, g_MVPStars[client]);
 } 
