@@ -179,11 +179,7 @@ public void StartTouch(int client, int action[3])
 		else if (action[0] == 2) // End Zone
 		{
 			if (g_iClientInZone[client][2] == action[2]) {//  Cant end bonus timer in this zone && in the having the same timer on
-				// CL_OnEndStageTimerPress(client);
 				CL_OnEndTimerPress(client);
-			  	// g_stageStartTime[client] = GetGameTime();
-      //           g_stageFinalTime[client] = 0.0;
-      //           g_stageTimerActivated[client] = false;
 			}
 			else
 			{
@@ -248,11 +244,13 @@ public void StartTouch(int client, int action[3])
 		}
 		if (action[0] == 9){ //Stage End
             if (!g_bPracticeMode[client] && g_stageTimerActivated[client]){
-                // Get runtime and format it to a string
-                CL_OnEndStageTimerPress(client);
-                g_stageStartTime[client] = GetGameTime();
-                g_stageFinalTime[client] = 0.0;
-                g_stageTimerActivated[client] = false;
+            	/*Setting the stage final time. Not updating points or anything since i run the validation on the next stage zone.
+            	This is so you don't have to create Stage End zones in order.*/
+            	g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
+            	g_fFinalTime[client] = g_stageFinalTime[client];
+   				FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
+   				g_passedThroughStageEnd[client] = true;     
+   				LogError("StageFinaltime es %f", g_stageFinalTime[client]);        
             }
         }
 	}

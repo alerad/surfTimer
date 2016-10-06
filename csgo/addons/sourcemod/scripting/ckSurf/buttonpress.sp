@@ -562,109 +562,7 @@ public void CL_OnEndTimerPress(int client)
 	CS_SetMVPCount(client, g_MVPStars[client]);
 } 
 
-
-
-
-// End timer
-public void CL_OnEndStageTimerPress(int client)
-{
-	if (!IsValidClient(client))
-		return;
-
-	int inStageEnd = g_iClientInZone[client][1];
-	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
-	if (inStageEnd != g_doingStage[client]){
-		PrintToChat(client, "%cSurfLatam%c |  This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i) (inStageEnd %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
-		return;
-	}
-
-	// Get client name
-	char szName[MAX_NAME_LENGTH];
-	GetClientName(client, szName, MAX_NAME_LENGTH);
-
-	// Get runtime and format it to a string
-	g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
-	g_fFinalTime[client] = g_stageFinalTime[client];
-
-    FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
-	
-
-	// Get Zonegroup (Ejemplo bonus 1, 2, 3, etc)
-	int zGroup = g_doingStage[client];
-
-	//LO QUE NECESITO ES ZONETYPEID +1 Y CONSIGO EN QUE STAGE ESTA :D
-
-	/*====================================
-	=            Handle Stage            =
-	====================================*/
-	//Record bools init
-	if (g_stageTimerActivated[client] && !StrEqual(g_szSteamID[client], "")) {
-		char szDiff[54];
-		char szZoneGroupName[128];
-		float diff;
-		g_stageFirstRecord[client] = false;
-		g_stagePBRecord[client] = false;
-		g_stageSRVRecord[client] = false;
-		g_OldMapRankStage[zGroup][client] = g_MapRankStage[zGroup][client];	
-		g_szFinalTime[client] = g_stageFinalTimeStr[client];
-		g_szStageZone[client] = g_doingStage[client];
-
-		diff = g_fPersonalRecordStage[zGroup][client] - g_stageFinalTime[client];
-		FormatTimeFloat(client, diff, 3, szDiff, sizeof(szDiff));
-		if (diff > 0.0)	{
-			Format(g_szStageTimeDifference[client], sizeof(szDiff), "-%s", szDiff);
-		}
-		else {
-			Format(g_szStageTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
-		}
-
-		if (g_iStageCount[zGroup] > 0)
-		{  // If the server already has a stage record
-			if (g_stageFinalTime[client] < g_stageFastest[zGroup])
-			{  // New fastest time in current stage
-				g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
-				g_stageFastest[zGroup] = g_stageFinalTime[client];
-				Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
-				FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);
-				
-				g_stageSRVRecord[client] = true;
-			}
-		} else { // Has to be the new record, since it is the first completion
-			g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
-			g_stageFastest[zGroup] = g_stageFinalTime[client];
-			Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
-			FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);
-			g_stageSRVRecord[client] = true;
-			g_stageFirstRecord[client] = true;
-			g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
-		}
-
-
-		if (g_fPersonalRecordStage[zGroup][client] == 0.0)
-		{  // Clients first record
-			g_fPersonalRecordStage[zGroup][client] = g_fFinalTime[client];
-			FormatTimeFloat(1, g_fPersonalRecordStage[zGroup][client], 3, g_szPersonalRecordStage[zGroup][client], 64);
-			
-			g_stageFirstRecord[client] = true;
-			g_pr_showmsg[client] = true;
-			db_insertStageRecord(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
-		}
-		else if (diff > 0.0)
-		{  // client's new record
-			g_fPersonalRecordStage[zGroup][client] = g_fFinalTime[client];
-			FormatTimeFloat(1, g_fPersonalRecordStage[zGroup][client], 3, g_szPersonalRecordStage[zGroup][client], 64);
-			
-			g_stagePBRecord[client] = true;
-			g_pr_showmsg[client] = true;
-			db_updateStageRecord(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
-		}
-	}
-
-
-	g_stageTimerActivated[client] = false;
-} 
-
-// End timer
+// This method is invoked when a player touches a stage zones.
 public void CL_OnEndStageTimerPressStageStart(int client)
 {
 	if (!IsValidClient(client))
@@ -673,7 +571,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	int inStageEnd = g_iClientInZone[client][1]+1;
 	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 	if (inStageEnd != g_doingStage[client]){
-		PrintToChat(client, "%cSurfLatam%c |  This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i) (inStageEnd %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
+		PrintToChat(client, "%cSurfLatam%c |  This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
 		return;
 	}
 
@@ -681,12 +579,19 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
 
-	// Get runtime and format it to a string
-	g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
-	g_fFinalTime[client] = g_stageFinalTime[client];
 
-    FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
-	
+	// If it doesn't pass through a stage end, i calculate his stage time when he reaches the stage start. 
+	// If he did, it's calculated on surfzones.sp, StartTouch method (Please don't hate me.)
+	if (!g_passedThroughStageEnd[client]){
+		LogError("Dice que esta en false");
+		g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
+		g_fFinalTime[client] = g_stageFinalTime[client];
+
+	    FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
+	} else {
+		LogError("Dice que esta en true");
+		g_passedThroughStageEnd[client] = false;
+	}
 
 	// Get Zonegroup (Ejemplo bonus 1, 2, 3, etc)
 	int zGroup = g_doingStage[client];

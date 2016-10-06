@@ -1551,8 +1551,6 @@ public void sql_CountFinishedMapsCallback(Handle owner, Handle hndl, const char[
 		return;
 	}
 
-	LogError("Entra en sql_CountFinishedMapsCallback");
-	
 	char szMap[128], szMapName2[128];
 	int finishedMaps = 0, totalplayers, rank;
 	

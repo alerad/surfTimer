@@ -2048,9 +2048,7 @@ public Action Client_MapStats(int client, int args)
 {
 	if (IsValidClient(client))
 	{
-		char szValue[128];
-		// char szTime[32];
-		char szSteamId[32];
+	
 		char szArg[128];
 		
 		if (args>0){
@@ -2061,13 +2059,16 @@ public Action Client_MapStats(int client, int args)
 		}
 
 
-		getSteamIDFromClient(client, szSteamId, 32);
-		DisplayMapStats(client)
+		DisplayMapStats(client);
 	}
 	return Plugin_Handled;
 }
 
 public void DisplayMapStats(int client){
+	char szValue[128];
+	// char szTime[32];
+	char szSteamId[32];
+	getSteamIDFromClient(client, szSteamId, 32);
 	Menu mapInfoMenu = new Menu(MapMenuHandler1);
 	mapInfoMenu.Pagination = 10;
 

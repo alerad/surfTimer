@@ -287,6 +287,7 @@ char g_szStageFastest[MAXZONEGROUPS][MAX_NAME_LENGTH]; 			// Name of the #1 in t
 float g_fOldStageRecordTime[MAXZONEGROUPS];						// Old record time, for prints + counting
 int g_tmpStageCount[MAXZONEGROUPS];								// Used to make sure bonus finished prints are correct
 int g_totalStageCount; 											// How many total bonuses there are
+bool g_passedThroughStageEnd[MAXPLAYERS + 1];					// Used to know if a player passed through a stage end. Used in buttonpress.sp (CL_OnEndStageTimerPressStageStart)
 
 /*----------  Checkpoint variables  ----------*/
 float g_fCheckpointTimesRecord[MAXZONEGROUPS][MAXPLAYERS + 1][CPLIMIT]; // Clients best run's times
