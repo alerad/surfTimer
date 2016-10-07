@@ -1451,7 +1451,6 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 	int totalplayers, rank;
 	
 	getSteamIDFromClient(client, szSteamId, 32);
-	int check=0;
 	if (SQL_HasResultSet(hndl))
 	{
 		while (SQL_FetchRow(hndl))
@@ -1460,7 +1459,7 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 			totalplayers = SQL_FetchInt(hndl, 2);
 			rank = SQL_FetchInt(hndl, 1);
 			SQL_FetchString(hndl, 0, szMap, 128);
-			for (int i = 0; i < GetArraySize(g_MapList)/2; i++) // Check that the map is in the mapcycle
+			for (int i = 0; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
 			{
 				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
 				if (StrEqual(szMapName2, szMap, false))
@@ -1492,46 +1491,9 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 					}
 					break;
 				}
-				check = i;
 			}
-			for (int i = check; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
-			{
-				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
-				if (StrEqual(szMapName2, szMap, false))
-				{
-					float percentage = 1.0 + ((1.0 / float(totalplayers)) - (float(rank) / float(totalplayers)));
-					g_pr_points[client] += RoundToCeil(50.0 * percentage);
-					switch (rank)
-					{
-						case 1:g_pr_points[client] += 55;
-						case 2:g_pr_points[client] += 45;
-						case 3:g_pr_points[client] += 40;
-						case 4:g_pr_points[client] += 38;
-						case 5:g_pr_points[client] += 36;
-						case 6:g_pr_points[client] += 34;
-						case 7:g_pr_points[client] += 32;
-						case 8:g_pr_points[client] += 30;
-						case 9:g_pr_points[client] += 28;
-						case 10:g_pr_points[client] += 25;
-						case 11:g_pr_points[client] += 20;
-						case 12:g_pr_points[client] += 18;
-						case 13:g_pr_points[client] += 16;
-						case 14:g_pr_points[client] += 14;
-						case 15:g_pr_points[client] += 12;
-						case 16:g_pr_points[client] += 10;
-						case 17:g_pr_points[client] += 9 ;
-						case 18:g_pr_points[client] += 8;
-						case 19:g_pr_points[client] += 7;
-						case 20:g_pr_points[client] += 5;
-					}
-					break;
-				}
-				check += 1;
-			}
-
 		}
 	}
-	LogError("Cantidad de veces iterado : %i", check);
 	// Next up: Points from maps
 	char szQuery[512];
 	Format(szQuery, 512, "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro) AS rank, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname) as total FROM ck_playertimes a where steamid = '%s';", szSteamId);
@@ -4729,6 +4691,7 @@ public void SQL_selectBonusCountCallback(Handle owner, Handle hndl, const char[]
 ////////////////////////////
 ////   Stage Records   /////
 ////////////////////////////
+
 public void db_viewFastestStage()
 {
 	char szQuery[1024];
@@ -6526,17 +6489,6 @@ public Action PrintUnfinishedLine(Handle timer, any pack)
 	
 }
 
-/*
-void PrintUnfinishedLine(Handle pack)
-{
-	ResetPack(pack);
-	int client = ReadPackCell(pack);
-	char teksti[1024];
-	ReadPackString(pack, teksti, 1024);
-	CloseHandle(pack);
-	PrintToConsole(client, teksti);
-}
-*/
 public void db_viewPlayerProfile1(int client, char szPlayerName[MAX_NAME_LENGTH])
 {
 	char szQuery[512];

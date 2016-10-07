@@ -1978,6 +1978,11 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 	if (rank == 0)
 		rank = g_MapRankStage[zGroup][client];
 	
+	//When a bot beats the stage it for some reason reaches here.
+	//To lazy to  fix tbh, just doing this, he gets rank 99k.
+	if (rank>30000){
+		return;
+	}
 	LogError("%s", g_szZoneGroupName[zGroup]);
 
 	GetClientName(client, szName, MAX_NAME_LENGTH);
