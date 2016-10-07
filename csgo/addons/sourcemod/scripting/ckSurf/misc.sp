@@ -1245,26 +1245,50 @@ public void LimitSpeed(int client)
 		
 	float speedCap = 0.0, CurVelVec[3];
 	
-	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0)
+	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0  && (GetEntityFlags(client) & FL_ONGROUND))
 		speedCap = GetConVarFloat(g_hBonusPreSpeed);
 	else
 		if (g_iClientInZone[client][0] == 1 && (GetEntityFlags(client) & FL_ONGROUND))
 			speedCap = GetConVarFloat(g_hStartPreSpeed);
 		else
-			if (g_iClientInZone[client][0] == 5)
+			if (g_iClientInZone[client][0] == 5  && (GetEntityFlags(client) & FL_ONGROUND))
 			{
 				if (!g_bNoClipUsed[client])
 					speedCap = GetConVarFloat(g_hSpeedPreSpeed);
 				else
 					speedCap = GetConVarFloat(g_hStartPreSpeed); // If noclipping, top speed at normal start zone speed
 			} else {
-				if (g_iClientInZone[client][0] == 3)
+				if (g_iClientInZone[client][0] == 3  && (GetEntityFlags(client) & FL_ONGROUND))
 					speedCap = GetConVarFloat(g_hStagePreSpeed);
 			}
 	
 	if (speedCap == 0.0)
 		return;
 	
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+	
+	if (CurVelVec[0] == 0.0)
+		CurVelVec[0] = 1.0;
+	if (CurVelVec[1] == 0.0)
+		CurVelVec[1] = 1.0;
+	if (CurVelVec[2] == 0.0)
+		CurVelVec[2] = 1.0;
+	
+	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+	
+	if (currentspeed > speedCap)
+	{
+		NormalizeVector(CurVelVec, CurVelVec);
+		ScaleVector(CurVelVec, speedCap);
+		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+	}
+}
+
+public void ForceLimitSpeed(int client, float speedCap){
+	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0)
+		return;
+		
+	float CurVelVec[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
 	
 	if (CurVelVec[0] == 0.0)
