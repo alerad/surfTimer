@@ -250,6 +250,7 @@ public void StartTouch(int client, int action[3])
             	g_fFinalTime[client] = g_stageFinalTime[client];
    				FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
    				g_passedThroughStageEnd[client] = true;     
+   				LogError("StageFinaltime es %f", g_stageFinalTime[client]);        
             }
         }
 	}
