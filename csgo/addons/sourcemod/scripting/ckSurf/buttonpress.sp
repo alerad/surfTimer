@@ -570,7 +570,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 
 	int inStageEnd = g_iClientInZone[client][1]+1;
 	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
-	if (inStageEnd != g_doingStage[client]){
+	if (inStageEnd != g_doingStage[client] && stageCount != g_doingStage[client]){
 		PrintToChat(client, "%cSurfLatam%c |  This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
 		return;
 	}
@@ -596,7 +596,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	// Get Zonegroup (Ejemplo bonus 1, 2, 3, etc)
 	int zGroup = g_doingStage[client];
 
-	//LO QUE NECESITO ES ZONETYPEID +1 Y CONSIGO EN QUE STAGE ESTA :D
+	//ZonetypeId + 1 = stage number
 
 	/*====================================
 	=            Handle Stage            =

@@ -220,9 +220,9 @@ public void db_setupDatabase()
 	
 	//TODO Tengo que hacer que si no esta creada nomas que la cree, sino se rompe todo.
 	//Creo stageRecord table
-	// Transaction createTableTnx = SQL_CreateTransaction();
-	// SQL_AddQuery(createTableTnx, sql_createStageRecord);
-	// SQL_AddQuery(createTableTnx, sql_createStageRecordIndex);
+	Transaction createTableTnx = SQL_CreateTransaction();
+	SQL_AddQuery(createTableTnx, sql_createStageRecord);
+	SQL_AddQuery(createTableTnx, sql_createStageRecordIndex);
 	
 	// SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 	

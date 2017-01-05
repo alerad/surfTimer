@@ -179,7 +179,12 @@ public void StartTouch(int client, int action[3])
 		else if (action[0] == 2) // End Zone
 		{
 			if (g_iClientInZone[client][2] == action[2]) {//  Cant end bonus timer in this zone && in the having the same timer on
-				CL_OnEndTimerPress(client);
+				if (g_stageTimerActivated[client] && g_bhasStages) {
+					CL_OnEndStageTimerPressStageStart(client);
+					CL_OnEndTimerPress(client);
+				} else {
+					CL_OnEndTimerPress(client);
+				}
 			}
 			else
 			{
