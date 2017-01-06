@@ -1449,13 +1449,15 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 	
 	char szMap[128], szSteamId[32], szMapName2[128];
 	int totalplayers, rank;
-	
+
 	getSteamIDFromClient(client, szSteamId, 32);
 	int check=0;
 	if (SQL_HasResultSet(hndl))
 	{
 		while (SQL_FetchRow(hndl))
 		{
+			//To lazy to fix a bug, so i'll just do this. (The for is splitted for optimization)
+			bool alreadyAdded = false;
 			// Total amount of players who have finished the bonus
 			totalplayers = SQL_FetchInt(hndl, 2);
 			rank = SQL_FetchInt(hndl, 1);
@@ -1467,6 +1469,7 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 				{
 					float percentage = 1.0 + ((1.0 / float(totalplayers)) - (float(rank) / float(totalplayers)));
 					g_pr_points[client] += RoundToCeil(50.0 * percentage);
+					alreadyAdded = true;
 					switch (rank)
 					{
 						case 1:g_pr_points[client] += 55;
@@ -1497,7 +1500,7 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 			for (int i = check; i < GetArraySize(g_MapList); i++) // Check that the map is in the mapcycle
 			{
 				GetArrayString(g_MapList, i, szMapName2, sizeof(szMapName2));
-				if (StrEqual(szMapName2, szMap, false))
+				if (StrEqual(szMapName2, szMap, false) && !alreadyAdded)
 				{
 					float percentage = 1.0 + ((1.0 / float(totalplayers)) - (float(rank) / float(totalplayers)));
 					g_pr_points[client] += RoundToCeil(50.0 * percentage);
