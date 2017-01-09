@@ -419,7 +419,7 @@
 	"BonusFinished7"
 	{
 		"#format"	"{1:c},{2:c},{3:c},{4:s},{5:c},{6:c},{7:s},{8:c},{9:c},{10:s},{11:c},{12:c},{13:i},{14:c},{15:i},{16:c},{17:s},{18:c}"
-		"en"		"{1}SurfLatam{2} | {3}{4} {5}finished the {6}{7} {8}with a time of {9}{10}{11}. [rank {12}#{13} {1}/ {15} | record {16}{17}{18}]"
+		"en"		"{1}SurfLatam{2} | {3}{4} {5}finished the {6}{7} {8}with a time of {9}{10}{11}. [rank {12}#{13} {14}/ {15} | record {16}{17}{18}]"
 	}
 	"StageFinished1"
 	{
