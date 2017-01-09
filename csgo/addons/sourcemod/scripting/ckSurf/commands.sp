@@ -415,6 +415,7 @@ public Action Command_goToPlayerCheckpoint(int client, int args)
 			PrintToChat(client, "%t", "PracticeStarted2", MOSSGREEN, WHITE, MOSSGREEN, WHITE, MOSSGREEN, WHITE);
 			g_bPracticeMode[client] = true;
 		}
+		g_stageTimerActivated[client] = false;
 		
 		SetEntPropVector(client, Prop_Data, "m_vecVelocity", view_as<float>( { 0.0, 0.0, 0.0 } ));
 		TeleportEntity(client, g_fCheckpointLocation[client], g_fCheckpointAngle[client], g_fCheckpointVelocity[client]);
@@ -552,6 +553,49 @@ public int MenuHandler_SelectBonusTop(Menu sMenu, MenuAction action, int client,
 	}
 }
 
+
+public void ListStageRecords(int client, int type)
+{
+	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
+	char buffer[3];
+	Menu listStagesMenu;
+
+	if (type == 1)
+	{
+	PrintToChat(client, "Entra aca porlomeno.type1 ");
+
+		listStagesMenu = new Menu(MenuHandler_SelectStageTop);
+	}
+	else
+	{
+	PrintToChat(client, "Entra aca porlomeno.type2");
+
+		listStagesMenu = new Menu(MenuHandler_SelectStageTop);
+	}
+	
+	listStagesMenu.SetTitle("Choose a Stage");
+	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+
+	if (stageCount > 1)
+	{
+		for (int i = 1; i <= stageCount; i++)
+		{
+			// IntToString(i, buffer, 3);
+			char stageName[64];
+			Format(stageName, 64, "Stage %i", i);
+			listStagesMenu.AddItem(buffer, stageName);
+		}
+	}
+	else
+	{
+		PrintToChat(client, "[%cCK%c] This map is linear.", MOSSGREEN, WHITE);
+		return;
+	}
+	
+	listStagesMenu.ExitButton = true;
+	listStagesMenu.Display(client, 60);
+}
+
 public int MenuHandler_SelectStageTop(Menu sMenu, MenuAction action, int client, int item)
 {
 	switch (action)
@@ -561,10 +605,14 @@ public int MenuHandler_SelectStageTop(Menu sMenu, MenuAction action, int client,
 			char aID[3];
 			GetMenuItem(sMenu, item, aID, sizeof(aID));
 			int zoneGrp = StringToInt(aID);
+			PrintToChat(client, "Entra aca porlomeno. %i" ,zoneGrp);
+
 			db_selectStageTopSurfers(client, g_szMapName, zoneGrp);
 		}
 		case MenuAction_End:
 		{
+	PrintToChat(client, "end2");
+
 			delete sMenu;
 		}
 	}
@@ -1460,21 +1508,13 @@ public Action Client_StageTop(int client, int args)
 	
 	switch (args) {
 		case 0: {  // !btop
-			if (g_mapZoneGroupCount == 1)
+			if (!g_bhasStages)
 			{
 				PrintToChat(client, "%cSurfLatam%c |  No stage found on this map.", MOSSGREEN, WHITE);
 				PrintToChat(client, "%cSurfLatam%c |  Usage: !stagetop <stage number> <mapname>", MOSSGREEN, WHITE);
 				return Plugin_Handled;
-			}
-			if (g_mapZoneGroupCount == 2)
-			{
-				zGrp = 1;
-				Format(szArg, 128, "%s", g_szMapName);
-			}
-			if (g_mapZoneGroupCount > 2)
-			{
+			} else {
 				ListStageRecords(client, 2);
-				return Plugin_Handled;
 			}
 		}
 		case 1: {  //!btop <mapname> / <bonus id>
@@ -1494,7 +1534,7 @@ public Action Client_StageTop(int client, int args)
 				}
 				else
 				{
-					PrintToChat(client, "%cSurfLatam%c |  Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+					PrintToChat(client, "%cSurfLatam%c |  Invalid stage ID %i.", MOSSGREEN, WHITE, zGrp);
 					return Plugin_Handled;
 				}
 			}
@@ -1515,12 +1555,12 @@ public Action Client_StageTop(int client, int args)
 			
 			if (0 > zGrp || zGrp > MAXZONEGROUPS)
 			{
-				PrintToChat(client, "%cSurfLatam%c |  Invalid bonus ID %i.", MOSSGREEN, WHITE, zGrp);
+				PrintToChat(client, "%cSurfLatam%c |  Invalid stage ID %i.", MOSSGREEN, WHITE, zGrp);
 				return Plugin_Handled;
 			}
 		}
 		default: {
-			PrintToChat(client, "%cSurfLatam%c |  Usage: !btop <bonus id> <mapname>", MOSSGREEN, WHITE);
+			PrintToChat(client, "%cSurfLatam%c |  Usage: !st <stage id> <mapname>", MOSSGREEN, WHITE);
 			return Plugin_Handled;
 		}
 	}
@@ -2116,42 +2156,6 @@ public void DisplayMapStats(int client){
 	CloseHandle(stringArray);
 }
 
-public void ListStageRecords(int client, int type)
-{
-	// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
-	char buffer[3];
-	Menu listStagesMenu;
-	if (type == 1)
-	{
-		listStagesMenu = new Menu(MenuHandler_SelectStage);
-	}
-	else
-	{
-		listStagesMenu = new Menu(MenuHandler_SelectStageTop);
-	}
-	
-	listStagesMenu.SetTitle("Choose a Stage");
-	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
-
-	if (stageCount > 1)
-	{
-		for (int i = 1; i <= stageCount; i++)
-		{
-			IntToString(i, buffer, 3);
-			char stageName[64];
-			Format(stageName, 64, "Stage %i", i);
-			listStagesMenu.AddItem(buffer, stageName);
-		}
-	}
-	else
-	{
-		PrintToChat(client, "%cSurfLatam%c |  This map is linear.", MOSSGREEN, WHITE);
-		return;
-	}
-	
-	listStagesMenu.ExitButton = true;
-	listStagesMenu.Display(client, 60);
-}
 
 public Action Client_Profile(int client, int args)
 {
@@ -2592,7 +2596,7 @@ public void StageTopMenu(int client)
 	{
 		char buffer[3];
 		Menu sMenu = new Menu(BonusTopMenuHandler);
-		sMenu.SetTitle("Bonus selector");
+		sMenu.SetTitle("Stage top selector");
 		int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 		if (stageCount > 1)
 		{
@@ -2606,7 +2610,7 @@ public void StageTopMenu(int client)
 		}
 		else
 		{
-			PrintToChat(client, "%cSurfLatam%c |  This map is linear.", MOSSGREEN, WHITE);
+			PrintToChat(client, "[%cCK%c] This map is linear.", MOSSGREEN, WHITE);
 			return;
 		}
 		
@@ -2631,7 +2635,7 @@ public void HelpPanel(int client)
 	PrintConsoleInfo(client);
 	Handle panel = CreatePanel();
 	char title[64];
-	Format(title, 64, "ckSurf Help (1/4) - v%s\nby Elzi", VERSION);
+	Format(title, 64, "ckSurf Help", VERSION);
 	DrawPanelText(panel, title);
 	DrawPanelText(panel, " ");
 	DrawPanelText(panel, "!help - opens this menu");
@@ -2643,6 +2647,7 @@ public void HelpPanel(int client)
 	DrawPanelText(panel, "!profile/!ranks - opens your profile");
 	DrawPanelText(panel, "!ms/!mapstats - opens your map statistics");
 	DrawPanelText(panel, "!st/!stagetop - opens stage top menu");
+	DrawPanelText(panel, "!gb - goes back one stage, without loosing your time");
 	DrawPanelText(panel, " ");
 	DrawPanelItem(panel, "next page");
 	DrawPanelItem(panel, "exit");
@@ -2663,7 +2668,7 @@ public int HelpPanel2(int client)
 {
 	Handle panel = CreatePanel();
 	char szTmp[64];
-	Format(szTmp, 64, "ckSurf Help (2/4) - v%s\nby Elzi", VERSION);
+	Format(szTmp, 64, "ckSurf Help 2", VERSION);
 	DrawPanelText(panel, szTmp);
 	DrawPanelText(panel, " ");
 	DrawPanelText(panel, "!start/!r - go back to start");
@@ -2699,7 +2704,7 @@ public void HelpPanel3(int client)
 {
 	Handle panel = CreatePanel();
 	char szTmp[64];
-	Format(szTmp, 64, "ckSurf Help (3/4) - v%s\nby Elzi", VERSION);
+	Format(szTmp, 64, "ckSurf Help", VERSION);
 	DrawPanelText(panel, szTmp);
 	DrawPanelText(panel, " ");
 	DrawPanelText(panel, "!maptop <mapname> - displays map top for a given map");
@@ -2733,7 +2738,7 @@ public void HelpPanel4(int client)
 {
 	Handle panel = CreatePanel();
 	char szTmp[64];
-	Format(szTmp, 64, "ckSurf Help (4/4) - v%s\nby Elzi", VERSION);
+	Format(szTmp, 64, "ckSurf Help", VERSION);
 	DrawPanelText(panel, szTmp);
 	DrawPanelText(panel, " ");
 	DrawPanelText(panel, "!cp - Creates a checkpoint to use in practice mode.");

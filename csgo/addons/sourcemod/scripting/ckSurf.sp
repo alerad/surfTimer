@@ -1670,9 +1670,19 @@ public void OnPluginStart()
 	float fltickrate = 1.0 / GetTickInterval();
 	if (fltickrate > 65)
 		if (fltickrate < 103)
-			g_Server_Tickrate = 102;
-		else
+		{
+			if (fltickrate>85)
+			{
+				g_Server_Tickrate = 102;
+			} else
+			{
+				g_Server_Tickrate = 73;
+			}
+			
+		}
+		else{
 			g_Server_Tickrate = 128;
+		}
 	else
 		g_Server_Tickrate = 64;
 	
@@ -1888,6 +1898,7 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_accept", Client_Accept, "[SurfLatam] allows you to accept a challenge request");
 	RegConsoleCmd("sm_hidechat", Client_HideChat, "[SurfLatam] hides your ingame chat");
 	RegConsoleCmd("sm_hideweapon", Client_HideWeapon, "[SurfLatam] hides your weapon model");
+	RegConsoleCmd("sm_hidewep", Client_HideWeapon, "[SurfLatam] hides your weapon model");
 	RegConsoleCmd("sm_disarm", Client_HideWeapon, "[SurfLatam] hides your weapon model");
 	RegConsoleCmd("sm_goto", Client_GoTo, "[SurfLatam] teleports you to a selected player");
 	RegConsoleCmd("sm_sound", Client_QuakeSounds, "[SurfLatam] on/off quake sounds");

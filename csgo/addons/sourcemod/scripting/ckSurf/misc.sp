@@ -1993,7 +1993,7 @@ stock void PrintChatStage (int client, int zGroup, int rank = 0)
 			Format(szRecordDiff, 54, "-%s", szRecordDiff);
 		}
 		char szZoneGroupName[128];
-		Format(szZoneGroupName,128,"STAGE %i", g_szStageZone[client]);
+		Format(szZoneGroupName,128,"Stage %i", g_szStageZone[client]);
 
 		if (g_stageFirstRecord[client] && g_stageSRVRecord[client])
 		{

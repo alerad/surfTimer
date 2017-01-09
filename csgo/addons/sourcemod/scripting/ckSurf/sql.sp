@@ -64,7 +64,7 @@ char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
 char sql_selectStageCount[] = "SELECT zonegroup, count(1) FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup";
 char sql_selectTopStageSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ar_stage as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
 char sql_selectTotalStageCount[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 3 GROUP BY mapname, zonegroup;";
-char sql_selectStagesInMap[] = "SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c' AND zonegroup > 0 GROUP BY zonegroup;";
+char sql_selectStagesInMap[] = "SELECT mapname, zonegroup, zonename FROM `ck_zones` WHERE mapname LIKE '%c%s%c';";
 
 //TABLE BONUS
 char sql_createBonus[] = "CREATE TABLE IF NOT EXISTS ck_bonus (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), runtime FLOAT NOT NULL DEFAULT '-1.0', zonegroup INT(12) NOT NULL DEFAULT 1, PRIMARY KEY(steamid, mapname, zonegroup));";
@@ -1534,7 +1534,6 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 
 		}
 	}
-	LogError("Cantidad de veces iterado : %i", check);
 	// Next up: Points from maps
 	char szQuery[512];
 	Format(szQuery, 512, "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro) AS rank, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname) as total FROM ck_playertimes a where steamid = '%s';", szSteamId);
@@ -3004,7 +3003,7 @@ public void db_selectStagesInMapCallback(Handle owner, Handle hndl, const char[]
 {
 	if (hndl == null)
 	{
-		LogError("[SurfLatam] SQL Error (db_selectStagesInMapCallback): %s", error);
+		LogError("[ckSurf] SQL Error (db_selectStagesInMapCallback): %s", error);
 		return;
 	}
 	if (SQL_HasResultSet(hndl) && SQL_FetchRow(hndl))
@@ -3019,7 +3018,7 @@ public void db_selectStagesInMapCallback(Handle owner, Handle hndl, const char[]
 			return;
 		}
 		
-		Menu listStagesinMapMenu = new Menu(MenuHandler_SelectBonusinMap);
+		Menu listStagesinMapMenu = new Menu(MenuHandler_SelectStageinMap);
 		
 		SQL_FetchString(hndl, 0, mapname, 128);
 		zGrp = SQL_FetchInt(hndl, 1);
@@ -3054,7 +3053,7 @@ public void db_selectStagesInMapCallback(Handle owner, Handle hndl, const char[]
 	}
 	else
 	{
-		PrintToChat(client, "%cSurfLatam%c |  No Stages found.", MOSSGREEN, WHITE);
+		PrintToChat(client, "[%cCK%c] No Stages found.", MOSSGREEN, WHITE);
 		return;
 	}
 }
@@ -3080,6 +3079,25 @@ public int MenuHandler_SelectBonusinMap(Handle sMenu, MenuAction action, int cli
 	}
 }
 
+public int MenuHandler_SelectStageinMap(Handle sMenu, MenuAction action, int client, int item)
+{
+	switch (action)
+	{
+		case MenuAction_Select:
+		{
+			char aID[248];
+			char splits[2][128];
+			GetMenuItem(sMenu, item, aID, sizeof(aID));
+			ExplodeString(aID, "-", splits, sizeof(splits), sizeof(splits[]));
+			
+			db_selectStageTopSurfers(client, splits[0], StringToInt(splits[1]));
+		}
+		case MenuAction_End:
+		{
+			delete sMenu;
+		}
+	}
+}
 
 
 public void db_selectBonusTopSurfers(int client, char mapname[128], int zGrp)
@@ -6210,7 +6228,7 @@ public void sql_selectTopStageSurfersCallback(Handle owner, Handle hndl, const c
 				}
 			}
 		}
-		if (i == 1)
+		if (i == 0)
 		{
 			PrintToChat(client, "%t", "NoTopRecords", MOSSGREEN, WHITE, szMap);
 		}

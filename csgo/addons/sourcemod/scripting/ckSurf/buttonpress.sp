@@ -583,13 +583,11 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	// If it doesn't pass through a stage end, i calculate his stage time when he reaches the stage start. 
 	// If he did, it's calculated on surfzones.sp, StartTouch method (Please don't hate me.)
 	if (!g_passedThroughStageEnd[client]){
-		LogError("Dice que esta en false");
 		g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
 		g_fFinalTime[client] = g_stageFinalTime[client];
 
 	    FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
 	} else {
-		LogError("Dice que esta en true");
 		g_passedThroughStageEnd[client] = false;
 	}
 
@@ -621,6 +619,8 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 		else {
 			Format(g_szStageTimeDifference[client], sizeof(szDiff), "+%s", szDiff);
 		}
+
+		g_tmpStageCount[zGroup] = g_iStageCount[zGroup];
 
 		if (g_iStageCount[zGroup] > 0)
 		{  // If the server already has a stage record
