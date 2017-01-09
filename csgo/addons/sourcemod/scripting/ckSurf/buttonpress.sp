@@ -568,6 +568,9 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	if (!IsValidClient(client))
 		return;
 
+	if (IsFakeClient(client))
+		return;
+
 	int inStageEnd = g_iClientInZone[client][1]+1;
 	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 	if (inStageEnd != g_doingStage[client] && stageCount != g_doingStage[client]){

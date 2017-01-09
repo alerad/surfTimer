@@ -1,0 +1,170 @@
+<div>
+	<span id="weekError" class="formerror" style="display:none;"><span class="redsharp"> X </span></span>
+	<input type="text" placeholder="Horas manejadas en la semana" id="weekHours" class="custinp ">
+</div>
+<div>
+	<span id="weekEndError" class="formerror" style="display:none;"> <span class="redsharp"> X </span></span>
+	<input type="text" placeholder="Horas manejadas en fin de semana" id="weekEndHours" class="custinp ">
+</div>
+<div>
+<span id="typeError" class="formerror" style="display:none;"> <span class="redsharp"> X </span></span>
+<select id="fuelType" name="" class="customselect">
+	<option style="color: 000000" value="" default="" disabled="" selected="">Tipo de combustible</option>
+	<option value="Gas (Diesel)">Gas (Diesel)</option>
+	<option value="Nafta">Nafta</option>pr
+</select></div>
+<div>
+<span id="performanceError" class="formerror" style="display:none;"> <span class="redsharp"> X </span></span>
+<select id="fuelPerformance" name="" class="customselect  ">
+	<option style="color: 000000" value="" default="" disabled="" selected="">Rendimiento del combustible</option>
+	<option value="Bajo" id="lowr">Bajo</option>
+	<option value="Medio" id="medr">Medio</option>
+	<option value="Alto" id="highr">Alto</option>
+</select>
+</div>
+<button class="customsubmit" id="calculate">¡Calcular!</button>
+
+<div style="display:none;" id="spacerdiv">
+<br><br><br><br>
+</div>
+
+#weekError{
+	position:absolute;
+	top:19px;
+	left:-19px;
+}
+
+#weekEndError{
+	position:absolute;
+	top:78px;
+	left:-19px;
+}
+
+#typeError{
+	position:absolute;
+	top:138px;
+	left:-19px;
+}
+
+#performanceError{
+	position:absolute;
+	top:198px;
+	left:-19px;
+}
+
+.custinperr::-webkit-input-placeholder {
+    color: red;
+}
+.customselecterr::-webkit-input-placeholder{
+	color:red;
+}
+
+.redsharp{
+	color:red;
+	float:left;
+	font-size:15px;
+}
+
+.requiredspan{
+	float:left;
+	font-size:16px;
+	color:#FFFFFF;
+}
+
+input[type="text"], input[type="password"], input[type="email"], input[type="input"] .custinp {
+    color: #000000;
+    background-color: #ffffff;
+    border-color: #555555;
+    width:100%;
+    background-color: #fff;
+    border: 1px solid #8095a8;
+    padding: 9px 10px 10px 10px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    margin: 8px 0 8px 0;
+    font-size: 15px;
+    line-height: 19px;
+    width: 100%;
+    height: 43px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: 'Exo 2';
+    font-weight: 400;
+}
+
+#calculate{
+	background-color: #8fe3c1;
+    color: #000000;
+    width: 298px;
+    height: 70px;
+    box-sizing: content-box;
+    line-height: 28px;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Exo 2';
+    border-radius: 5px;
+}
+
+.customselect{
+	border-color: #555555;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Exo 2';
+    font-weight: 400;
+    margin: 8px 0;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    width: 100%;
+    height: 43px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url(//storage.googleapis.com/instapage-app-assets/img/builder2/select-arrow-drop-down.png);
+    background-position: right;
+    background-repeat: no-repeat;
+    padding-left: 9px;
+    -moz-padding-start: 5px;
+    line-height: 22px;
+    padding: 9px 7px 9px 9px;
+    border: 1px solid #8195a8;
+    -webkit-border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px 5px 5px 5px;
+    border-radius: 5px 5px 5px 5px;
+    cursor: auto !important;
+    font-size: 1em;
+    margin: 0 0 0 -1px;
+    padding: 10px 7px 11px 0;
+    height: 40px;
+    width: 100%;
+    text-indent: 0;
+    margin: 8px 0;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    width: 100%;
+    height: 43px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 15px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url(//storage.googleapis.com/instapage-app-assets/img/builder2/select-arrow-drop-down.png);
+    background-position: right;
+    background-repeat: no-repeat;
+    padding-left: 9px;!important
+}
