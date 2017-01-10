@@ -150,7 +150,7 @@ public void CL_OnStartTimerPress(int client)
 	PlayButtonSound(client);
 	
 	// Start recording for record bot
-	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) || (!IsFakeClient(client) && GetConVarBool(g_hBonusBot)))
+	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) && !g_hRecording[client])
 	{
 		if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
 		{
@@ -183,12 +183,12 @@ public void CL_OnEndTimerPress(int client)
 				if (SpecMode == 4 || SpecMode == 5)
 				{
 					int Target = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
-					if (Target == client)
+					if (Target == client && g_RecordBot == Target)
 					{
-						if (Target == g_RecordBot)
+						if (g_CurrentReplay == 0)
 							PrintToChat(i, "%t", "ReplayFinishingMsg", MOSSGREEN, WHITE, LIMEGREEN, g_szReplayName, GRAY, LIMEGREEN, g_szReplayTime, GRAY);
-						if (Target == g_BonusBot)
-							PrintToChat(i, "%t", "ReplayFinishingMsgBonus", MOSSGREEN, WHITE, LIMEGREEN, g_szBonusName, GRAY, YELLOW, g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], GRAY, LIMEGREEN, g_szBonusTime, GRAY);
+						else if (g_CurrentReplay > 0)
+							PrintToChat(i, "%t", "ReplayFinishingMsgBonus", MOSSGREEN, WHITE, LIMEGREEN, g_szBonusName, GRAY, YELLOW, g_szZoneGroupName[g_iClientInZone[Target][2]], GRAY, LIMEGREEN, g_szBonusTime, GRAY);
 					}
 				}
 			}
@@ -387,7 +387,7 @@ public void CL_OnEndTimerPress(int client)
 			SetEntityRenderColor(client, 255, 255, 255, 255);
 			for (int i = 1; i <= MaxClients; i++)
 			{
-				if (IsValidClient(i) && i != client && i != g_RecordBot && i != g_BonusBot)
+				if (IsValidClient(i) && i != client && i != g_RecordBot)
 				{
 					if (StrEqual(g_szSteamID[i], g_szChallenge_OpponentID[client]))
 					{
@@ -424,15 +424,7 @@ public void CL_OnEndTimerPress(int client)
 	{
 		if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[zGroup] || g_fReplayTimes[zGroup] == 0.0))
 		{
-			if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client])
-			{
-				g_fReplayTimes[zGroup] = g_fFinalTime[client];
-				g_bNewBonus[client] = true;
-				Handle pack;
-				CreateDataTimer(3.0, BonusReplayTimer, pack);
-				WritePackCell(pack, GetClientUserId(client));
-				WritePackCell(pack, zGroup);
-			}
+			
 		}
 		char szDiff[54];
 		float diff;
@@ -474,7 +466,7 @@ public void CL_OnEndTimerPress(int client)
 				}
 				
 				g_bBonusSRVRecord[client] = true;
-				if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client] && !g_bNewBonus[client])
+				if (GetConVarBool(g_hReplayBot) && !g_bPositionRestored[client] && !g_bNewBonus[client])
 				{
 					g_bNewBonus[client] = true;
 					g_fReplayTimes[zGroup] = g_fFinalTime[client];
@@ -487,7 +479,7 @@ public void CL_OnEndTimerPress(int client)
 		}
 		else
 		{  // Has to be the new record, since it is the first completion
-			if (GetConVarBool(g_hBonusBot) && !g_bPositionRestored[client] && !g_bNewBonus[client])
+			if (GetConVarBool(g_hReplayBot) && !g_bPositionRestored[client] && !g_bNewBonus[client])
 			{
 				g_bNewBonus[client] = true;
 				g_fReplayTimes[zGroup] = g_fFinalTime[client];
