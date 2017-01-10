@@ -1612,16 +1612,6 @@ public void SpecPlayer(int client, int args)
 				playerCount++;
 			}
 		}
-		if (g_BonusBot != -1)
-		{
-			if (g_BonusBot != -1 && IsValidClient(g_BonusBot) && IsPlayerAlive(g_BonusBot))
-			{
-				Format(szPlayerName2, 256, "Bonus record replay (%s)", g_szBonusTime);
-				AddMenuItem(menu, "BONUS RECORD REPLAY", szPlayerName2);
-				playerCount++;
-			}
-		}
-		
 		
 		int count = 0;
 		//add players
@@ -1651,7 +1641,7 @@ public void SpecPlayer(int client, int args)
 			}
 		}
 		
-		if (playerCount > 0 || g_RecordBot != -1 || g_BonusBot != -1)
+		if (playerCount > 0 || g_RecordBot != -1)
 		{
 			SetMenuOptionFlags(menu, MENUFLAG_BUTTON_EXIT);
 			DisplayMenu(menu, client, MENU_TIME_FOREVER);
@@ -1736,9 +1726,7 @@ public int SpecMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 				{
 					GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
 					if (i == g_RecordBot)
-						Format(szPlayerName, MAX_NAME_LENGTH, "MAP RECORD REPLAY");
-					if (i == g_BonusBot)
-						Format(szPlayerName, MAX_NAME_LENGTH, "BONUS RECORD REPLAY");
+						Format(szPlayerName, MAX_NAME_LENGTH, "Replay Bot");
 					if (StrEqual(info, szPlayerName))
 					{
 						ChangeClientTeam(param1, 1);
@@ -2199,7 +2187,7 @@ public void PauseMethod(int client)
 	if (GetClientTeam(client) == 1)return;
 	if (g_bPause[client] == false && IsValidEntity(client))
 	{
-		if (GetConVarBool(g_hPauseServerside) == false && client != g_RecordBot && client != g_BonusBot)
+		if (GetConVarBool(g_hPauseServerside) == false && client != g_RecordBot)
 		{
 			PrintToChat(client, "%t", "Pause1", MOSSGREEN, WHITE, RED, WHITE);
 			return;
@@ -2910,6 +2898,11 @@ public void OptionMenu(int client)
 	else
 		AddMenuItem(optionmenu, "Checkpoints - Disabled", "Checkpoints - Disabled");
 	
+	if (g_bHideLeftHud[client])
+		AddMenuItem(optionmenu, "Left Hud - Disabled", "Left Hud - Disabled");
+	else
+		AddMenuItem(optionmenu, "Left Hud - Enabled", "Left Hud - Enabled");
+
 	SetMenuOptionFlags(optionmenu, MENUFLAG_BUTTON_EXIT);
 	if (g_OptionsMenuLastPage[client] < 6)
 		DisplayMenuAtItem(optionmenu, client, 0, MENU_TIME_FOREVER);
@@ -2939,6 +2932,7 @@ public int OptionMenuHandler(Menu menu, MenuAction action, int param1, int param
 			case 8:HideChat(param1);
 			case 9:HideViewModel(param1);
 			case 10:ToggleCheckpoints(param1, 1);
+			case 11: g_bHideLeftHud[param1] = !g_bHideLeftHud[param1];
 		}
 		g_OptionsMenuLastPage[param1] = param2;
 		OptionMenu(param1);
@@ -2986,5 +2980,61 @@ public Action Client_InfoPanel(int client, int args)
 public void InfoPanel(int client)
 {
 	g_bInfoPanel[client] = !g_bInfoPanel[client];
+}
+
+public Action Command_Replay(int client, int args)
+{
+	// TODO: Check if there are spectators
+
+	if (!g_RecordBot) {
+		PrintToChat(client, "[%cSurf Timer%c] No replay bots available.", MOSSGREEN, WHITE);
+		return Plugin_Handled;
+	}
+
+	if (g_bIsPlayingReplay) {
+		PrintToChat(client, "[%cSurf Timer%c] The replay bot is currently busy. Wait for the current replay to finish.", MOSSGREEN, WHITE);
+		return Plugin_Handled;
+	}
+
+
+	float requestDelay = GetGameTime() - g_fLastReplayRequested[client];
+	if (requestDelay < 15.0 && CountSpectators(g_RecordBot) > 1) {
+		PrintToChat(client, "[%cSurf Timer%c] Please wait %d seconds before requesting a new replay", MOSSGREEN, WHITE, RoundToCeil(15.0 - requestDelay));
+		return Plugin_Handled;
+	}
+
+
+	Menu menu = CreateMenu(ReplayMenu_Handler);
+
+	SetMenuTitle(menu, "[Surf Timer] Replay");
+
+	menu.AddItem("map", "Map");
+
+	for (int i = 1; i < g_mapZoneGroupCount; i++)
+	{
+		menu.AddItem(g_szZoneGroupName[i], g_szZoneGroupName[i]);
+	}
+
+	menu.Display(client, 60);
+
+	return Plugin_Handled;
+}
+
+
+public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int item) {
+	if (action != MenuAction_Select) return 0;
+
+	g_ReplayRequester = client;
+	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
+
+	g_CurrentReplay = item;
+
+	PlayRecord(g_RecordBot, item);
+
+	ChangeClientTeam(client, 1);
+	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", g_RecordBot);
+	SetEntProp(client, Prop_Send, "m_iObserverMode", 4);
+
+	return 0;
 }
 
