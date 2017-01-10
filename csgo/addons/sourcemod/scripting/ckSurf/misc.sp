@@ -32,17 +32,12 @@ void setBotQuota()
 
 	// Check how many bots are needed
 	int count = 0;
-	if (g_bMapReplay)
+	if (g_bMapReplay || g_BonusBotCount > 0)
 		count++;
 	if (GetConVarBool(g_hInfoBot))
 		count++;
-	if (g_BonusBotCount > 0)
-		count++;
 
-	if (count == 0)
-		SetConVarInt(hBotQuota, 0, false, false);
-	else
-		SetConVarInt(hBotQuota, count, false, false);
+	SetConVarInt(hBotQuota, count, false, false);
 	
 	CloseHandle(hBotQuota);
 
@@ -1345,25 +1340,7 @@ void refreshTrailBot(int bot)
 	if (!IsValidEntity(ent))
 		ent = bot;
 
-	if ((GetConVarBool(g_hBonusBotTrail) && GetConVarBool(g_hBonusBot)) && bot == g_BonusBot)
-	{
-		for (int i = 1; i < MAXPLAYERS+1; i++)
-		{
-			if (IsValidClient(i) && ((g_iClientInZone[i][2] == g_iClientInZone[bot][2] && g_Stage[g_iClientInZone[i][2]][i] == g_Stage[g_iClientInZone[bot][2]][bot]) || g_bSpectate[i]))
-			{
-				TE_SetupBeamFollow(ent, 
-					g_BeamSprite, 
-					0, 
-					BEAMLIFE, 
-					4.0, 
-					1.0, 
-					1, 
-					g_BonusBotTrailColor);
-   				TE_SendToClient(i);
-			}
-		}
-	}
-	else if ((GetConVarBool(g_hRecordBotTrail) && GetConVarBool(g_hReplayBot)) && bot == g_RecordBot)
+	if ((GetConVarBool(g_hRecordBotTrail) && GetConVarBool(g_hReplayBot)) && bot == g_RecordBot)
 	{
 		for (int i = 1; i < MAXPLAYERS+1; i++)
 		{
@@ -1564,6 +1541,7 @@ public void SetClientDefaults(int client)
 	g_bShowSpecs[client] = true;
 	g_bAutoBhopClient[client] = true;
 	g_bHideChat[client] = false;
+	g_bHideLeftHud[client] = false;
 	g_bViewModel[client] = true;
 	g_bCheckpointsEnabled[client] = true;
 	g_bEnableQuakeSounds[client] = true;
@@ -2585,19 +2563,9 @@ public void GetRGBColor(int bot, char color[256])
 		g_ReplayBotColor[1] = StringToInt(sPart[1]);
 		g_ReplayBotColor[2] = StringToInt(sPart[2]);
 	}
-	else
-		if (bot == 1)
-	{
-		g_BonusBotColor[0] = StringToInt(sPart[0]);
-		g_BonusBotColor[1] = StringToInt(sPart[1]);
-		g_BonusBotColor[2] = StringToInt(sPart[2]);
-	}
 	
 	if (bot == 0 && g_RecordBot != -1 && IsValidClient(g_RecordBot))
 		SetEntityRenderColor(g_RecordBot, g_ReplayBotColor[0], g_ReplayBotColor[1], g_ReplayBotColor[2], 50);
-	else
-		if (bot == 1 && g_BonusBot != -1 && IsValidClient(g_BonusBot))
-		SetEntityRenderColor(g_BonusBot, g_BonusBotColor[0], g_BonusBotColor[1], g_BonusBotColor[2], 50);
 	
 }
 
@@ -2828,21 +2796,22 @@ public void SpecListMenuDead(int client) // What Spectators see
 						}
 						else
 						{
-							if (ObservedUser == g_RecordBot)
-								Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", szTime, szTick, count, szStage);
-							else
-								if (ObservedUser == g_BonusBot)
-									Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTime, szTick, count, szStage);
-							
+							if (ObservedUser == g_RecordBot) {
+								if (g_CurrentReplay == 0)
+									Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", szTime, szTick, count, szStage);
+								else if (g_CurrentReplay > 0)
+									Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\n%s\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", g_szZoneGroupName[g_iClientInZone[g_RecordBot][2]], szTime, szTick, count, szStage);
+							}
 						}
 					}
 					else
 					{
-						if (ObservedUser == g_RecordBot)
-							Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", szTick, count, szStage);
-						else
-							if (ObservedUser == g_BonusBot)
-								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nStage: Bonus\n", g_szZoneGroupName[g_iClientInZone[g_BonusBot][2]], szTick, count);
+						if (ObservedUser == g_RecordBot) {
+							if (g_CurrentReplay == 0)
+								Format(g_szPlayerPanelText[client], 512, "[Map Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nStage: %s\n", szTick, count, szStage);
+							else if (g_CurrentReplay > 0)
+								Format(g_szPlayerPanelText[client], 512, "[%s Record Replay]\nTime: PAUSED\nTickrate: %s\nSpecs: %i\n\nStage: Bonus\n", g_szZoneGroupName[g_iClientInZone[g_RecordBot][2]], szTick, count);
+						}
 					}
 				}
 				else
@@ -2857,14 +2826,14 @@ public void SpecListMenuDead(int client) // What Spectators see
 				
 				if (!g_bShowTime[client] && g_bShowSpecs[client])
 				{
-					if (ObservedUser != g_RecordBot && ObservedUser != g_BonusBot)
+					if (ObservedUser != g_RecordBot)
 						Format(g_szPlayerPanelText[client], 512, "%Specs (%i):\n%s\n \n%s\nRecord: %s\n\nStage: %s\n", count, sSpecs, szPlayerRank, szProBest, szStage);
 					else
 					{
-						if (ObservedUser == g_RecordBot)
+						if (g_CurrentReplay == 0)
 							Format(g_szPlayerPanelText[client], 512, "Record replay of\n%s\n \nTickrate: %s\nSpecs (%i):\n%s\n\nStage: %s\n", g_szReplayName, szTick, count, sSpecs, szStage);
 						else
-							if (ObservedUser == g_BonusBot)
+							if (g_CurrentReplay > 0)
 							Format(g_szPlayerPanelText[client], 512, "Bonus replay of\n%s\n \nTickrate: %s\nSpecs (%i):\n%s\n\nStage: Bonus\n", g_szBonusName, szTick, count, sSpecs);
 						
 					}
@@ -2875,10 +2844,10 @@ public void SpecListMenuDead(int client) // What Spectators see
 						Format(g_szPlayerPanelText[client], 512, "%s\nRecord: %s\n\nStage: %s\n", szPlayerRank, szProBest, szStage);
 					else
 					{
-						if (ObservedUser == g_RecordBot)
+						if (g_CurrentReplay == 0)
 							Format(g_szPlayerPanelText[client], 512, "Record replay of\n%s\n \nTickrate: %s\n\nStage: %s\n", g_szReplayName, szTick, szStage);
 						else
-							if (ObservedUser == g_BonusBot)
+							if (g_CurrentReplay > 0)
 							Format(g_szPlayerPanelText[client], 512, "Bonus replay of\n%s\n \nTickrate: %s\n\nStage: Bonus\n", g_szBonusName, szTick, szStage);
 						
 					}
@@ -2944,7 +2913,7 @@ public void LoadInfoBot()
 	g_InfoBot = -1;
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (!IsValidClient(i) || !IsFakeClient(i) || i == g_RecordBot || i == g_BonusBot)
+		if (!IsValidClient(i) || !IsFakeClient(i) || i == g_RecordBot)
 			continue;
 		g_InfoBot = i;
 		break;
@@ -3215,6 +3184,91 @@ public void CenterHudAlive(int client)
 	}
 }
 
+public void LeftHudAlive(int client)
+{
+
+	if (g_bHideLeftHud[client])
+		return;
+
+	char buffer[256];
+
+	int zgroup = g_iClientInZone[client][2];
+	int stage = g_Stage[zgroup][client];
+	int timeleft; GetMapTimeLeft(timeleft);
+
+	Format(buffer, sizeof(buffer), "> %s\n", g_szMapName);
+
+	if (g_fPersonalRecord[client] > 0.0)
+		//Format(buffer, sizeof(buffer), "%sRank: %d/%d\nPB: %s\n", buffer, g_MapRank[client], g_MapTimesCount, g_szPersonalRecord[client]);
+		Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, g_szPersonalRecord[client]);
+	//else
+		//Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_MapTimesCount);
+
+	if (g_MapTimesCount > 0)
+		Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, g_szRecordMapTime, g_szRecordPlayer);
+	else
+		Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
+
+
+	if (zgroup > 0) {
+		Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
+
+		Format(buffer, sizeof(buffer), "%s%s\n", buffer, g_szZoneGroupName[zgroup]);
+
+		if (g_fPersonalRecordBonus[zgroup][client] > 0.0)
+			//Format(buffer, sizeof(buffer), "%sRank: %d/%d\nPB: %s\n", buffer, g_MapRankBonus[zgroup][client], g_iBonusCount[zgroup], g_szPersonalRecordBonus[zgroup][client]);
+			Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, g_szPersonalRecordBonus[zgroup][client]);
+		//else
+		//	Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_iBonusCount[zgroup]);
+
+		if (g_iBonusCount[zgroup] > 0)
+			Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, g_szBonusFastestTime[zgroup], g_szBonusFastest[zgroup]);
+		//else
+		//	Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
+
+
+	}	else if (g_bhasStages) {
+
+		// Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
+
+		// Format(buffer, sizeof(buffer), "%sStage: %d/%d\n", buffer, stage, (g_mapZonesTypeCount[zgroup][3] + 1));
+
+		// player rank
+		//if (g_StagePlayerRank[client][stage] > 0)
+			//Format(buffer, sizeof(buffer), "%sRank: %d/%d\n", buffer, g_StagePlayerRank[client][stage], g_StageRecords[stage][srCompletions]);
+		//else
+		//	Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_StageRecords[stage][srCompletions]);
+
+		// stage player record
+		// if (g_fStagePlayerRecord[client][stage] != 9999999.0) {
+		// 	char srcp[16];
+		// 	FormatTimeFloat(client, g_fStagePlayerRecord[client][stage], 5, srcp, sizeof(srcp));
+		// 	Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, srcp);
+		// }
+		//else
+		//	Format(buffer, sizeof(buffer), "%sPB: N/A\n", buffer);
+
+		// stage server record
+		// if (g_StageRecords[stage][srLoaded]) {
+		// 	char srcp[16];
+		// 	FormatTimeFloat(client, g_StageRecords[stage][srRunTime], 5, srcp, sizeof(srcp));
+		// 	Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, srcp, g_StageRecords[stage][srPlayerName]);
+		// }
+		//else
+		//	Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
+	}
+
+	Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
+
+	//Format(buffer, sizeof(buffer), "%sTime left: %dm\n", buffer, timeleft/60);
+
+	Format(buffer, sizeof(buffer), "%sSpectators: %d", buffer, CountSpectators(client));
+
+
+	strcopy(g_szPlayerPanelText[client], sizeof(g_szPlayerPanelText[]), buffer);
+	SpecList(client);
+}
+
 public void Checkpoint(int client, int zone, int zonegroup)
 {
 	if (!IsValidClient(client) || g_bPositionRestored[client] || IsFakeClient(client) || zone >= CPLIMIT)
@@ -3437,4 +3491,23 @@ public void CheckpointToSpec(int client, char[] buffer)
 			}
 		}
 	}
+}
+
+public int CountSpectators(int client) {
+	int specCount = 0;
+	for (int x = 1; x <= MaxClients; x++)
+	{
+		if (IsValidClient(x) && !IsFakeClient(client) && !IsPlayerAlive(x) && GetClientTeam(x) >= 1 && GetClientTeam(x) <= 3) {
+			int SpecMode = GetEntProp(x, Prop_Send, "m_iObserverMode");
+
+			if (SpecMode == 4 || SpecMode == 5) {
+				int ObservedUser = GetEntPropEnt(x, Prop_Send, "m_hObserverTarget");
+
+				if (ObservedUser == client)
+					specCount++;
+			}
+		}
+	}
+
+	return specCount;
 }
