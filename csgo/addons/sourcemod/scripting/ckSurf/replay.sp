@@ -481,7 +481,7 @@ public void LoadRecordReplay()
 
 
 		CS_SetClientClanTag(g_RecordBot, "REPLAY");
-		SetClientName(g_RecordBot, "Type !replay to watch");
+		SetClientName(g_RecordBot, "[Press E While Spectating]");
 
 
 		SetEntityRenderColor(g_RecordBot, g_ReplayBotColor[0], g_ReplayBotColor[1], g_ReplayBotColor[2], 50);
@@ -733,7 +733,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			if ((GetEngineTime() - g_fReplayRestarted[client]) < (BEAMLIFE))
 				return;
 
-			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
+			// SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 			g_bReplayAtEnd[client] = false;
 			g_BotMimicTick[client] = 0;
 			g_CurrentAdditionalTeleportIndex[client] = 0;
@@ -742,7 +742,9 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			g_bIsPlayingReplay = false;
 
 			CS_SetClientClanTag(g_RecordBot, "REPLAY");
-			SetClientName(g_RecordBot, "Type !replay to watch");
+			SetEntPropFloat(g_RecordBot, Prop_Data, "m_flLaggedMovementValue", 0.0);
+			Command_Restart(g_RecordBot, 1);
+			SetClientName(g_RecordBot, "[Press E While Spectating]");
 			return;
 		}
 		

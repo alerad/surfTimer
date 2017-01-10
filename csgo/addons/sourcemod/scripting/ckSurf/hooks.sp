@@ -671,6 +671,11 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		g_LastButton[client] = buttons;
 		
 		BeamBox_OnPlayerRunCmd(client);
+	} else {
+		if (buttons & IN_USE == IN_USE && oldButtons[client] & IN_USE != IN_USE){
+			Command_Replay(client, 0);
+		}
+		oldButtons[client] = buttons; 
 	}
 	
 	return Plugin_Continue;

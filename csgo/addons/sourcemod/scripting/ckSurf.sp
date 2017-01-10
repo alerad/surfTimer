@@ -668,6 +668,7 @@ int g_AdminMenuFlag; 											// Admin flag required for !ckadmin
 ConVar g_hAdminMenuFlag = null;
 Handle g_hAdminMenu = null; 									// Add !ckadmin to !admin
 int g_AdminMenuLastPage[MAXPLAYERS + 1]; 						// Weird admin menu trickery TODO: wtf
+new oldButtons[MAXPLAYERS];										//To check the INUSE listener 
 
 /*----------  Challenge variables  ----------*/ 
 /**
@@ -1888,6 +1889,8 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_topSurfers", Client_Top, "[SurfLatam] displays top rankings (Top 100 Players, Top 50 overall)");
 	RegConsoleCmd("sm_bonustop", Client_BonusTop, "[SurfLatam] displays top rankings of the bonus");
 	RegConsoleCmd("sm_stagetop", Client_StageTop, "[SurfLatam] displays top rankings of the stage");
+
+
 	RegConsoleCmd("sm_st", Client_StageTop, "[SurfLatam] displays top rankings of the stage");
 	RegConsoleCmd("sm_btop", Client_BonusTop, "[SurfLatam] displays top rankings of the bonus");
 	RegConsoleCmd("sm_stop", Client_Stop, "[SurfLatam] stops your timer");
@@ -1905,7 +1908,6 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_nc", Command_ckNoClip, "[SurfLatam] Player noclip on/off");
 	RegConsoleCmd("sm_gb", Command_GoBack, "[SurfLatam] Go back 1 stage without loosing your time.");
 
-	
 	// Teleportation commands
 	RegConsoleCmd("sm_stages", Command_SelectStage, "[SurfLatam] Opens up the stage selector");
 	RegConsoleCmd("sm_r", Command_Restart, "[SurfLatam] Teleports player back to the start");
@@ -1973,6 +1975,8 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_undo", Command_undoPlayerCheckpoint, "[SurfLatam] Undoes the players lchast checkpoint.");
 	RegConsoleCmd("sm_normal", Command_normalMode, "[SurfLatam] Switches player back to normal mode.");
 	RegConsoleCmd("sm_n", Command_normalMode, "[SurfLatam] Switches player back to normal mode.");
+
+	RegConsoleCmd("sm_replay", Command_Replay, "[SurfLatam] use replay bot ");
 	
 	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[SurfLatam] Displays the ckSurf menu panel");
 	RegAdminCmd("sm_refreshprofile", Admin_RefreshProfile, g_AdminMenuFlag, "[SurfLatam] Recalculates player profile for given steam id");
@@ -2087,6 +2091,8 @@ public void OnPluginStart()
 	{
 		CreateTimer(3.0, LoadPlayerSettings, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE);
 	}
+
+
 	
 	Format(szWHITE, 12, "%c", WHITE);
 	Format(szDARKRED, 12, "%c", DARKRED);
@@ -2226,6 +2232,9 @@ public Action:Timer_Pay(Handle:timer)
 	}
 }
 public Action:CMD_laser_p(client, args) {
+	if (!IsPlayerAlive(client)){
+		return Plugin_Handled;
+	}
 	if (!g_bflagTitles[client][0])
 	{
 		ReplyToCommand(client, "[CK] This command requires the VIP title.");
@@ -2237,6 +2246,9 @@ public Action:CMD_laser_p(client, args) {
 }
 
 public Action:CMD_laser_m(client, args) {
+	if (!IsPlayerAlive(client)){
+		return Plugin_Handled;
+	}
 	if (!g_bflagTitles[client][0])
 	{
 		ReplyToCommand(client, "[CK] This command requires the VIP title.");

@@ -1582,6 +1582,7 @@ public Action Client_Spec(int client, int args)
 	return Plugin_Handled;
 }
 
+
 public void SpecPlayer(int client, int args)
 {
 	char szPlayerName[MAX_NAME_LENGTH];
@@ -1607,7 +1608,7 @@ public void SpecPlayer(int client, int args)
 		{
 			if (g_RecordBot != -1 && IsValidClient(g_RecordBot) && IsPlayerAlive(g_RecordBot))
 			{
-				Format(szPlayerName2, 256, "Map record replay (%s)", g_szReplayTime);
+				Format(szPlayerName2, 256, "Replay bot", g_szReplayTime);
 				AddMenuItem(menu, "MAP RECORD REPLAY", szPlayerName2);
 				playerCount++;
 			}
@@ -1726,7 +1727,7 @@ public int SpecMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 				{
 					GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
 					if (i == g_RecordBot)
-						Format(szPlayerName, MAX_NAME_LENGTH, "Replay Bot");
+						Format(szPlayerName, MAX_NAME_LENGTH, "MAP RECORD REPLAY");
 					if (StrEqual(info, szPlayerName))
 					{
 						ChangeClientTeam(param1, 1);
@@ -1743,6 +1744,7 @@ public int SpecMenuHandler(Menu menu, MenuAction action, int param1, int param2)
 			CloseHandle(menu);
 		}
 }
+
 
 public void CompareMenu(int client, int args)
 {
@@ -2985,6 +2987,8 @@ public void InfoPanel(int client)
 public Action Command_Replay(int client, int args)
 {
 	// TODO: Check if there are spectators
+	if (IsPlayerAlive(client))
+		return Plugin_Handled;
 
 	if (!g_RecordBot) {
 		PrintToChat(client, "[%cSurf Timer%c] No replay bots available.", MOSSGREEN, WHITE);
