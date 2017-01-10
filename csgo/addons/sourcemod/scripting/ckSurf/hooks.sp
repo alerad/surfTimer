@@ -88,9 +88,8 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			if (client == g_InfoBot)
 				CS_SetClientClanTag(client, "");
 			else if (client == g_RecordBot)
-				CS_SetClientClanTag(client, "MAP REPLAY");
-			else if (client == g_BonusBot)
-				CS_SetClientClanTag(client, "BONUS REPLAY");
+				CS_SetClientClanTag(client, "Replay Bot");
+
 			return Plugin_Continue;
 		}
 		
@@ -639,13 +638,13 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		if (newVelocity[0] == 0.0 && newVelocity[1] == 0.0 && newVelocity[2] == 0.0)
 		{
 			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
-			if (IsFakeClient(client))
+			if (IsFakeClient(client) && g_bIsPlayingReplay)
 				PlayReplay(client, buttons, subtype, seed, impulse, weapon, angles, vel);
 		}
 		else
 		{
 			RecordReplay(client, buttons, subtype, seed, impulse, weapon, angles, newVelocity);
-			if (IsFakeClient(client))
+			if (IsFakeClient(client) && g_bIsPlayingReplay)
 				PlayReplay(client, buttons, subtype, seed, impulse, weapon, angles, newVelocity);
 		}
 
