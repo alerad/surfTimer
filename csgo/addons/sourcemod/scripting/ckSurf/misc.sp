@@ -1226,7 +1226,7 @@ public void FixPlayerName(int client)
 	}
 }
 
-public void LimitSpeed(int client)
+public void LimitSpeed(int client, bool isEnteringZone)
 {
 	// Dont limits speed if in practice mode, or if there is no end zone in current zonegroup
 	if (!IsValidClient(client) || !IsPlayerAlive(client) || IsFakeClient(client) || g_bPracticeMode[client] || g_mapZonesTypeCount[g_iClientInZone[client][2]][2] == 0)
@@ -1237,7 +1237,7 @@ public void LimitSpeed(int client)
 	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0)
 		speedCap = GetConVarFloat(g_hBonusPreSpeed);
 	else
-		if (g_iClientInZone[client][0] == 1 && (GetEntityFlags(client) & FL_ONGROUND))
+		if (g_iClientInZone[client][0] == 1 && ((GetEntityFlags(client) & FL_ONGROUND) || isEnteringZone))
 			speedCap = GetConVarFloat(g_hStartPreSpeed);
 		else
 			if (g_iClientInZone[client][0] == 5)

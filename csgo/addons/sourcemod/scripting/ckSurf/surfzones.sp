@@ -165,6 +165,10 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
 		{
+			if (action[0] == 1) {
+				LimitSpeed(client, true);
+			}
+			
 			if (g_Stage[g_iClientInZone[client][2]][client] == 1 && g_bPracticeMode[client]) // If practice mode is on
 				Command_goToPlayerCheckpoint(client, 1);
 			else
@@ -175,6 +179,9 @@ public void StartTouch(int client, int action[3])
 				// Resetting last checkpoint
 				lastCheckpoint[g_iClientInZone[client][2]][client] = 1;
 			}
+
+			
+
 		}
 		else if (action[0] == 2) // End Zone
 		{
@@ -212,7 +219,9 @@ public void StartTouch(int client, int action[3])
 			else
 			{  // Setting valid to false, in case of checkers
 				g_bValidRun[client] = false;
-				
+				if (FindConVar("ck_pre_stage_speed").FloatValue < 500){
+					LimitSpeed(client, true);
+				}
 				// Announcing checkpoint
 				if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
 				{

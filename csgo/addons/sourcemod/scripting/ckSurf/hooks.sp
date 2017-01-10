@@ -666,7 +666,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 		AttackProtection(client, buttons);
 		
 		// If in start zone, cap speed
-		LimitSpeed(client);
+		LimitSpeed(client, false);
 		
 		g_fLastSpeed[client] = speed;
 		g_LastButton[client] = buttons;

@@ -38,6 +38,9 @@ public Action Command_Vip(int client, int args)
 	else
 		AddMenuItem(vipEffects, "", "Mute a player (!vmute)", ITEMDRAW_DISABLED);
 
+	
+	AddMenuItem(vipEffects, "", "Lazer menu");
+
 	AddMenuItem(vipEffects, "", "More to come...", ITEMDRAW_DISABLED);
 	
 	SetMenuExitButton(vipEffects, true);
@@ -70,6 +73,10 @@ public int h_vipEffects(Menu tMenu, MenuAction action, int client, int item)
 				case 3:
 				{
 					Command_MutePlayer(client, 0);
+				}
+				case 4:
+				{
+					GetSpray(client, 0);
 				}
 			}
 		}
