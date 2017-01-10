@@ -1717,8 +1717,6 @@ public void OnPluginStart()
 	g_hAllowVipMute = CreateConVar("ck_vip_mute", "1", "(1 / 0) Allows VIP's to mute players", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 	g_hTeleToStartWhenSettingsLoaded = CreateConVar("ck_teleportclientstostart", "1", "(1 / 0) Teleport players automatically back to the start zone, when their settings have been loaded.", FCVAR_NOTIFY, true, 0.0, true, 1.0);
 
-	g_hBonusBotTrail = CreateConVar("ck_bonus_bot_trail", "1", "(1 / 0) Enables a trail on the bonus bot.", FCVAR_NOTIFY);
-	HookConVarChange(g_hBonusBotTrail, OnSettingChanged);
 	g_hRecordBotTrail = CreateConVar("ck_record_bot_trail", "1", "(1 / 0) Enables a trail on the record bot.", FCVAR_NOTIFY);
 	HookConVarChange(g_hRecordBotTrail, OnSettingChanged);
 	g_hPointSystem = CreateConVar("ck_point_system", "1", "on/off - Player point system", FCVAR_NOTIFY, true, 0.0, true, 1.0);

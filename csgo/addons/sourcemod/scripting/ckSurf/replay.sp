@@ -733,12 +733,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			if ((GetEngineTime() - g_fReplayRestarted[client]) < (BEAMLIFE))
 				return;
 
-			if (client != g_BonusBot)
-			{
-				g_BotMimicTick[client] = 0;
-				g_CurrentAdditionalTeleportIndex[client] = 0;
-			}
-
 			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 			g_bReplayAtEnd[client] = false;
 			g_BotMimicTick[client] = 0;
