@@ -3,17 +3,7 @@ public Action ReplayTrailRefresh(Handle timer, int bot)
 	if (g_bReplayAtEnd[bot])
 		return Plugin_Handled;
 
-	if (bot == g_BonusBot)
-	{
-		if (GetConVarBool(g_hBonusBotTrail))
-			refreshTrailBot(bot);
-		else
-		{
-			CloseHandle(g_hBotTrail[1]);
-			g_hBotTrail[1] = null;
-		}
-	}
-	else if (bot == g_RecordBot)
+	if (bot == g_RecordBot)
 	{
 		if (GetConVarBool(g_hRecordBotTrail))
 			refreshTrailBot(bot);
@@ -270,7 +260,13 @@ public Action CKTimer2(Handle timer)
 		if (IsPlayerAlive(i))
 		{
 			//spec hud
-			SpecListMenuAlive(i);
+			if (g_bHideLeftHud[client])
+			{
+				SpecListMenuAlive(i);
+			} else 
+			{
+				LeftHudAlive(i);
+			}
 			
 			//challenge check
 			if (g_bChallenge_Request[i])

@@ -158,12 +158,12 @@ public void StartTouch(int client, int action[3])
 	{
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
 		
-		if (action[0] == 0) // Stop Zone
+		if (action[0] == view_as<int>(ST_Stop)) // Stop Zone
 		{
 			Client_Stop(client, 1);
 			lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
 		}
-		else if (action[0] == 1 || action[0] == 5) // Start Zone or Speed Start
+		else if (action[0] == view_as<int>(ST_Start) || action[0] == view_as<int>(ST_Speed)) // Start Zone or Speed Start
 		{
 			if (action[0] == 1) {
 				LimitSpeed(client, true);
@@ -173,6 +173,21 @@ public void StartTouch(int client, int action[3])
 				Command_goToPlayerCheckpoint(client, 1);
 			else
 			{
+				// Start recording
+				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
+				{
+					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
+					{
+						if (g_hRecording[client] != null)
+							StopRecording(client);
+					}
+					else
+					{
+						if (g_hRecording[client] != null)
+							StopRecording(client);
+						StartRecording(client);
+					}
+				}
 				g_Stage[g_iClientInZone[client][2]][client] = 1;
 				
 				Client_Stop(client, 1);
@@ -183,7 +198,7 @@ public void StartTouch(int client, int action[3])
 			
 
 		}
-		else if (action[0] == 2) // End Zone
+		else if (action[0] == view_as<int>(ST_End))  // End Zone
 		{
 			if (g_iClientInZone[client][2] == action[2]) {//  Cant end bonus timer in this zone && in the having the same timer on
 				if (g_stageTimerActivated[client] && g_bhasStages) {
@@ -205,7 +220,7 @@ public void StartTouch(int client, int action[3])
 			// Resetting checkpoints
 			lastCheckpoint[g_iClientInZone[client][2]][client] = 999;
 		}
-		else if (action[0] == 3) // Stage Zone
+		else if (action[0] == view_as<int>(ST_Stage)) // Stage Zone
 		{
 			if (g_bPracticeMode[client]) // If practice mode is on
 			{
@@ -234,7 +249,7 @@ public void StartTouch(int client, int action[3])
 				}
 			}
 		}
-		else if (action[0] == 4) // Checkpoint Zone
+		else if (action[0] == view_as<int>(ST_Checkpoint)) // Checkpoint Zone
 		{
 			if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
 			{
@@ -243,15 +258,15 @@ public void StartTouch(int client, int action[3])
 				lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 			}
 		}
-		else if (action[0] == 6) // TeleToStart Zone
+		else if (action[0] == view_as<int>(ST_TeleToStart)) // TeleToStart Zone
 		{
 			teleportClient(client, g_iClientInZone[client][2], 1, true);
 		}
-		else if (action[0] == 7) // Validator Zone
+		else if (action[0] == view_as<int>(ST_Validator)) // Validator Zone
 		{
 			g_bValidRun[client] = true;
 		}
-		else if (action[0] == 8) // Checker Zone
+		else if (action[0] == view_as<int>(ST_Checker)) // Checker Zone
 		{
 			if (!g_bValidRun[client])
 				Command_Teleport(client, 1);
@@ -275,7 +290,7 @@ public void EndTouch(int client, int action[3])
 	if (IsValidClient(client))
 	{
 		// Types: Start(1), End(2), Stage(3), Checkpoint(4), Speed(5), TeleToStart(6), Validator(7), Chekcer(8), Stop(0)
-		if (action[0] == 1 || action[0] == 5)
+		if (action[0] == view_as<int>(ST_Start) || action[0] == view_as<int>(ST_Speed))
 		{
 			if (g_bPracticeMode[client] && !g_bTimeractivated[client]) // If on practice mode, but timer isn't on - start timer
 			{
