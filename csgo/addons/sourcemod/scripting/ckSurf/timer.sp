@@ -260,13 +260,13 @@ public Action CKTimer2(Handle timer)
 		if (IsPlayerAlive(i))
 		{
 			//spec hud
-			if (g_bHideLeftHud[i])
-			{
+			// if (g_bHideLeftHud[i])
+			// {
 				SpecListMenuAlive(i);
-			} else 
-			{
-				LeftHudAlive(i);
-			}
+			// } else 
+			// {
+			// 	LeftHudAlive(i);
+			// }
 			
 			//challenge check
 			if (g_bChallenge_Request[i])

@@ -62,7 +62,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 			StripAllWeapons(client);
 			if (!IsFakeClient(client))
 				GivePlayerItem(client, "weapon_usp_silencer");
-			if (!g_bStartWithUsp[client])
+			if (!g_bStartWithUsp[client] && !IsFakeClient(client))
 			{
 				int weapon = GetPlayerWeaponSlot(client, 2);
 				if (weapon != -1 && !IsFakeClient(client))

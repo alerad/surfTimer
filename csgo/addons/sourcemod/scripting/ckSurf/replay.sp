@@ -42,7 +42,7 @@ public Action RespawnBot(Handle timer, any userid)
 	if (g_hBotMimicsRecord[client] != null && IsValidClient(client) && !IsPlayerAlive(client) && IsFakeClient(client) && GetClientTeam(client) >= CS_TEAM_T)
 	{
 		TeamChangeActual(client, 2);
-		CS_RespawnPlayer(client);
+		CS_RespawnPlayer(g_RecordBot);
 	}
 	
 	return Plugin_Stop;
@@ -460,6 +460,8 @@ public void LoadRecordReplay()
 		}
 		
 		g_RecordBot = i;
+		Command_Restart(g_RecordBot, 0);
+
 		g_fCurrentRunTime[g_RecordBot] = 0.0;
 		g_bIsPlayingReplay = false;
 		g_CurrentReplay = -1;
@@ -474,14 +476,14 @@ public void LoadRecordReplay()
 			
 		char clantag[100];
 		CS_GetClientClanTag(g_RecordBot, clantag, sizeof(clantag));
-		if (StrContains(clantag, "REPLAY") == -1)
+		if (StrContains(clantag, "Latam") == -1)
 			g_bNewRecordBot = true;
 
 		g_iClientInZone[g_RecordBot][2] = 0;
 
 
-		CS_SetClientClanTag(g_RecordBot, "REPLAY");
-		SetClientName(g_RecordBot, "[Press E While Spectating]");
+		CS_SetClientClanTag(g_RecordBot, "Latam");
+		SetClientName(g_RecordBot, "Press E While Spectating");
 
 
 		SetEntityRenderColor(g_RecordBot, g_ReplayBotColor[0], g_ReplayBotColor[1], g_ReplayBotColor[2], 50);
@@ -499,6 +501,8 @@ public void LoadRecordReplay()
 	{
 		CreateTimer(1.0, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
 	}
+
+
 }
 public Action RefreshBonusBot(Handle timer)
 {
@@ -733,7 +737,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			if ((GetEngineTime() - g_fReplayRestarted[client]) < (BEAMLIFE))
 				return;
 
-			// SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
+			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 			g_bReplayAtEnd[client] = false;
 			g_BotMimicTick[client] = 0;
 			g_CurrentAdditionalTeleportIndex[client] = 0;
@@ -741,10 +745,10 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			g_fLastReplayRequested[g_ReplayRequester] = GetGameTime();
 			g_bIsPlayingReplay = false;
 
-			CS_SetClientClanTag(g_RecordBot, "REPLAY");
-			SetEntPropFloat(g_RecordBot, Prop_Data, "m_flLaggedMovementValue", 0.0);
+			CS_SetClientClanTag(g_RecordBot, "Latam");
+			// SetEntPropFloat(g_RecordBot, Prop_Data, "m_flLaggedMovementValue", 0.0);
 			Command_Restart(g_RecordBot, 1);
-			SetClientName(g_RecordBot, "[Press E While Spectating]");
+			SetClientName(g_RecordBot, "Press E While Spectating");
 			return;
 		}
 		

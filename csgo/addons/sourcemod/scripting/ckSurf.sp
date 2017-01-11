@@ -463,6 +463,8 @@ int g_ReplayBotColor[3];
 ConVar g_hRecordBotTrail = null; 								// Record bot trail?
 ConVar g_hReplayBotTrailColor = null; 							// Replay bot trail color
 int g_ReplayBotTrailColor[4];
+bool g_bSpawnedBot = false;										//Chjeck if already spawned bot for first time
+
 ConVar g_hDoubleRestartCommand;									// Double !r restart
 ConVar g_hStartPreSpeed = null; 								// Start zone speed cap
 ConVar g_hSpeedPreSpeed = null; 								// Speed Start zone speed cap

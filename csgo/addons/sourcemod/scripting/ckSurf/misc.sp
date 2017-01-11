@@ -3187,86 +3187,86 @@ public void CenterHudAlive(int client)
 public void LeftHudAlive(int client)
 {
 
-	if (g_bHideLeftHud[client])
-		return;
+	// if (g_bHideLeftHud[client])
+	// 	return;
 
-	char buffer[256];
+	// char buffer[256];
 
-	int zgroup = g_iClientInZone[client][2];
-	int stage = g_Stage[zgroup][client];
-	int timeleft; GetMapTimeLeft(timeleft);
+	// int zgroup = g_iClientInZone[client][2];
+	// int stage = g_Stage[zgroup][client];
+	// int timeleft; GetMapTimeLeft(timeleft);
 
-	Format(buffer, sizeof(buffer), "> %s\n", g_szMapName);
+	// Format(buffer, sizeof(buffer), "> %s\n", g_szMapName);
 
-	if (g_fPersonalRecord[client] > 0.0)
-		//Format(buffer, sizeof(buffer), "%sRank: %d/%d\nPB: %s\n", buffer, g_MapRank[client], g_MapTimesCount, g_szPersonalRecord[client]);
-		Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, g_szPersonalRecord[client]);
-	//else
-		//Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_MapTimesCount);
+	// if (g_fPersonalRecord[client] > 0.0)
+	// 	//Format(buffer, sizeof(buffer), "%sRank: %d/%d\nPB: %s\n", buffer, g_MapRank[client], g_MapTimesCount, g_szPersonalRecord[client]);
+	// 	Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, g_szPersonalRecord[client]);
+	// //else
+	// 	//Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_MapTimesCount);
 
-	if (g_MapTimesCount > 0)
-		Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, g_szRecordMapTime, g_szRecordPlayer);
-	else
-		Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
-
-
-	if (zgroup > 0) {
-		Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
-
-		Format(buffer, sizeof(buffer), "%s%s\n", buffer, g_szZoneGroupName[zgroup]);
-
-		if (g_fPersonalRecordBonus[zgroup][client] > 0.0)
-			//Format(buffer, sizeof(buffer), "%sRank: %d/%d\nPB: %s\n", buffer, g_MapRankBonus[zgroup][client], g_iBonusCount[zgroup], g_szPersonalRecordBonus[zgroup][client]);
-			Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, g_szPersonalRecordBonus[zgroup][client]);
-		//else
-		//	Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_iBonusCount[zgroup]);
-
-		if (g_iBonusCount[zgroup] > 0)
-			Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, g_szBonusFastestTime[zgroup], g_szBonusFastest[zgroup]);
-		//else
-		//	Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
+	// if (g_MapTimesCount > 0)
+	// 	Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, g_szRecordMapTime, g_szRecordPlayer);
+	// else
+	// 	Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
 
 
-	}	else if (g_bhasStages) {
+	// if (zgroup > 0) {
+	// 	Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
 
-		// Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
+	// 	Format(buffer, sizeof(buffer), "%s%s\n", buffer, g_szZoneGroupName[zgroup]);
 
-		// Format(buffer, sizeof(buffer), "%sStage: %d/%d\n", buffer, stage, (g_mapZonesTypeCount[zgroup][3] + 1));
+	// 	if (g_fPersonalRecordBonus[zgroup][client] > 0.0)
+	// 		//Format(buffer, sizeof(buffer), "%sRank: %d/%d\nPB: %s\n", buffer, g_MapRankBonus[zgroup][client], g_iBonusCount[zgroup], g_szPersonalRecordBonus[zgroup][client]);
+	// 		Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, g_szPersonalRecordBonus[zgroup][client]);
+	// 	//else
+	// 	//	Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_iBonusCount[zgroup]);
 
-		// player rank
-		//if (g_StagePlayerRank[client][stage] > 0)
-			//Format(buffer, sizeof(buffer), "%sRank: %d/%d\n", buffer, g_StagePlayerRank[client][stage], g_StageRecords[stage][srCompletions]);
-		//else
-		//	Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_StageRecords[stage][srCompletions]);
-
-		// stage player record
-		// if (g_fStagePlayerRecord[client][stage] != 9999999.0) {
-		// 	char srcp[16];
-		// 	FormatTimeFloat(client, g_fStagePlayerRecord[client][stage], 5, srcp, sizeof(srcp));
-		// 	Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, srcp);
-		// }
-		//else
-		//	Format(buffer, sizeof(buffer), "%sPB: N/A\n", buffer);
-
-		// stage server record
-		// if (g_StageRecords[stage][srLoaded]) {
-		// 	char srcp[16];
-		// 	FormatTimeFloat(client, g_StageRecords[stage][srRunTime], 5, srcp, sizeof(srcp));
-		// 	Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, srcp, g_StageRecords[stage][srPlayerName]);
-		// }
-		//else
-		//	Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
-	}
-
-	Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
-
-	//Format(buffer, sizeof(buffer), "%sTime left: %dm\n", buffer, timeleft/60);
-
-	Format(buffer, sizeof(buffer), "%sSpectators: %d", buffer, CountSpectators(client));
+	// 	if (g_iBonusCount[zgroup] > 0)
+	// 		Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, g_szBonusFastestTime[zgroup], g_szBonusFastest[zgroup]);
+	// 	//else
+	// 	//	Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
 
 
-	strcopy(g_szPlayerPanelText[client], sizeof(g_szPlayerPanelText[]), buffer);
-	SpecList(client);
+	// }	else if (g_bhasStages) {
+
+	// 	// Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
+
+	// 	// Format(buffer, sizeof(buffer), "%sStage: %d/%d\n", buffer, stage, (g_mapZonesTypeCount[zgroup][3] + 1));
+
+	// 	// player rank
+	// 	//if (g_StagePlayerRank[client][stage] > 0)
+	// 		//Format(buffer, sizeof(buffer), "%sRank: %d/%d\n", buffer, g_StagePlayerRank[client][stage], g_StageRecords[stage][srCompletions]);
+	// 	//else
+	// 	//	Format(buffer, sizeof(buffer), "%sCompletions: %d\n", buffer, g_StageRecords[stage][srCompletions]);
+
+	// 	// stage player record
+	// 	// if (g_fStagePlayerRecord[client][stage] != 9999999.0) {
+	// 	// 	char srcp[16];
+	// 	// 	FormatTimeFloat(client, g_fStagePlayerRecord[client][stage], 5, srcp, sizeof(srcp));
+	// 	// 	Format(buffer, sizeof(buffer), "%sPB: %s\n", buffer, srcp);
+	// 	// }
+	// 	//else
+	// 	//	Format(buffer, sizeof(buffer), "%sPB: N/A\n", buffer);
+
+	// 	// stage server record
+	// 	// if (g_StageRecords[stage][srLoaded]) {
+	// 	// 	char srcp[16];
+	// 	// 	FormatTimeFloat(client, g_StageRecords[stage][srRunTime], 5, srcp, sizeof(srcp));
+	// 	// 	Format(buffer, sizeof(buffer), "%sSR: %s\n    by %s\n", buffer, srcp, g_StageRecords[stage][srPlayerName]);
+	// 	// }
+	// 	//else
+	// 	//	Format(buffer, sizeof(buffer), "%sSR: N/A\n", buffer);
+	// }
+
+	// Format(buffer, sizeof(buffer), "%s--------------------------\n", buffer);
+
+	// //Format(buffer, sizeof(buffer), "%sTime left: %dm\n", buffer, timeleft/60);
+
+	// Format(buffer, sizeof(buffer), "%sSpectators: %d", buffer, CountSpectators(client));
+
+
+	// strcopy(g_szPlayerPanelText[client], sizeof(g_szPlayerPanelText[]), buffer);
+	// SpecList(client);
 }
 
 public void Checkpoint(int client, int zone, int zonegroup)
