@@ -62,7 +62,7 @@ public Action Hook_WeaponCanSwitchTo(int client, int weapon)
 
 public void StartRecording(int client)
 {
-	if (!IsValidClient(client) || IsFakeClient(client) || g_savingRecord[client])
+	if (!IsValidClient(client) || IsFakeClient(client))
 		return;
 	
 	g_hRecording[client] = CreateArray(view_as<int>(FrameInfo));
