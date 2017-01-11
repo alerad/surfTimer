@@ -575,6 +575,13 @@ char g_doingStageStr[MAXPLAYERS + 1][64]; 						//doingStage str
 
 
 /*----------  Replay Variables  ----------*/
+Handle g_hRecordingStage[MAXPLAYERS + 1]; 						// Client is beign recorded
+Handle g_hRecordingAdditionalTeleportStage[MAXPLAYERS + 1];		// No idea what this does, i'm just copy pasting code :c
+float g_fInitialPositionStage[MAXPLAYERS + 1][3]				// Replay start position
+float g_fInitialAnglesStage[MAXPLAYERS + 1][3]; 				// Replay start angle
+int g_RecordedTicksStage[MAXPLAYERS + 1];						// No idea what this does, i'm just copy pasting code :c
+int g_OriginSnapshotIntervalStage[MAXPLAYERS + 1];				// ^
+//----- End Stage Replay vars
 bool g_bNewRecordBot; 											// Checks if the bot is new, if so, set weapon
 Handle g_hTeleport = null; 										// Used to track teleportations
 Handle g_hRecording[MAXPLAYERS + 1]; 							// Client is beign recorded

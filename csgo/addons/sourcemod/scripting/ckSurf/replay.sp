@@ -910,3 +910,20 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 	}
 }
 
+
+/**Stage recording routines*/
+
+
+public void StartRecordingStage(int client)
+{
+	if (!IsValidClient(client) || IsFakeClient(client))
+		return;
+	
+	g_hRecordingStage[client] = CreateArray(view_as<int>(FrameInfo));
+	g_hRecordingAdditionalTeleportStage[client] = CreateArray(view_as<int>(AdditionalTeleport));
+	GetClientAbsOrigin(client, g_fInitialPositionStage[client]);
+	GetClientEyeAngles(client, g_fInitialAngles[client]);
+	g_RecordedTicksStage[client] = 0;
+	g_OriginSnapshotIntervalStage[client] = 0;
+}
+
