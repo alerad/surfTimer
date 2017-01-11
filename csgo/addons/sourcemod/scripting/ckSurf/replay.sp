@@ -62,10 +62,9 @@ public Action Hook_WeaponCanSwitchTo(int client, int weapon)
 
 public void StartRecording(int client)
 {
-	if (!IsValidClient(client) || IsFakeClient(client))
+	if (!IsValidClient(client) || IsFakeClient(client) || g_savingRecord[client])
 		return;
 	
-	PrintToServer("[SurfLatam] Empezando a grabar");
 	g_hRecording[client] = CreateArray(view_as<int>(FrameInfo));
 	g_hRecordingAdditionalTeleport[client] = CreateArray(view_as<int>(AdditionalTeleport));
 	GetClientAbsOrigin(client, g_fInitialPosition[client]);
@@ -79,7 +78,6 @@ public void StopRecording(int client)
 	if (!IsValidClient(client) || g_hRecording[client] == null)
 		return;
 	
-	PrintToServer("[SurfLatam] Parando de grabar");
 	CloseHandle(g_hRecording[client]);
 	CloseHandle(g_hRecordingAdditionalTeleport[client]);	
 	g_hRecording[client] = null;
@@ -100,8 +98,7 @@ public void SaveRecording(int client, int zgroup)
 		g_bNewReplay[client] = false;
 		g_bNewBonus[client] = false;
 	}
-	
-	PrintToServer("[SurfLatam] Guardando rekor");
+	g_savingRecord[client] = true;
 	char sPath2[256];
 	// Check if the default record folder exists?
 	BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s", CK_REPLAY_PATH);
@@ -154,7 +151,7 @@ public void SaveRecording(int client, int zgroup)
 
 	g_bNewReplay[client] = false;
 	g_bNewBonus[client] = false;
-
+	g_savingRecord[client] = false;
 	if (g_hRecording[client] != null)
 		StopRecording(client);
 }

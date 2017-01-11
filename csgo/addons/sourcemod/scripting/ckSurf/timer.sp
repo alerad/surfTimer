@@ -333,8 +333,8 @@ public Action Timer_Countdown(Handle timer, any client)
 public Action ReplayTimer(Handle timer, any userid)
 {
 	int client = GetClientOfUserId(userid);
-	if (IsValidClient(client) && !IsFakeClient(client))
-		SaveRecording(client, 0);
+	if (IsValidClient(client) && !IsFakeClient(client)){
+	}
 	else
 		g_bNewReplay[client] = false;
 
@@ -347,10 +347,11 @@ public Action BonusReplayTimer(Handle timer, Handle pack)
 	int client = GetClientOfUserId(ReadPackCell(pack));
 	int zGrp = ReadPackCell(pack);
 
-	if (IsValidClient(client) && !IsFakeClient(client))
-		SaveRecording(client, zGrp);
-	else
+	if (IsValidClient(client) && !IsFakeClient(client)){
+	}
+	else{
 		g_bNewBonus[client] = false;
+	}
 
 	
 	return Plugin_Handled;

@@ -606,6 +606,8 @@ int g_BonusBotCount;
 int g_iCurrentBonusReplayIndex;
 int g_iBonusToReplay[MAXZONEGROUPS + 1];
 float g_fReplayTimes[MAXZONEGROUPS];
+bool g_savingRecord[MAXPLAYERS+1];								//Checks if a record is being saved
+bool g_startRecordingOnZoneLeave[MAXPLAYERS+1];					//If a record was being saved when a player entered a zone, it will start recording
 
 /*----------  Misc  ----------*/
 Handle g_MapList = null; 										// Used to load the mapcycle

@@ -256,6 +256,7 @@ public void CL_OnEndTimerPress(int client)
 	==========================================*/
 	if (zGroup == 0)
 	{
+
 		// Make a new record bot?
 		if (GetConVarBool(g_hReplaceReplayTime) && (g_fFinalTime[client] < g_fReplayTimes[0] || g_fReplayTimes[0] == 0.0))
 		{
@@ -289,6 +290,7 @@ public void CL_OnEndTimerPress(int client)
 		{  // If the server already has a record
 			if (g_fFinalTime[client] < g_fRecordMapTime)
 			{  // New fastest time in map
+				SaveRecording(client, zGroup);
 				g_bMapSRVRecord[client] = true;
 				g_fRecordMapTime = g_fFinalTime[client];
 				Format(g_szRecordPlayer, MAX_NAME_LENGTH, "%s", szName);
@@ -323,6 +325,8 @@ public void CL_OnEndTimerPress(int client)
 				g_bNewReplay[client] = true;
 				CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 			}
+			SaveRecording(client, zGroup);
+
 			g_bMapSRVRecord[client] = true;
 			g_fRecordMapTime = g_fFinalTime[client];
 			Format(g_szRecordPlayer, MAX_NAME_LENGTH, "%s", szName);
@@ -464,6 +468,7 @@ public void CL_OnEndTimerPress(int client)
 					}
 					g_bCheckpointRecordFound[zGroup] = true;
 				}
+				SaveRecording(client, zGroup);
 				
 				g_bBonusSRVRecord[client] = true;
 				if (GetConVarBool(g_hReplayBot) && !g_bPositionRestored[client] && !g_bNewBonus[client])
@@ -503,6 +508,7 @@ public void CL_OnEndTimerPress(int client)
 				}
 				g_bCheckpointRecordFound[zGroup] = true;
 			}
+			SaveRecording(client, zGroup);
 			
 			g_bBonusSRVRecord[client] = true;
 			

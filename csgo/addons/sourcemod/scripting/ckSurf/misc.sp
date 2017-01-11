@@ -1809,7 +1809,6 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		Call_PushString(g_szFinalTime[client]);
 		Call_PushCell(g_MapRank[client]);
 		Call_PushCell(count);
-		
 		/* Finish the call, get the result */
 		Call_Finish();
 		
