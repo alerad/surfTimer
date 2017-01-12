@@ -579,6 +579,10 @@ float g_fInitialPositionStage[MAXPLAYERS + 1][3];				// Replay start position
 float g_fInitialAnglesStage[MAXPLAYERS + 1][3]; 				// Replay start angle
 int g_RecordedTicksStage[MAXPLAYERS + 1];						// No idea what this does, i'm just copy pasting code :c
 int g_OriginSnapshotIntervalStage[MAXPLAYERS + 1];				// ^
+int g_CurrentAdditionalTeleportIndexStage[MAXPLAYERS + 1];
+bool g_bNewReplayStage[MAXPLAYERS + 1];							// Don't allow starting a new run if saving a record run
+Handle g_hLoadedRecordsAdditionalTeleportStage = null; 			// No idea what this does, i'm just copy pasting code :c
+
 //----- End Stage Replay vars
 bool g_bNewRecordBot; 											// Checks if the bot is new, if so, set weapon
 Handle g_hTeleport = null; 										// Used to track teleportations

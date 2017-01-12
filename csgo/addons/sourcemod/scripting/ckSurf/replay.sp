@@ -141,7 +141,6 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 	Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
 	iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
 	
-	WriteRecordToDisk(sPath2, iHeader);
 
 	//This variables are used for whole map recording, if i reset them everything goes to shit.
 	if (!isStage){
@@ -152,11 +151,25 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 			CloseHandle(g_hRecordingAdditionalTeleport[client]);
 			g_hRecordingAdditionalTeleport[client] = null;
 		}
+		WriteRecordToDisk(sPath2, iHeader);
 
 
 		g_bNewReplay[client] = false;
 		g_bNewBonus[client] = false;
 		if (g_hRecording[client] != null)
+			StopRecording(client);
+	} else {
+		if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > 0)
+			SetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath2, g_hRecordingAdditionalTeleportStage[client]);
+		else
+		{
+			CloseHandle(g_hRecordingAdditionalTeleportStage[client]);
+			g_hRecordingAdditionalTeleportStage[client] = null;
+		}
+
+
+		g_bNewReplayStage[client] = false;
+		if (g_hRecordingStage[client] != null)
 			StopRecording(client);
 	}
 
@@ -942,3 +955,18 @@ public void StartRecordingStage(int client)
 	g_OriginSnapshotIntervalStage[client] = 0;
 }
 
+
+public void StopRecordingStage(int client)
+{
+	if (!IsValidClient(client) || g_hRecording[client] == null)
+		return;
+	
+	CloseHandle(g_hRecordingStage[client]);
+	CloseHandle(g_hRecordingAdditionalTeleportStage[client]);	
+	g_hRecordingStage[client] = null;
+	g_hRecordingAdditionalTeleportStage[client] = null;
+
+	g_RecordedTicksStage[client] = 0;
+	g_CurrentAdditionalTeleportIndexStage[client] = 0;
+	g_OriginSnapshotIntervalStage[client] = 0;
+}
