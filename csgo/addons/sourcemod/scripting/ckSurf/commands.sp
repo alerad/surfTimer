@@ -3013,6 +3013,8 @@ public Action Command_Replay(int client, int args)
 	SetMenuTitle(menu, "[Surf Timer] Replay");
 
 	menu.AddItem("map", "Map");
+	menu.AddItem("map", "Select Stage");
+
 
 	for (int i = 1; i < g_mapZoneGroupCount; i++)
 	{
@@ -3028,12 +3030,17 @@ public Action Command_Replay(int client, int args)
 public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int item) {
 	if (action != MenuAction_Select) return 0;
 
+	if (item == 1){
+		StageBotMenu(client, 0);
+		return 0;
+	}
+
 	g_ReplayRequester = client;
 	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
 
 	g_CurrentReplay = item;
 
-	PlayRecord(g_RecordBot, item);
+	PlayRecord(g_RecordBot, item, false);
 
 	ChangeClientTeam(client, 1);
 	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", g_RecordBot);
@@ -3042,3 +3049,24 @@ public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int ite
 	return 0;
 }
 
+public Action StageBotMenu(int client, int args)
+{
+	Menu menu = new Menu(StageBotMenu_Handler);
+	menu.SetTitle("Select a stage to replay");
+	menu.AddItem("stage1", "Stage 1");
+	menu.AddItem("stage2", "Stage 2");
+	menu.AddItem("stage1", "Stage 3");
+	menu.AddItem("stage2", "Stage 4");
+	menu.ExitButton = false;
+	menu.Display(client, 60);
+ 
+	return Plugin_Handled;
+}
+
+public int StageBotMenu_Handler(Menu menu, MenuAction action, int client, int item) {
+
+	g_ReplayRequester = client;
+	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
+	PlayRecord(g_RecordBot, item, true);
+	return 0;
+}

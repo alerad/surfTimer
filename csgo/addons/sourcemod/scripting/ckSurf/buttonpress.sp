@@ -39,6 +39,7 @@ public void CL_OnStageTimerPress(int client){
             return;
     }
 
+	StartRecordingStage(client);
     //Reset stage variables for client
     g_stageStartTime[client] = GetGameTime();
     g_stageFinalTime[client] = 0.0;
@@ -597,6 +598,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 
 	// Get Zonegroup (Ejemplo bonus 1, 2, 3, etc)
 	int zGroup = g_doingStage[client];
+	SaveRecording(client, zGroup, true);
 
 	//ZonetypeId + 1 = stage number
 

@@ -141,21 +141,25 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 	Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
 	iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
 	
-	if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
-		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
-	else
-	{
-		CloseHandle(g_hRecordingAdditionalTeleport[client]);
-		g_hRecordingAdditionalTeleport[client] = null;
-	}
-
 	WriteRecordToDisk(sPath2, iHeader);
 
-	g_bNewReplay[client] = false;
-	g_bNewBonus[client] = false;
-	g_savingRecord[client] = false;
-	if (g_hRecording[client] != null)
-		StopRecording(client);
+	//This variables are used for whole map recording, if i reset them everything goes to shit.
+	if (!isStage){
+		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
+			SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
+		else
+		{
+			CloseHandle(g_hRecordingAdditionalTeleport[client]);
+			g_hRecordingAdditionalTeleport[client] = null;
+		}
+
+
+		g_bNewReplay[client] = false;
+		g_bNewBonus[client] = false;
+		if (g_hRecording[client] != null)
+			StopRecording(client);
+	}
+
 }
 
 
@@ -249,16 +253,20 @@ public void LoadReplays()
 	CreateTimer(1.0, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public void PlayRecord(int client, int type)
+public void PlayRecord(int client, int type, bool isStage)
 {
 	if (!IsValidClient(client))
 		return;
 	char buffer[256];
 	char sPath[256];
-	if (type == 0)
+	if (type == 0 && !isStage)
 		Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
-	if (type > 0)
+	if (type > 0 && !isStage){
 		Format(sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, type);
+	} else if (isStage){
+		Format(sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, type+1);
+	}
+	PrintToServer(sPath);
 	// He's currently recording. Don't start to play some record on him at the same time.
 	if (g_hRecording[client] != null || !IsFakeClient(client))
 		return;
@@ -844,7 +852,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			CL_OnStartTimerPress(client);			
 			g_bValidTeleportCall[client] = true;
 			TeleportEntity(client, g_fInitialPosition[client], g_fInitialAngles[client], fActualVelocity);
-			TeleportEntity(client, g_fInitialPositionStage[client], g_fInitialAnglesStage[client], fActualVelocity);
+			// TeleportEntity(client, g_fInitialPositionStage[client], g_fInitialAnglesStage[client], fActualVelocity);
 			
 		}
 		else
