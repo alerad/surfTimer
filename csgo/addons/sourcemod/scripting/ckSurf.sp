@@ -463,7 +463,6 @@ int g_ReplayBotColor[3];
 ConVar g_hRecordBotTrail = null; 								// Record bot trail?
 ConVar g_hReplayBotTrailColor = null; 							// Replay bot trail color
 int g_ReplayBotTrailColor[4];
-bool g_bSpawnedBot = false;										//Chjeck if already spawned bot for first time
 
 ConVar g_hDoubleRestartCommand;									// Double !r restart
 ConVar g_hStartPreSpeed = null; 								// Start zone speed cap
@@ -571,13 +570,12 @@ bool g_stagePBRecord[MAXPLAYERS + 1];							// Personal best time in bonus
 bool g_stageSRVRecord[MAXPLAYERS + 1];							// New server record in bonus
 bool g_stageFirstRecord[MAXPLAYERS + 1];						// First bonus time in map?
 int g_doingStage[MAXPLAYERS + 1];								// Is the player doing the stage
-char g_doingStageStr[MAXPLAYERS + 1][64]; 						//doingStage str
 
 
 /*----------  Replay Variables  ----------*/
 Handle g_hRecordingStage[MAXPLAYERS + 1]; 						// Client is beign recorded
 Handle g_hRecordingAdditionalTeleportStage[MAXPLAYERS + 1];		// No idea what this does, i'm just copy pasting code :c
-float g_fInitialPositionStage[MAXPLAYERS + 1][3]				// Replay start position
+float g_fInitialPositionStage[MAXPLAYERS + 1][3];				// Replay start position
 float g_fInitialAnglesStage[MAXPLAYERS + 1][3]; 				// Replay start angle
 int g_RecordedTicksStage[MAXPLAYERS + 1];						// No idea what this does, i'm just copy pasting code :c
 int g_OriginSnapshotIntervalStage[MAXPLAYERS + 1];				// ^
@@ -614,7 +612,6 @@ int g_iCurrentBonusReplayIndex;
 int g_iBonusToReplay[MAXZONEGROUPS + 1];
 float g_fReplayTimes[MAXZONEGROUPS];
 bool g_savingRecord[MAXPLAYERS+1];								//Checks if a record is being saved
-bool g_startRecordingOnZoneLeave[MAXPLAYERS+1];					//If a record was being saved when a player entered a zone, it will start recording
 
 /*----------  Misc  ----------*/
 Handle g_MapList = null; 										// Used to load the mapcycle
@@ -1116,6 +1113,7 @@ public void OnClientPutInServer(int client)
 	if (IsFakeClient(client))
 	{
 		g_hRecordingAdditionalTeleport[client] = CreateArray(view_as<int>(AdditionalTeleport));
+		g_hRecordingAdditionalTeleportStage[client] = CreateArray(view_as<int>(AdditionalTeleport));
 		CS_SetMVPCount(client, 1);
 		return;
 	}
@@ -2340,6 +2338,7 @@ public Action:GetSpray(client, args)
 	}
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, 0);
+	return Plugin_Handled;
 }
 
 public DIDMenuHandler(Handle:menu, MenuAction:action, client, itemNum) 

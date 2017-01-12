@@ -314,7 +314,7 @@ public void CL_OnEndTimerPress(int client)
 					g_fReplayTimes[0] = g_fFinalTime[client];
 					CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				}
-				SaveRecording(client, zGroup);
+				SaveRecording(client, zGroup, false);
 
 			}
 		}
@@ -345,7 +345,7 @@ public void CL_OnEndTimerPress(int client)
 				}
 				g_bCheckpointRecordFound[zGroup] = true;
 			}
-			SaveRecording(client, zGroup);
+			SaveRecording(client, zGroup, false);
 		}
 
 		
@@ -481,7 +481,7 @@ public void CL_OnEndTimerPress(int client)
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, zGroup);
 				}
-				SaveRecording(client, zGroup);
+				SaveRecording(client, zGroup, false);
 			}
 		}
 		else
@@ -514,8 +514,8 @@ public void CL_OnEndTimerPress(int client)
 			g_bBonusSRVRecord[client] = true;
 			
 			g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
-			SaveRecording(client, zGroup);
-			
+			SaveRecording(client, zGroup, false);
+
 		}
 		
 		

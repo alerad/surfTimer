@@ -277,7 +277,7 @@ public void StartTouch(int client, int action[3])
             	This is so you don't have to create Stage End zones in order.*/
             	g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
             	g_fFinalTime[client] = g_stageFinalTime[client];
-   				FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
+            	FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
    				g_passedThroughStageEnd[client] = true;     
    				LogError("StageFinaltime es %f", g_stageFinalTime[client]);        
             }
@@ -323,7 +323,8 @@ public void EndTouch(int client, int action[3])
                 {
                     PrintToChat(client, "%cSurfLatam%c |  You are noclipping or have noclipped recently, timer disabled.", MOSSGREEN, WHITE);
                     ClientCommand(client, "play buttons\\button10.wav");
-                } else {
+                }
+                else {
                 	g_doingStage[client] = action[1] + 2;
                     g_stageStartTime[client] = GetGameTime();
                     g_stageFinalTime[client] = 0.0;

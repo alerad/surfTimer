@@ -89,7 +89,7 @@ public void StopRecording(int client)
 	g_OriginSnapshotInterval[client] = 0;
 }
 
-public void SaveRecording(int client, int zgroup)
+public void SaveRecording(int client, int zgroup, bool isStage)
 {
 	if (!IsValidClient(client) || g_hRecording[client] == null)
 		return;
@@ -113,9 +113,11 @@ public void SaveRecording(int client, int zgroup)
 	}
 	else
 	{
-		if (zgroup > 0) // bonus bot
+		if (zgroup > 0 && !isStage) // bonus bot
 		{
 			BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, zgroup);
+		} else {
+			BuildPath(Path_SM, sPath2, sizeof(sPath2), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, zgroup);
 		}
 	}
 
@@ -627,7 +629,7 @@ void DeleteReplay(int client, int zonegroup, char[] map)
 
 public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int &impulse, int &weapon, float angles[3], float vel[3])
 {
-	if (g_hRecording[client] != null && !IsFakeClient(client))
+	if ((g_hRecording[client] != null || g_hRecordingStage[client] != null) && !IsFakeClient(client))
 	{
 		if (g_bPause[client]) //  Dont record pause frames
 			return;
@@ -703,7 +705,11 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 		}
 		
 		PushArrayArray(g_hRecording[client], iFrame[0], view_as<int>(FrameInfo));
+		if (g_hRecordingStage[client]!=null){
+			PushArrayArray(g_hRecordingStage[client], iFrame[0], view_as<int>(FrameInfo));
+		}
 		g_RecordedTicks[client]++;
+		g_RecordedTicksStage[client]++;
 	}
 }
 
@@ -838,6 +844,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			CL_OnStartTimerPress(client);			
 			g_bValidTeleportCall[client] = true;
 			TeleportEntity(client, g_fInitialPosition[client], g_fInitialAngles[client], fActualVelocity);
+			TeleportEntity(client, g_fInitialPositionStage[client], g_fInitialAnglesStage[client], fActualVelocity);
 			
 		}
 		else
