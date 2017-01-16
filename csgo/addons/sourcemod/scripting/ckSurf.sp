@@ -582,6 +582,7 @@ int g_OriginSnapshotIntervalStage[MAXPLAYERS + 1];				// ^
 int g_CurrentAdditionalTeleportIndexStage[MAXPLAYERS + 1];
 bool g_bNewReplayStage[MAXPLAYERS + 1];							// Don't allow starting a new run if saving a record run
 Handle g_hLoadedRecordsAdditionalTeleportStage = null; 			// No idea what this does, i'm just copy pasting code :c
+bool g_bReplayingStage;											// The bot is replaying a stage records
 
 //----- End Stage Replay vars
 bool g_bNewRecordBot; 											// Checks if the bot is new, if so, set weapon

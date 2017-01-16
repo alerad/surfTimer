@@ -151,8 +151,8 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 			CloseHandle(g_hRecordingAdditionalTeleport[client]);
 			g_hRecordingAdditionalTeleport[client] = null;
 		}
-		WriteRecordToDisk(sPath2, iHeader);
 
+		WriteRecordToDisk(sPath2, iHeader);
 
 		g_bNewReplay[client] = false;
 		g_bNewBonus[client] = false;
@@ -167,11 +167,13 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 			g_hRecordingAdditionalTeleportStage[client] = null;
 		}
 
+		WriteRecordToDisk(sPath2, iHeader);
 
 		g_bNewReplayStage[client] = false;
 		if (g_hRecordingStage[client] != null)
-			StopRecording(client);
+			StopRecordingStage(client);
 	}
+
 
 }
 
@@ -766,6 +768,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 
 			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
 			g_bReplayAtEnd[client] = false;
+			g_bReplayingStage = false;
 			g_BotMimicTick[client] = 0;
 			g_CurrentAdditionalTeleportIndex[client] = 0;
 
@@ -874,7 +877,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			TeleportEntity(client, NULL_VECTOR, angles, fActualVelocity);
 		}
 		
-		if (iFrame[newWeapon] != CSWeapon_NONE)
+		if (iFrame[newWeapon] != CSWeapon_NONE && !g_bReplayingStage)
 		{
 			char sAlias[64];
 			CS_WeaponIDToAlias(iFrame[newWeapon], sAlias, sizeof(sAlias));
