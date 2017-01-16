@@ -1,5 +1,6 @@
 //Start stage record timer
 public void CL_OnStageTimerPress(int client){
+
     if (!IsFakeClient(client))
     {
         if (IsValidClient(client))
@@ -35,11 +36,11 @@ public void CL_OnStageTimerPress(int client){
                 return;
             }
         }
-        if (g_bNewReplay[client] || g_bNewBonus[client]) // Don't allow starting the timer, if players record is being saved
+        if (g_bNewReplay[client] || g_bNewBonus[client]){
             return;
+    	} // Don't allow starting the timer, if players record is being saved
     }
 
-	StartRecordingStage(client);
     //Reset stage variables for client
     g_stageStartTime[client] = GetGameTime();
     g_stageFinalTime[client] = 0.0;
@@ -90,7 +91,6 @@ public void CL_OnStartTimerPress(int client)
 			return;
         }
 	}
-		
 	if (!g_bSpectate[client] && !g_bNoClip[client] && ((GetGameTime() - g_fLastTimeNoClipUsed[client]) > 2.0))
 	{
 		if (g_bActivateCheckpointsOnStart[client])
@@ -122,6 +122,7 @@ public void CL_OnStartTimerPress(int client)
 				g_stageStartTime[client] = GetGameTime();
 			    g_stageFinalTime[client] = 0.0;
 			    g_stageTimerActivated[client] = true;
+
 			    g_doingStage[client]=1;
 				if (g_fPersonalRecord[client] > 0.0)
 					g_bMissedMapBest[client] = false;
@@ -575,6 +576,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 
 	int inStageEnd = g_iClientInZone[client][1]+1;
 	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+	bool isLegitRun = true;
 	if (inStageEnd != g_doingStage[client] && stageCount != g_doingStage[client]){
 		PrintToChat(client, "%cSurfLatam%c |  This stage end doesn't match the stage you tried to do. If you think this is an error, contact an admin with this info: (StageCount %i) (DoingStage %i)", MOSSGREEN, WHITE, stageCount, g_doingStage[client], inStageEnd);
 		return;
@@ -583,7 +585,6 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	// Get client name
 	char szName[MAX_NAME_LENGTH];
 	GetClientName(client, szName, MAX_NAME_LENGTH);
-
 
 	// If it doesn't pass through a stage end, i calculate his stage time when he reaches the stage start. 
 	// If he did, it's calculated on surfzones.sp, StartTouch method (Please don't hate me.)
@@ -598,7 +599,6 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 
 	// Get Zonegroup (Ejemplo bonus 1, 2, 3, etc)
 	int zGroup = g_doingStage[client];
-	SaveRecording(client, zGroup, true);
 
 	//ZonetypeId + 1 = stage number
 
@@ -614,7 +614,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 		g_stagePBRecord[client] = false;
 		g_stageSRVRecord[client] = false;
 		g_OldMapRankStage[zGroup][client] = g_MapRankStage[zGroup][client];	
-		g_szFinalTime[client] = g_stageFinalTimeStr[client];
+		g_szFinalTimeStage[client] = g_stageFinalTimeStr[client];
 		g_szStageZone[client] = g_doingStage[client];
 
 		diff = g_fPersonalRecordStage[zGroup][client] - g_stageFinalTime[client];
@@ -636,7 +636,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 				g_stageFastest[zGroup] = g_stageFinalTime[client];
 				Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);
-				
+				SaveRecording(client, zGroup, true);
 				g_stageSRVRecord[client] = true;
 			}
 		} else { // Has to be the new record, since it is the first completion
@@ -647,6 +647,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 			g_stageSRVRecord[client] = true;
 			g_stageFirstRecord[client] = true;
 			g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
+			SaveRecording(client, zGroup, true);
 		}
 
 
