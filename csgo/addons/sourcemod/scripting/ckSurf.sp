@@ -298,7 +298,7 @@ bool g_bhasBonus;												// Does map have a bonus?
 int g_OldMapRankStage[MAXZONEGROUPS][MAXPLAYERS + 1];			// Old rank in Stage
 int g_MapRankStage[MAXZONEGROUPS][MAXPLAYERS + 1];				// Clients personal Stage rank in the current map
 char g_szPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1][64];// Personal bonus record in 00:00:00 format
-float g_fPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1]; 	// Clients personal stage record in the current map
+float g_fPersonalRecordStage[MAXZONEGROUPS][MAXPLAYERS + 1]; 				// Clients personal stage record in the current map
 int g_iStageCount[MAXZONEGROUPS]; 								// Amount of players that have passed the stage in current map
 float g_stageFastest[MAXZONEGROUPS]; 							// Fastest stage time in the current map
 char g_szStageFastestTime[MAXZONEGROUPS][64]; 					// Fastest stage time in 00:00:00:00 format
@@ -562,7 +562,6 @@ int g_OldMapRank[MAXPLAYERS + 1];								// Clients old rank
 char g_szRecordPlayer[MAX_NAME_LENGTH];							// Current map's record player's name
 
 /*----------  Stage Record Variables ----------*/
-char g_szFinalTimeStage[MAXPLAYERS + 1][32];						//Stage final time chararray
 float g_stageStartTime[MAXPLAYERS +1];                          // When the player started a stage
 float g_stageFinalTime[MAXPLAYERS +1];                          // When the player finished the stage
 bool g_stageTimerActivated[MAXPLAYERS +1];                     	// Is client stage timer running
@@ -571,12 +570,11 @@ bool g_stagePBRecord[MAXPLAYERS + 1];							// Personal best time in bonus
 bool g_stageSRVRecord[MAXPLAYERS + 1];							// New server record in bonus
 bool g_stageFirstRecord[MAXPLAYERS + 1];						// First bonus time in map?
 int g_doingStage[MAXPLAYERS + 1];								// Is the player doing the stage
-int g_iStageToReplay[MAXZONEGROUPS + 1];						// Stage to be replayed
 
 
 /*----------  Replay Variables  ----------*/
 Handle g_hRecordingStage[MAXPLAYERS + 1]; 						// Client is beign recorded
-Handle g_hRecordingAdditionalTeleportStage[MAXPLAYERS + 1];		// No idea what this does, i'm just copy pasting code :c  check
+Handle g_hRecordingAdditionalTeleportStage[MAXPLAYERS + 1];		// No idea what this does, i'm just copy pasting code :c
 float g_fInitialPositionStage[MAXPLAYERS + 1][3];				// Replay start position
 float g_fInitialAnglesStage[MAXPLAYERS + 1][3]; 				// Replay start angle
 int g_RecordedTicksStage[MAXPLAYERS + 1];						// No idea what this does, i'm just copy pasting code :c
@@ -584,7 +582,6 @@ int g_OriginSnapshotIntervalStage[MAXPLAYERS + 1];				// ^
 int g_CurrentAdditionalTeleportIndexStage[MAXPLAYERS + 1];
 bool g_bNewReplayStage[MAXPLAYERS + 1];							// Don't allow starting a new run if saving a record run
 Handle g_hLoadedRecordsAdditionalTeleportStage = null; 			// No idea what this does, i'm just copy pasting code :c
-bool g_bReplayingStage;											// Bot is replaying stage record
 
 //----- End Stage Replay vars
 bool g_bNewRecordBot; 											// Checks if the bot is new, if so, set weapon
@@ -1226,13 +1223,6 @@ public void OnClientDisconnect(int client)
 		CloseHandle(g_hRecordingAdditionalTeleport[client]);
 		g_hRecordingAdditionalTeleport[client] = null;
 	}
-
-	if (IsFakeClient(client) && g_hRecordingAdditionalTeleportStage[client] != null)
-	{
-		CloseHandle(g_hRecordingAdditionalTeleportStage[client]);
-		g_hRecordingAdditionalTeleportStage[client] = null;
-	}
-	
 
 
 	g_fPlayerLastTime[client] = -1.0;
@@ -2082,7 +2072,6 @@ public void OnPluginStart()
 	CheatFlag("bot_zombie", false, true);
 	CheatFlag("bot_mimic", false, true);
 	g_hLoadedRecordsAdditionalTeleport = CreateTrie();
-	g_hLoadedRecordsAdditionalTeleportStage = CreateTrie();
 	Handle hGameData = LoadGameConfigFile("sdktools.games");
 	if (hGameData == null)
 	{

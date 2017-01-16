@@ -3032,7 +3032,6 @@ public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int ite
 
 	if (item == 1){
 		StageBotMenu(client, 0);
-		delete tMenu;
 		return 0;
 	}
 
@@ -3054,42 +3053,20 @@ public Action StageBotMenu(int client, int args)
 {
 	Menu menu = new Menu(StageBotMenu_Handler);
 	menu.SetTitle("Select a stage to replay");
-	char panelName[64];
-	char panelItemName[64];
-	char buffer[3];
-
-	
-
-	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
-	
-	for (int i = 1; i <= stageCount; i++)
-	{
-		char sPath[256];
-		Format(sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, i);
-		PrintToServer(sPath);
-		BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
-		char stageName[64];
-		IntToString(i, buffer, 3);
-		Format(stageName, 64, "Stage %i", i);
-		if (FileExists(sPath)) {
-			menu.AddItem(buffer, stageName);
-		} else {
-			menu.AddItem(buffer, stageName, ITEMDRAW_DISABLED);
-		}
-	}
-
-	menu.ExitButton = true;
+	menu.AddItem("stage1", "Stage 1");
+	menu.AddItem("stage2", "Stage 2");
+	menu.AddItem("stage1", "Stage 3");
+	menu.AddItem("stage2", "Stage 4");
+	menu.ExitButton = false;
 	menu.Display(client, 60);
  
 	return Plugin_Handled;
 }
 
 public int StageBotMenu_Handler(Menu menu, MenuAction action, int client, int item) {
-	if (action != MenuAction_Select) return 0;
 
 	g_ReplayRequester = client;
 	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
-	g_bReplayingStage = true;
 	PlayRecord(g_RecordBot, item, true);
 	return 0;
 }

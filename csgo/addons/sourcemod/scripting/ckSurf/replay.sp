@@ -133,19 +133,17 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 	
 	int iHeader[FILE_HEADER_LENGTH];
 	iHeader[view_as<int>(FH_binaryFormatVersion)] = BINARY_FORMAT_VERSION;
+	strcopy(iHeader[view_as<int>(FH_Time)], 32, g_szFinalTime[client]);
+	iHeader[view_as<int>(FH_tickCount)] = GetArraySize(g_hRecording[client]);
 	strcopy(iHeader[view_as<int>(FH_Playername)], 32, szName);
 	iHeader[view_as<int>(FH_Checkpoints)] = 0; // So that KZTimers replays work
-	
+	Array_Copy(g_fInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
+	Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
+	iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
 	
 
 	//This variables are used for whole map recording, if i reset them everything goes to shit.
 	if (!isStage){
-		strcopy(iHeader[view_as<int>(FH_Time)], 32, g_szFinalTime[client]);
-		iHeader[view_as<int>(FH_tickCount)] = GetArraySize(g_hRecording[client]);
-		Array_Copy(g_fInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
-		Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
-		iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
-
 		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
 			SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
 		else
@@ -153,22 +151,14 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 			CloseHandle(g_hRecordingAdditionalTeleport[client]);
 			g_hRecordingAdditionalTeleport[client] = null;
 		}
-		WriteRecordToDisk(sPath2, iHeader, isStage);
+		WriteRecordToDisk(sPath2, iHeader);
+
 
 		g_bNewReplay[client] = false;
 		g_bNewBonus[client] = false;
-
 		if (g_hRecording[client] != null)
 			StopRecording(client);
-
-	} else if (g_hRecordingStage[client]){ //Duplicated code for stages
-		PrintToServer("Estoy grabando mami");
-		strcopy(iHeader[view_as<int>(FH_Time)], 32, g_szFinalTimeStage[client]);
-		iHeader[view_as<int>(FH_tickCount)] = GetArraySize(g_hRecordingStage[client]);
-		Array_Copy(g_fInitialPositionStage[client], iHeader[view_as<int>(FH_initialPosition)], 3);
-		Array_Copy(g_fInitialAnglesStage[client], iHeader[view_as<int>(FH_initialAngles)], 3);
-		iHeader[view_as<int>(FH_frames)] = g_hRecordingStage[client];
-
+	} else {
 		if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > 0)
 			SetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath2, g_hRecordingAdditionalTeleportStage[client]);
 		else
@@ -177,16 +167,11 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 			g_hRecordingAdditionalTeleportStage[client] = null;
 		}
 
+
 		g_bNewReplayStage[client] = false;
-
-		WriteRecordToDisk(sPath2, iHeader, isStage);
-
-		g_bNewReplay[client] = false;
-		g_bNewBonus[client] = false;
 		if (g_hRecordingStage[client] != null)
-			StopRecordingStage(client);
+			StopRecording(client);
 	}
-
 
 }
 
@@ -210,7 +195,6 @@ public void LoadReplays()
 	g_RecordBot = -1;
 	g_iCurrentBonusReplayIndex = 0;
 	ClearTrie(g_hLoadedRecordsAdditionalTeleport);
-	ClearTrie(g_hLoadedRecordsAdditionalTeleportStage);
 
 	// Check that map replay exists
 	char sPath[256];
@@ -295,7 +279,6 @@ public void PlayRecord(int client, int type, bool isStage)
 	} else if (isStage){
 		Format(sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, type+1);
 	}
-
 	PrintToServer(sPath);
 	// He's currently recording. Don't start to play some record on him at the same time.
 	if (g_hRecording[client] != null || !IsFakeClient(client))
@@ -331,15 +314,9 @@ public void PlayRecord(int client, int type, bool isStage)
 	g_BotMimicTick[client] = 0;
 	g_BotMimicRecordTickCount[client] = iFileHeader[view_as<int>(FH_tickCount)];
 	g_CurrentAdditionalTeleportIndex[client] = 0;
-	g_CurrentAdditionalTeleportIndexStage[client] = 0;
 	
-	if (isStage){
-		Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPositionStage[client], 3);
-		Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAnglesStage[client], 3);
-	} else {
-		Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPosition[client], 3);
-		Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAngles[client], 3);
-	}
+	Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPosition[client], 3);
+	Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAngles[client], 3);
 	SDKHook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
 	// Respawn him to get him moving!
 	if (IsValidClient(client) && !IsPlayerAlive(client) && GetClientTeam(client) >= CS_TEAM_T)
@@ -352,7 +329,7 @@ public void PlayRecord(int client, int type, bool isStage)
 	g_bIsPlayingReplay = true;
 }
 
-public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH], bool isStage)
+public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH])
 {
 	Handle hFile = OpenFile(sPath, "wb");
 	if (hFile == null)
@@ -373,12 +350,8 @@ public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH
 	
 	Handle hAdditionalTeleport;
 	int iATIndex;
-	if (isStage) {
-		GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
-	} else {
-		GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
-	}
-
+	GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
+	
 	int iTickCount = iFileHeader[view_as<int>(FH_tickCount)];
 	WriteFileCell(hFile, iTickCount, 4);
 	
@@ -481,10 +454,8 @@ public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LEN
 	
 	headerInfo[view_as<int>(FH_frames)] = hRecordFrames;
 	
-	if (GetArraySize(hAdditionalTeleport) > 0){
+	if (GetArraySize(hAdditionalTeleport) > 0)
 		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, path, hAdditionalTeleport);
-		SetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, path, hAdditionalTeleport);
-	}
 	CloseHandle(hFile);
 	
 	return;
@@ -622,7 +593,6 @@ public void StopPlayerMimic(int client)
 	
 	g_BotMimicTick[client] = 0;
 	g_CurrentAdditionalTeleportIndex[client] = 0;
-	g_CurrentAdditionalTeleportIndexStage[client] = 0;
 	g_BotMimicRecordTickCount[client] = 0;
 	g_bValidTeleportCall[client] = false;
 	SDKUnhook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
@@ -729,35 +699,6 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 			g_CurrentAdditionalTeleportIndex[client]++;
 		}
 
-
-
-
-		//Stage duplicated code (How2nigga)
-		// Save the current position 
-		if (g_OriginSnapshotIntervalStage[client] > ORIGIN_SNAPSHOT_INTERVAL)
-		{
-			int iAT[AdditionalTeleport];
-			float fBuffer[3];
-			GetClientAbsOrigin(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atOrigin], 3);
-
-			iAT[atFlags] = ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
-			PushArrayArray(g_hRecordingAdditionalTeleportStage[client], iAT[0], view_as<int>(AdditionalTeleport));
-			g_OriginSnapshotIntervalStage[client] = 0;
-		}
-		g_OriginSnapshotIntervalStage[client]++;
-
-		// Check for additional Teleports
-		// if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > g_CurrentAdditionalTeleportIndexStage[client])
-		// {
-		// 	int iAT[AdditionalTeleport];
-		// 	GetArrayArray(g_hRecordingAdditionalTeleportStage[client], g_CurrentAdditionalTeleportIndexStage[client], iAT[0], view_as<int>(AdditionalTeleport));
-		// 	// Remember, we were teleported this frame!
-		// 	iFrame[additionalFields] |= iAT[atFlags];
-		// 	g_CurrentAdditionalTeleportIndexStage[client]++;
-		// }
-
-
 		int iNewWeapon = -1;
 		// Did he change his weapon?
 		if (weapon)
@@ -804,6 +745,17 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 		{			
 			if (!g_bReplayAtEnd[client])
 			{
+				/*if (client == g_BonusBot)
+				{
+					// Call to load another replay
+					if (g_iCurrentBonusReplayIndex < (g_BonusBotCount-1))
+						g_iCurrentBonusReplayIndex++;
+					else
+						g_iCurrentBonusReplayIndex = 0;
+
+					PlayRecord(g_BonusBot, 1);
+					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
+				}*/
 				g_fReplayRestarted[client] = GetEngineTime();
 				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.0);
 				g_bReplayAtEnd[client] = true;
@@ -816,12 +768,9 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			g_bReplayAtEnd[client] = false;
 			g_BotMimicTick[client] = 0;
 			g_CurrentAdditionalTeleportIndex[client] = 0;
-			g_CurrentAdditionalTeleportIndexStage[client] = 0;
-
 
 			g_fLastReplayRequested[g_ReplayRequester] = GetGameTime();
 			g_bIsPlayingReplay = false;
-			g_bReplayingStage = false;
 
 			CS_SetClientClanTag(g_RecordBot, "Latam");
 			// SetEntPropFloat(g_RecordBot, Prop_Data, "m_flLaggedMovementValue", 0.0);
@@ -856,15 +805,11 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			char sPath[PLATFORM_MAX_PATH];
 			if (g_CurrentReplay == 0)
 				Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
-			else if (g_CurrentReplay > 0 && !g_bReplayingStage){
+			else if (g_CurrentReplay > 0)
 				Format(sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex]);
-			} else if (g_bReplayingStage){
-				Format(sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, g_iStageToReplay[g_iCurrentBonusReplayIndex]);
-			}
 
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
-
-			if (g_hLoadedRecordsAdditionalTeleport != null && !g_bReplayingStage)
+			if (g_hLoadedRecordsAdditionalTeleport != null)
 			{
 				GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
 				if (hAdditionalTeleport != null)
@@ -911,54 +856,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 					}
 				}
 				g_CurrentAdditionalTeleportIndex[client]++;
-			} 
-			//Duplicated code for stage
-			else if (g_hLoadedRecordsAdditionalTeleport != null && g_bReplayingStage) {
-				GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
-				if (hAdditionalTeleport != null)
-					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndexStage[client], iAT, 10);
-				
-				float fOrigin[3], fAngles[3], fVelocity[3];
-				Array_Copy(iAT[atOrigin], fOrigin, 3);
-				Array_Copy(iAT[atAngles], fAngles, 3);
-				Array_Copy(iAT[atVelocity], fVelocity, 3);
-
-				// The next call to Teleport is ok.
-				g_bValidTeleportCall[client] = true;
-
-				if (iAT[atFlags] & ADDITIONAL_FIELD_TELEPORTED_ORIGIN)
-				{
-					if (iAT[atFlags] & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
-					{
-						if (iAT[atFlags] & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
-							TeleportEntity(client, fOrigin, fAngles, fVelocity);
-						else
-							TeleportEntity(client, fOrigin, fAngles, NULL_VECTOR);
-					}
-					else
-					{
-						if (iAT[atFlags] & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
-							TeleportEntity(client, fOrigin, NULL_VECTOR, fVelocity);
-						else
-							TeleportEntity(client, fOrigin, NULL_VECTOR, NULL_VECTOR);
-					}
-				}
-				else
-				{
-					if (iAT[atFlags] & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
-					{
-						if (iAT[atFlags] & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
-							TeleportEntity(client, NULL_VECTOR, fAngles, fVelocity);
-						else
-							TeleportEntity(client, NULL_VECTOR, fAngles, NULL_VECTOR);
-					}
-					else
-					{
-						if (iAT[atFlags] & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
-							TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, fVelocity);
-					}
-				}
-				g_CurrentAdditionalTeleportIndexStage[client]++;
 			}
 		}
 
@@ -967,11 +864,9 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 		{
 			CL_OnStartTimerPress(client);			
 			g_bValidTeleportCall[client] = true;
-			if (g_bReplayingStage){
-				TeleportEntity(client, g_fInitialPosition[client], g_fInitialAngles[client], fActualVelocity);
-			} else {
-				TeleportEntity(client, g_fInitialPositionStage[client], g_fInitialAnglesStage[client], fActualVelocity);
-			}
+			TeleportEntity(client, g_fInitialPosition[client], g_fInitialAngles[client], fActualVelocity);
+			// TeleportEntity(client, g_fInitialPositionStage[client], g_fInitialAnglesStage[client], fActualVelocity);
+			
 		}
 		else
 		{
@@ -979,8 +874,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			TeleportEntity(client, NULL_VECTOR, angles, fActualVelocity);
 		}
 		
-		//Apparently does shit with changing weapon and shit, i'll deprecate this eventually since i don't want bots with weapons.
-		if (iFrame[newWeapon] != CSWeapon_NONE && !g_bReplayingStage)
+		if (iFrame[newWeapon] != CSWeapon_NONE)
 		{
 			char sAlias[64];
 			CS_WeaponIDToAlias(iFrame[newWeapon], sAlias, sizeof(sAlias));
@@ -1052,8 +946,6 @@ public void StartRecordingStage(int client)
 {
 	if (!IsValidClient(client) || IsFakeClient(client))
 		return;
-
-	PrintToServer("empiezo a grabar stage");
 	
 	g_hRecordingStage[client] = CreateArray(view_as<int>(FrameInfo));
 	g_hRecordingAdditionalTeleportStage[client] = CreateArray(view_as<int>(AdditionalTeleport));
@@ -1069,9 +961,6 @@ public void StopRecordingStage(int client)
 	if (!IsValidClient(client) || g_hRecording[client] == null)
 		return;
 	
-	PrintToServer("paro de a grabar stage");
-	g_bNewReplay[client] = false;
-	g_bNewBonus[client] = false;
 	CloseHandle(g_hRecordingStage[client]);
 	CloseHandle(g_hRecordingAdditionalTeleportStage[client]);	
 	g_hRecordingStage[client] = null;

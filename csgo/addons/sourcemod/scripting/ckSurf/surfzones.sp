@@ -188,21 +188,6 @@ public void StartTouch(int client, int action[3])
 						StartRecording(client);
 					}
 				}
-				//Start recording stage
-				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
-				{
-					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
-					{
-						if (g_hRecordingStage[client] != null)
-							StopRecordingStage(client);
-					}
-					else
-					{
-						if (g_hRecordingStage[client] != null)
-							StopRecordingStage(client);
-						StartRecordingStage(client);
-					}
-				}
 				g_Stage[g_iClientInZone[client][2]][client] = 1;
 				
 				Client_Stop(client, 1);
@@ -237,21 +222,6 @@ public void StartTouch(int client, int action[3])
 		}
 		else if (action[0] == view_as<int>(ST_Stage)) // Stage Zone
 		{
-			//Start recording stage
-			if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
-			{
-				if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
-				{
-					if (g_hRecordingStage[client] != null)
-						StopRecordingStage(client);
-				}
-				else
-				{
-					if (g_hRecordingStage[client] != null)
-						StopRecordingStage(client);
-					StartRecordingStage(client);
-				}
-			}
 			if (g_bPracticeMode[client]) // If practice mode is on
 			{
 				if (action[1] > lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2] || lastCheckpoint[g_iClientInZone[client][2]][client] == 999)
