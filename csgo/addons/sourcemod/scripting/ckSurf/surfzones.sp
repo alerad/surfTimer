@@ -188,6 +188,22 @@ public void StartTouch(int client, int action[3])
 						StartRecording(client);
 					}
 				}
+
+				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) && !g_hRecordingStage[client])
+				{
+					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+					}
+					else
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+						StartRecordingStage(client);
+					}
+				}
+
 				g_Stage[g_iClientInZone[client][2]][client] = 1;
 				
 				Client_Stop(client, 1);
@@ -236,6 +252,21 @@ public void StartTouch(int client, int action[3])
 				g_bValidRun[client] = false;
 				if (FindConVar("ck_pre_stage_speed").FloatValue < 500){
 					LimitSpeed(client, true);
+				}
+
+				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) && !g_hRecordingStage[client])
+				{
+					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+					}
+					else
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+						StartRecordingStage(client);
+					}
 				}
 				// Announcing checkpoint
 				if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])

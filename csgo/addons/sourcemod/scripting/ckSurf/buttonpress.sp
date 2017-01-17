@@ -39,20 +39,7 @@ public void CL_OnStageTimerPress(int client){
             return;
     }
 
-	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) && !g_hRecording[client])
-	{
-		if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
-		{
-			if (g_hRecordingStage[client] != null)
-				StopRecordingStage(client);
-		}
-		else
-		{
-			if (g_hRecordingStage[client] != null)
-				StopRecordingStage(client);
-			StartRecordingStage(client);
-		}
-	}
+	
     //Reset stage variables for client
     g_stageStartTime[client] = GetGameTime();
     g_stageFinalTime[client] = 0.0;
@@ -176,21 +163,6 @@ public void CL_OnStartTimerPress(int client)
 			if (g_hRecording[client] != null)
 				StopRecording(client);
 			StartRecording(client);
-		}
-	}
-
-	if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) && !g_hRecordingStage[client])
-	{
-		if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
-		{
-			if (g_hRecordingStage[client] != null)
-				StopRecordingStage(client);
-		}
-		else
-		{
-			if (g_hRecordingStage[client] != null)
-				StopRecordingStage(client);
-			StartRecordingStage(client);
 		}
 	}
 }

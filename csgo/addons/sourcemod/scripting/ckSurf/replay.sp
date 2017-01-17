@@ -134,16 +134,17 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 	int iHeader[FILE_HEADER_LENGTH];
 	iHeader[view_as<int>(FH_binaryFormatVersion)] = BINARY_FORMAT_VERSION;
 	strcopy(iHeader[view_as<int>(FH_Time)], 32, g_szFinalTime[client]);
-	iHeader[view_as<int>(FH_tickCount)] = GetArraySize(g_hRecording[client]);
 	strcopy(iHeader[view_as<int>(FH_Playername)], 32, szName);
 	iHeader[view_as<int>(FH_Checkpoints)] = 0; // So that KZTimers replays work
-	Array_Copy(g_fInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
-	Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
-	iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
+
 	
 
 	//This variables are used for whole map recording, if i reset them everything goes to shit.
 	if (!isStage){
+		iHeader[view_as<int>(FH_tickCount)] = GetArraySize(g_hRecording[client]);
+		iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
+		Array_Copy(g_fInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
+		Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
 		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
 			SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
 		else
@@ -159,6 +160,10 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 		if (g_hRecording[client] != null)
 			StopRecording(client);
 	} else {
+		iHeader[view_as<int>(FH_tickCount)] = GetArraySize(g_hRecordingStage[client]);
+		iHeader[view_as<int>(FH_frames)] = g_hRecordingStage[client];
+		Array_Copy(g_fInitialPositionStage[client], iHeader[view_as<int>(FH_initialPosition)], 3);
+		Array_Copy(g_fInitialAnglesStage[client], iHeader[view_as<int>(FH_initialAngles)], 3);
 		if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > 0)
 			SetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath2, g_hRecordingAdditionalTeleportStage[client]);
 		else
@@ -950,6 +955,7 @@ public void StartRecordingStage(int client)
 	if (!IsValidClient(client) || IsFakeClient(client))
 		return;
 	
+	PrintToServer("Empiezo a grabar stage");
 	g_hRecordingStage[client] = CreateArray(view_as<int>(FrameInfo));
 	g_hRecordingAdditionalTeleportStage[client] = CreateArray(view_as<int>(AdditionalTeleport));
 	GetClientAbsOrigin(client, g_fInitialPositionStage[client]);
@@ -964,6 +970,8 @@ public void StopRecordingStage(int client)
 	if (!IsValidClient(client) || g_hRecording[client] == null)
 		return;
 	
+	PrintToServer("Paro a grabar stage");
+
 	CloseHandle(g_hRecordingStage[client]);
 	CloseHandle(g_hRecordingAdditionalTeleportStage[client]);	
 	g_hRecordingStage[client] = null;
