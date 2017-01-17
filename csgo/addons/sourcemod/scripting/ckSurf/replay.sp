@@ -321,9 +321,23 @@ public void PlayRecord(int client, int type, bool isStage)
 	g_BotMimicTick[client] = 0;
 	g_BotMimicRecordTickCount[client] = iFileHeader[view_as<int>(FH_tickCount)];
 	g_CurrentAdditionalTeleportIndex[client] = 0;
+
+	if (isStage){
+		PrintToServer("g_fInitialPositionStage %f ", g_fInitialPositionStage[client]);
+		Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPositionStage[client], 3);
+		Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAnglesStage[client], 3);
+		PrintToServer("g_fInitialPositionStage %f ", g_fInitialPositionStage[client]);
+
+	} else {
+		PrintToServer("g_fInitialPosition %f ", g_fInitialPosition[client]);
+
+		Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPosition[client], 3);
+		Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAngles[client], 3);
+		PrintToServer("g_fInitialPosition %f ", g_fInitialPosition[client]);
+
+	}
+
 	
-	Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], g_fInitialPosition[client], 3);
-	Array_Copy(iFileHeader[view_as<int>(FH_initialAngles)], g_fInitialAngles[client], 3);
 	SDKHook(client, SDKHook_WeaponCanSwitchTo, Hook_WeaponCanSwitchTo);
 	// Respawn him to get him moving!
 	if (IsValidClient(client) && !IsPlayerAlive(client) && GetClientTeam(client) >= CS_TEAM_T)
@@ -959,6 +973,8 @@ public void StartRecordingStage(int client)
 	g_hRecordingStage[client] = CreateArray(view_as<int>(FrameInfo));
 	g_hRecordingAdditionalTeleportStage[client] = CreateArray(view_as<int>(AdditionalTeleport));
 	GetClientAbsOrigin(client, g_fInitialPositionStage[client]);
+	PrintToServer("Le pongo la initposition en %f", g_fInitialPositionStage[client]);
+
 	GetClientEyeAngles(client, g_fInitialAngles[client]);
 	g_RecordedTicksStage[client] = 0;
 	g_OriginSnapshotIntervalStage[client] = 0;

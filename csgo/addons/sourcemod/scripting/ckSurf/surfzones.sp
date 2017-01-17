@@ -189,7 +189,7 @@ public void StartTouch(int client, int action[3])
 					}
 				}
 
-				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) && !g_hRecordingStage[client])
+				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
 				{
 					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
 					{
@@ -254,7 +254,7 @@ public void StartTouch(int client, int action[3])
 					LimitSpeed(client, true);
 				}
 
-				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)) && !g_hRecordingStage[client])
+				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
 				{
 					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
 					{
