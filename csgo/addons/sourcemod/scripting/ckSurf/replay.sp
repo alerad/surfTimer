@@ -91,7 +91,7 @@ public void StopRecording(int client)
 
 public void SaveRecording(int client, int zgroup, bool isStage)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null)
+	if (!IsValidClient(client) || (g_hRecording[client] == null && g_hRecordingStage[client] == null))
 		return;
 	else
 	{
@@ -377,9 +377,11 @@ public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH
 	WriteFileCell(hFile, iTickCount, 4);
 	
 	int iFrame[FRAME_INFO_SIZE];
+	PrintToServer("Tick count %i", iTickCount);
 	for (int i = 0; i < iTickCount; i++)
 	{
 		GetArrayArray(iFileHeader[view_as<int>(FH_frames)], i, iFrame, view_as<int>(FrameInfo));
+		PrintToServer("iFrame %i", iFrame);
 		WriteFile(hFile, iFrame, view_as<int>(FrameInfo), 4);
 		
 		// Handle the optional Teleport call
@@ -747,9 +749,7 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 		}
 		
 		PushArrayArray(g_hRecording[client], iFrame[0], view_as<int>(FrameInfo));
-		if (g_hRecordingStage[client]!=null){
-			PushArrayArray(g_hRecordingStage[client], iFrame[0], view_as<int>(FrameInfo));
-		}
+		PushArrayArray(g_hRecordingStage[client], iFrame[0], view_as<int>(FrameInfo));
 		g_RecordedTicks[client]++;
 		g_RecordedTicksStage[client]++;
 	}
@@ -983,7 +983,7 @@ public void StartRecordingStage(int client)
 
 public void StopRecordingStage(int client)
 {
-	if (!IsValidClient(client) || g_hRecording[client] == null)
+	if (!IsValidClient(client) || g_hRecordingStage[client] == null)
 		return;
 	
 	PrintToServer("Paro a grabar stage");
