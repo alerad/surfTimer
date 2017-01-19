@@ -884,11 +884,13 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 		// This is the first tick. Teleport him to the initial position
 		if (g_BotMimicTick[client] == 0)
 		{
-			CL_OnStartTimerPress(client);			
 			g_bValidTeleportCall[client] = true;
-			TeleportEntity(client, g_fInitialPosition[client], g_fInitialAngles[client], fActualVelocity);
-			// TeleportEntity(client, g_fInitialPositionStage[client], g_fInitialAnglesStage[client], fActualVelocity);
-			
+			if (g_bReplayingStage){
+				TeleportEntity(client, g_fInitialPositionStage[client], g_fInitialAnglesStage[client], fActualVelocity);
+			} else {
+				CL_OnStartTimerPress(client);			
+				TeleportEntity(client, g_fInitialPosition[client], g_fInitialAngles[client], fActualVelocity);
+			}
 		}
 		else
 		{
