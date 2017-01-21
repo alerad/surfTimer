@@ -755,6 +755,7 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 			// Remember, we were teleported this frame!
 			iFrame[additionalFields] |= iAT[atFlags];
 			g_CurrentAdditionalTeleportIndexStage[client]++;
+			PrintToServer("Estoy grabando");
 		}
 
 
@@ -874,9 +875,20 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
 			if (g_hLoadedRecordsAdditionalTeleport != null)
 			{
-				GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
-				if (hAdditionalTeleport != null)
+				PrintToServer("Replaytting stage %b", g_bReplayingStage);
+				if (g_bReplayingStage){
+					if (g_hLoadedRecordsAdditionalTeleportStage != null) {
+						GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
+					}
+				} else {
+					GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
+				}
+
+				if (hAdditionalTeleport != null && g_bReplayingStage){
+					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndexStage[client], iAT, 10);
+				} else if (hAdditionalTeleport != null) {
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndex[client], iAT, 10);
+				}
 				
 				float fOrigin[3], fAngles[3], fVelocity[3];
 				Array_Copy(iAT[atOrigin], fOrigin, 3);
@@ -919,6 +931,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 					}
 				}
 				g_CurrentAdditionalTeleportIndex[client]++;
+				g_CurrentAdditionalTeleportIndexStage[client]++;
 			}
 		}
 

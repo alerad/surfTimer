@@ -1273,6 +1273,9 @@ public void OnClientDisconnect(int client)
 	if (g_hRecording[client] != null)
 		StopRecording(client);
 
+	if (g_hRecordingStage[client] != null)
+		StopRecordingStage(client);
+		
 	if(AreClientCookiesCached(client))
 	{
 		new String:SprayString[12];
