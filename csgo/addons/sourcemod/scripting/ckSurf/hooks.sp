@@ -712,8 +712,9 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	}
 	
 	// Don't care if he's not recording.
-	if (g_hRecording[client] == null)
+	if (g_hRecording[client] == null && g_hRecordingStage[client] == null)
 		return MRES_Ignored;
+
 
 	bool bOriginNull = DHookIsNullParam(hParams, 1);
 	bool bAnglesNull = DHookIsNullParam(hParams, 2);
@@ -751,6 +752,10 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 		
 	if (g_hRecordingAdditionalTeleport[client] != null)
 		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, AT_SIZE);
+	
+	if (g_hRecordingAdditionalTeleportStage[client] != null){
+		PushArrayArray(g_hRecordingAdditionalTeleportStage[client], iAT, AT_SIZE);
+	}
 	
 	return MRES_Ignored;
 }

@@ -3087,6 +3087,7 @@ public int StageBotMenu_Handler(Menu menu, MenuAction action, int client, int it
 	if (action != MenuAction_Select) return 0;
 
 	g_ReplayRequester = client;
+	g_iStageToBeReplayed = item+1;
 	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
 	g_bReplayingStage = true;
 	PlayRecord(g_RecordBot, item, true);

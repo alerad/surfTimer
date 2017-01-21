@@ -123,6 +123,7 @@
 #define ADDITIONAL_FIELD_TELEPORTED_VELOCITY (1<<2)
 #define FRAME_INFO_SIZE 15
 #define AT_SIZE 10
+#define AT_SIZE_STAGE 10
 #define ORIGIN_SNAPSHOT_INTERVAL 500
 #define FILE_HEADER_LENGTH 74
 
@@ -583,6 +584,7 @@ int g_CurrentAdditionalTeleportIndexStage[MAXPLAYERS + 1];
 bool g_bNewReplayStage[MAXPLAYERS + 1];							// Don't allow starting a new run if saving a record run
 Handle g_hLoadedRecordsAdditionalTeleportStage = null; 			// No idea what this does, i'm just copy pasting code :c
 bool g_bReplayingStage;											// The bot is replaying a stage records
+int g_iStageToBeReplayed = 0;									// Number of stage to be replayed
 
 //----- End Stage Replay vars
 bool g_bNewRecordBot; 											// Checks if the bot is new, if so, set weapon
@@ -2073,6 +2075,8 @@ public void OnPluginStart()
 	CheatFlag("bot_zombie", false, true);
 	CheatFlag("bot_mimic", false, true);
 	g_hLoadedRecordsAdditionalTeleport = CreateTrie();
+	g_hLoadedRecordsAdditionalTeleportStage = CreateTrie();
+
 	Handle hGameData = LoadGameConfigFile("sdktools.games");
 	if (hGameData == null)
 	{
