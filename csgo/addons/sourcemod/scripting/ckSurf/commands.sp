@@ -3013,7 +3013,14 @@ public Action Command_Replay(int client, int args)
 	SetMenuTitle(menu, "[Surf Timer] Replay");
 
 	menu.AddItem("map", "Map");
-	menu.AddItem("map", "Select Stage");
+
+	//Si no es vip
+	if (!g_bflagTitles[client][0])
+	{
+		menu.AddItem("map", "Select Stage (VIP ONLY)", ITEMDRAW_DISABLED);
+	} else {
+		menu.AddItem("map", "Select Stage");
+	}
 
 
 	for (int i = 1; i < g_mapZoneGroupCount; i++)
@@ -3051,6 +3058,11 @@ public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int ite
 
 public Action StageBotMenu(int client, int args)
 {
+	if (!g_bflagTitles[client][0])
+	{
+		PrintToChat(client, "This feature is only for VIPs.");
+		return Plugin_Handled;
+	}
 	Menu menu = new Menu(StageBotMenu_Handler);
 	menu.SetTitle("Select a stage to replay");
 	char panelName[64];

@@ -598,7 +598,6 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 
 	// Get Zonegroup (Ejemplo bonus 1, 2, 3, etc)
 	int zGroup = g_doingStage[client];
-	SaveRecording(client, zGroup, true);
 
 	//ZonetypeId + 1 = stage number
 
@@ -636,11 +635,13 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 				g_stageFastest[zGroup] = g_stageFinalTime[client];
 				Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);
+				SaveRecording(client, zGroup, true);
 				
 				g_stageSRVRecord[client] = true;
 			}
 		} else { // Has to be the new record, since it is the first completion
 			g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
+			SaveRecording(client, zGroup, true);
 			g_stageFastest[zGroup] = g_stageFinalTime[client];
 			Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);

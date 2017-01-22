@@ -146,8 +146,6 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 		Array_Copy(g_fInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
 		Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
 		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0){
-			PrintToServer("Entro a grabar adentro de loaded record mapd" );
-
 			SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
 		}
 		else
@@ -722,23 +720,28 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 			g_OriginSnapshotInterval[client]++;
 
 			// Check for additional Teleports
-			if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > g_CurrentAdditionalTeleportIndex[client] && g_hRecording[client] != null)
-			{
-				int iAT[AdditionalTeleport]; 
-				GetArrayArray(g_hRecordingAdditionalTeleport[client], g_CurrentAdditionalTeleportIndex[client], iAT[0], view_as<int>(AdditionalTeleport));
-				// Remember, we were teleported this frame!
-				iFrame[additionalFields] |= iAT[atFlags];
-				g_CurrentAdditionalTeleportIndex[client]++;
+			if (g_hRecording[client] != null){
+				if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > g_CurrentAdditionalTeleportIndex[client] && g_hRecording[client] != null)
+				{
+					int iAT[AdditionalTeleport]; 
+					GetArrayArray(g_hRecordingAdditionalTeleport[client], g_CurrentAdditionalTeleportIndex[client], iAT[0], view_as<int>(AdditionalTeleport));
+					// Remember, we were teleported this frame!
+					iFrame[additionalFields] |= iAT[atFlags];
+					g_CurrentAdditionalTeleportIndex[client]++;
 
+				}
 			}
-
-			if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > g_CurrentAdditionalTeleportIndexStage[client] && g_hRecordingStage[client] != null)
+			
+			if (g_hRecordingStage[client]!=null)
 			{
-				int iAT[AdditionalTeleport];
-				GetArrayArray(g_hRecordingAdditionalTeleportStage[client], g_CurrentAdditionalTeleportIndexStage[client], iAT[0], view_as<int>(AdditionalTeleport));
-				// Remember, we were teleported this frame!
-				iFrame[additionalFields] |= iAT[atFlags];
-				g_CurrentAdditionalTeleportIndexStage[client]++;
+				if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > g_CurrentAdditionalTeleportIndexStage[client] && g_hRecordingStage[client] != null)
+				{
+					int iAT[AdditionalTeleport];
+					GetArrayArray(g_hRecordingAdditionalTeleportStage[client], g_CurrentAdditionalTeleportIndexStage[client], iAT[0], view_as<int>(AdditionalTeleport));
+					// Remember, we were teleported this frame!
+					iFrame[additionalFields] |= iAT[atFlags];
+					g_CurrentAdditionalTeleportIndexStage[client]++;
+				}
 			}
 		}
 
@@ -792,17 +795,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 		{			
 			if (!g_bReplayAtEnd[client])
 			{
-				/*if (client == g_BonusBot)
-				{
-					// Call to load another replay
-					if (g_iCurrentBonusReplayIndex < (g_BonusBotCount-1))
-						g_iCurrentBonusReplayIndex++;
-					else
-						g_iCurrentBonusReplayIndex = 0;
-
-					PlayRecord(g_BonusBot, 1);
-					g_iClientInZone[g_BonusBot][2] = g_iBonusToReplay[g_iCurrentBonusReplayIndex];
-				}*/
 				g_fReplayRestarted[client] = GetEngineTime();
 				SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 0.0);
 				g_bReplayAtEnd[client] = true;
