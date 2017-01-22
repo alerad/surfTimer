@@ -752,8 +752,9 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	if (!bVelocityNull)
 		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_VELOCITY;
 		
-	if (g_hRecordingAdditionalTeleport[client] != null)
+	if (g_hRecordingAdditionalTeleport[client] != null){
 		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, AT_SIZE);
+	}
 	
 	if (g_hRecordingAdditionalTeleportStage[client] != null){
 		PushArrayArray(g_hRecordingAdditionalTeleportStage[client], iAT, AT_SIZE);

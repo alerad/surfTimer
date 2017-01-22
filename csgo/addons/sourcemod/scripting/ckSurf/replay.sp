@@ -145,8 +145,11 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 		iHeader[view_as<int>(FH_frames)] = g_hRecording[client];
 		Array_Copy(g_fInitialPosition[client], iHeader[view_as<int>(FH_initialPosition)], 3);
 		Array_Copy(g_fInitialAngles[client], iHeader[view_as<int>(FH_initialAngles)], 3);
-		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0)
+		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > 0){
+			PrintToServer("Entro a grabar adentro de loaded record mapd" );
+
 			SetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath2, g_hRecordingAdditionalTeleport[client]);
+		}
 		else
 		{
 			CloseHandle(g_hRecordingAdditionalTeleport[client]);
@@ -275,6 +278,64 @@ public void LoadReplays()
 	CreateTimer(1.0, RefreshBot, TIMER_FLAG_NO_MAPCHANGE);
 }
 
+public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH], bool isStage)
+{
+	Handle hFile = OpenFile(sPath, "wb");
+	if (hFile == null)
+	{
+		LogError("Can't open the record file for writing! (%s)", sPath);
+		return;
+	}
+	
+	WriteFileCell(hFile, BM_MAGIC, 4);
+	WriteFileCell(hFile, iFileHeader[view_as<int>(FH_binaryFormatVersion)], 1);
+	WriteFileCell(hFile, strlen(iFileHeader[view_as<int>(FH_Time)]), 1);
+	WriteFileString(hFile, iFileHeader[view_as<int>(FH_Time)], false);
+	WriteFileCell(hFile, strlen(iFileHeader[view_as<int>(FH_Playername)]), 1);
+	WriteFileString(hFile, iFileHeader[view_as<int>(FH_Playername)], false);
+	WriteFileCell(hFile, iFileHeader[view_as<int>(FH_Checkpoints)], 4);
+	WriteFile(hFile, view_as<int>(iFileHeader[view_as<int>(FH_initialPosition)]), 3, 4);
+	WriteFile(hFile, view_as<int>(iFileHeader[view_as<int>(FH_initialAngles)]), 2, 4);
+	
+	Handle hAdditionalTeleport;
+	int iATIndex;
+
+	if (isStage){
+		GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
+	} else {
+ 		GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
+	}
+
+	
+	int iTickCount = iFileHeader[view_as<int>(FH_tickCount)];
+	WriteFileCell(hFile, iTickCount, 4);
+	
+	int iFrame[FRAME_INFO_SIZE];
+	for (int i = 0; i < iTickCount; i++)
+	{
+		GetArrayArray(iFileHeader[view_as<int>(FH_frames)], i, iFrame, view_as<int>(FrameInfo));
+		WriteFile(hFile, iFrame, view_as<int>(FrameInfo), 4);
+		
+		// Handle the optional Teleport call
+		if (hAdditionalTeleport != null && iFrame[view_as<int>(additionalFields)] & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
+		{
+			//El index esta bien, el hAdditionalTeleport deja de grabar ewn un moemtno
+			int iAT[AT_SIZE];
+			GetArrayArray(hAdditionalTeleport, iATIndex, iAT, AT_SIZE);
+			if (iFrame[view_as<int>(additionalFields)] & ADDITIONAL_FIELD_TELEPORTED_ORIGIN)
+				WriteFile(hFile, view_as<int>(iAT[view_as<int>(atOrigin)]), 3, 4);
+			if (iFrame[view_as<int>(additionalFields)] & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
+				WriteFile(hFile, view_as<int>(iAT[view_as<int>(atAngles)]), 3, 4);
+			if (iFrame[view_as<int>(additionalFields)] & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
+				WriteFile(hFile, view_as<int>(iAT[view_as<int>(atVelocity)]), 3, 4);
+			iATIndex++;
+		}
+	}
+	
+	CloseHandle(hFile);
+	LoadReplays();
+}
+
 public void PlayRecord(int client, int type, bool isStage)
 {
 	if (!IsValidClient(client))
@@ -344,63 +405,6 @@ public void PlayRecord(int client, int type, bool isStage)
 	}
 
 	g_bIsPlayingReplay = true;
-}
-
-public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH], bool isStage)
-{
-	Handle hFile = OpenFile(sPath, "wb");
-	if (hFile == null)
-	{
-		LogError("Can't open the record file for writing! (%s)", sPath);
-		return;
-	}
-	
-	WriteFileCell(hFile, BM_MAGIC, 4);
-	WriteFileCell(hFile, iFileHeader[view_as<int>(FH_binaryFormatVersion)], 1);
-	WriteFileCell(hFile, strlen(iFileHeader[view_as<int>(FH_Time)]), 1);
-	WriteFileString(hFile, iFileHeader[view_as<int>(FH_Time)], false);
-	WriteFileCell(hFile, strlen(iFileHeader[view_as<int>(FH_Playername)]), 1);
-	WriteFileString(hFile, iFileHeader[view_as<int>(FH_Playername)], false);
-	WriteFileCell(hFile, iFileHeader[view_as<int>(FH_Checkpoints)], 4);
-	WriteFile(hFile, view_as<int>(iFileHeader[view_as<int>(FH_initialPosition)]), 3, 4);
-	WriteFile(hFile, view_as<int>(iFileHeader[view_as<int>(FH_initialAngles)]), 2, 4);
-	
-	Handle hAdditionalTeleport;
-	int iATIndex;
-
-	if (isStage){
-		GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
-	} else {
- 		GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
-	}
-
-	
-	int iTickCount = iFileHeader[view_as<int>(FH_tickCount)];
-	WriteFileCell(hFile, iTickCount, 4);
-	
-	int iFrame[FRAME_INFO_SIZE];
-	for (int i = 0; i < iTickCount; i++)
-	{
-		GetArrayArray(iFileHeader[view_as<int>(FH_frames)], i, iFrame, view_as<int>(FrameInfo));
-		WriteFile(hFile, iFrame, view_as<int>(FrameInfo), 4);
-		
-		// Handle the optional Teleport call
-		if (hAdditionalTeleport != null && iFrame[view_as<int>(additionalFields)] & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
-		{
-			int iAT[AT_SIZE];
-			GetArrayArray(hAdditionalTeleport, iATIndex, iAT, AT_SIZE);
-			if (iFrame[view_as<int>(additionalFields)] & ADDITIONAL_FIELD_TELEPORTED_ORIGIN)
-				WriteFile(hFile, view_as<int>(iAT[view_as<int>(atOrigin)]), 3, 4);
-			if (iFrame[view_as<int>(additionalFields)] & ADDITIONAL_FIELD_TELEPORTED_ANGLES)
-				WriteFile(hFile, view_as<int>(iAT[view_as<int>(atAngles)]), 3, 4);
-			if (iFrame[view_as<int>(additionalFields)] & ADDITIONAL_FIELD_TELEPORTED_VELOCITY)
-				WriteFile(hFile, view_as<int>(iAT[view_as<int>(atVelocity)]), 3, 4);
-			iATIndex++;
-		}
-	}
-	
-	CloseHandle(hFile);
-	LoadReplays();
 }
 
 public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LENGTH])
@@ -695,69 +699,48 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 		iFrame[playerSubtype] = subtype;
 		iFrame[playerSeed] = seed;
 
-		// Save the current position 
-		if (g_OriginSnapshotInterval[client] > ORIGIN_SNAPSHOT_INTERVAL)
-		{
-			int iAT[AdditionalTeleport];
-			float fBuffer[3];
-			GetClientAbsOrigin(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atOrigin], 3);
-
-			/*GetClientEyeAngles(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atAngles], 3);
-
-			Entity_GetAbsVelocity(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atVelocity], 3);*/
-			
-			iAT[atFlags] = ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
-			PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT[0], view_as<int>(AdditionalTeleport));
-			
-			g_OriginSnapshotInterval[client] = 0;
-		}
-		g_OriginSnapshotInterval[client]++;
-
-		// Check for additional Teleports
-		if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > g_CurrentAdditionalTeleportIndex[client])
-		{
-			int iAT[AdditionalTeleport];
-			GetArrayArray(g_hRecordingAdditionalTeleport[client], g_CurrentAdditionalTeleportIndex[client], iAT[0], view_as<int>(AdditionalTeleport));
-			// Remember, we were teleported this frame!
-			iFrame[additionalFields] |= iAT[atFlags];
-			g_CurrentAdditionalTeleportIndex[client]++;
-		}
-
+		if (g_hRecording[client] != null || g_hRecordingStage[client] != null) {
 			// Save the current position 
-		if (g_OriginSnapshotIntervalStage[client] > ORIGIN_SNAPSHOT_INTERVAL)
-		{
-			int iAT[AdditionalTeleport];
-			float fBuffer[3];
-			GetClientAbsOrigin(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atOrigin], 3);
+			if (g_OriginSnapshotInterval[client] > ORIGIN_SNAPSHOT_INTERVAL)
+			{
+				int iAT[AdditionalTeleport];
+				float fBuffer[3];
+				GetClientAbsOrigin(client, fBuffer);
+				Array_Copy(fBuffer, iAT[atOrigin], 3);
+				
+				iAT[atFlags] = ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
 
-			/*GetClientEyeAngles(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atAngles], 3);
+				// if (g_OriginSnapshotInterval[client] > ORIGIN_SNAPSHOT_INTERVAL){
+				g_OriginSnapshotInterval[client] = 0;
+				if (g_hRecording[client] != null)
+					PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT[0], view_as<int>(AdditionalTeleport));
 
-			Entity_GetAbsVelocity(client, fBuffer);
-			Array_Copy(fBuffer, iAT[atVelocity], 3);*/
-			
-			iAT[atFlags] = ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
-			if (g_hRecordingStage[client] != null){
-				PushArrayArray(g_hRecordingAdditionalTeleportStage[client], iAT[0], view_as<int>(AdditionalTeleport));
+				if (g_hRecordingStage[client] != null)
+					PushArrayArray(g_hRecordingAdditionalTeleportStage[client], iAT[0], view_as<int>(AdditionalTeleport));
+
 			}
-			g_OriginSnapshotIntervalStage[client] = 0;
-		}
-		g_OriginSnapshotIntervalStage[client]++;
+			g_OriginSnapshotInterval[client]++;
 
-		if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > g_CurrentAdditionalTeleportIndexStage[client])
-		{
-			int iAT[AdditionalTeleport];
-			GetArrayArray(g_hRecordingAdditionalTeleportStage[client], g_CurrentAdditionalTeleportIndexStage[client], iAT[0], view_as<int>(AdditionalTeleport));
-			// Remember, we were teleported this frame!
-			iFrame[additionalFields] |= iAT[atFlags];
-			g_CurrentAdditionalTeleportIndexStage[client]++;
-			PrintToServer("Estoy grabando");
-		}
+			// Check for additional Teleports
+			if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > g_CurrentAdditionalTeleportIndex[client] && g_hRecording[client] != null)
+			{
+				int iAT[AdditionalTeleport]; 
+				GetArrayArray(g_hRecordingAdditionalTeleport[client], g_CurrentAdditionalTeleportIndex[client], iAT[0], view_as<int>(AdditionalTeleport));
+				// Remember, we were teleported this frame!
+				iFrame[additionalFields] |= iAT[atFlags];
+				g_CurrentAdditionalTeleportIndex[client]++;
 
+			}
+
+			if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > g_CurrentAdditionalTeleportIndexStage[client] && g_hRecordingStage[client] != null)
+			{
+				int iAT[AdditionalTeleport];
+				GetArrayArray(g_hRecordingAdditionalTeleportStage[client], g_CurrentAdditionalTeleportIndexStage[client], iAT[0], view_as<int>(AdditionalTeleport));
+				// Remember, we were teleported this frame!
+				iFrame[additionalFields] |= iAT[atFlags];
+				g_CurrentAdditionalTeleportIndexStage[client]++;
+			}
+		}
 
 		int iNewWeapon = -1;
 		// Did he change his weapon?
@@ -785,10 +768,16 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 			}
 		}
 		
-		PushArrayArray(g_hRecording[client], iFrame[0], view_as<int>(FrameInfo));
-		PushArrayArray(g_hRecordingStage[client], iFrame[0], view_as<int>(FrameInfo));
-		g_RecordedTicks[client]++;
-		g_RecordedTicksStage[client]++;
+		if (g_hRecording[client] != null){
+			g_RecordedTicks[client]++;
+			PushArrayArray(g_hRecording[client], iFrame[0], view_as<int>(FrameInfo));
+		}
+
+		if (g_hRecordingStage[client] != null){
+			g_RecordedTicksStage[client]++;
+			PushArrayArray(g_hRecordingStage[client], iFrame[0], view_as<int>(FrameInfo));
+		}
+
 	}
 }
 
@@ -856,7 +845,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 
 		float fActualVelocity[3];
 		Array_Copy(iFrame[actualVelocity], fActualVelocity, 3);
-
 		// We're supposed to teleport stuff?
 		if (iFrame[additionalFields] & (ADDITIONAL_FIELD_TELEPORTED_ORIGIN | ADDITIONAL_FIELD_TELEPORTED_ANGLES | ADDITIONAL_FIELD_TELEPORTED_VELOCITY))
 		{
@@ -875,7 +863,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
 			if (g_hLoadedRecordsAdditionalTeleport != null)
 			{
-				PrintToServer("Replaytting stage %b", g_bReplayingStage);
 				if (g_bReplayingStage){
 					if (g_hLoadedRecordsAdditionalTeleportStage != null) {
 						GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
@@ -885,6 +872,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 				}
 
 				if (hAdditionalTeleport != null && g_bReplayingStage){
+					PrintToServer("Entro aca if xd");
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndexStage[client], iAT, 10);
 				} else if (hAdditionalTeleport != null) {
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndex[client], iAT, 10);
