@@ -39,6 +39,7 @@ public void CL_OnStageTimerPress(int client){
             return;
     }
 
+	
     //Reset stage variables for client
     g_stageStartTime[client] = GetGameTime();
     g_stageFinalTime[client] = 0.0;
@@ -314,7 +315,7 @@ public void CL_OnEndTimerPress(int client)
 					g_fReplayTimes[0] = g_fFinalTime[client];
 					CreateTimer(3.0, ReplayTimer, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 				}
-				SaveRecording(client, zGroup);
+				SaveRecording(client, zGroup, false);
 
 			}
 		}
@@ -345,7 +346,7 @@ public void CL_OnEndTimerPress(int client)
 				}
 				g_bCheckpointRecordFound[zGroup] = true;
 			}
-			SaveRecording(client, zGroup);
+			SaveRecording(client, zGroup, false);
 		}
 
 		
@@ -481,7 +482,7 @@ public void CL_OnEndTimerPress(int client)
 					WritePackCell(pack, GetClientUserId(client));
 					WritePackCell(pack, zGroup);
 				}
-				SaveRecording(client, zGroup);
+				SaveRecording(client, zGroup, false);
 			}
 		}
 		else
@@ -514,8 +515,8 @@ public void CL_OnEndTimerPress(int client)
 			g_bBonusSRVRecord[client] = true;
 			
 			g_fOldBonusRecordTime[zGroup] = g_fBonusFastest[zGroup];
-			SaveRecording(client, zGroup);
-			
+			SaveRecording(client, zGroup, false);
+
 		}
 		
 		
@@ -634,11 +635,13 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 				g_stageFastest[zGroup] = g_stageFinalTime[client];
 				Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
 				FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);
+				SaveRecording(client, zGroup, true);
 				
 				g_stageSRVRecord[client] = true;
 			}
 		} else { // Has to be the new record, since it is the first completion
 			g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];
+			SaveRecording(client, zGroup, true);
 			g_stageFastest[zGroup] = g_stageFinalTime[client];
 			Format(g_szStageFastest[zGroup], MAX_NAME_LENGTH, "%s", szName);
 			FormatTimeFloat(1, g_stageFastest[zGroup], 3, g_szStageFastestTime[zGroup], 64);

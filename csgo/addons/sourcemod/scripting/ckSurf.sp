@@ -123,6 +123,7 @@
 #define ADDITIONAL_FIELD_TELEPORTED_VELOCITY (1<<2)
 #define FRAME_INFO_SIZE 15
 #define AT_SIZE 10
+#define AT_SIZE_STAGE 10
 #define ORIGIN_SNAPSHOT_INTERVAL 500
 #define FILE_HEADER_LENGTH 74
 
@@ -463,7 +464,6 @@ int g_ReplayBotColor[3];
 ConVar g_hRecordBotTrail = null; 								// Record bot trail?
 ConVar g_hReplayBotTrailColor = null; 							// Replay bot trail color
 int g_ReplayBotTrailColor[4];
-bool g_bSpawnedBot = false;										//Chjeck if already spawned bot for first time
 
 ConVar g_hDoubleRestartCommand;									// Double !r restart
 ConVar g_hStartPreSpeed = null; 								// Start zone speed cap
@@ -571,7 +571,6 @@ bool g_stagePBRecord[MAXPLAYERS + 1];							// Personal best time in bonus
 bool g_stageSRVRecord[MAXPLAYERS + 1];							// New server record in bonus
 bool g_stageFirstRecord[MAXPLAYERS + 1];						// First bonus time in map?
 int g_doingStage[MAXPLAYERS + 1];								// Is the player doing the stage
-char g_doingStageStr[MAXPLAYERS + 1][64]; 						//doingStage str
 
 
 /*----------  Replay Variables  ----------*/
@@ -581,6 +580,14 @@ float g_fInitialPositionStage[MAXPLAYERS + 1][3];				// Replay start position
 float g_fInitialAnglesStage[MAXPLAYERS + 1][3]; 				// Replay start angle
 int g_RecordedTicksStage[MAXPLAYERS + 1];						// No idea what this does, i'm just copy pasting code :c
 int g_OriginSnapshotIntervalStage[MAXPLAYERS + 1];				// ^
+int g_CurrentAdditionalTeleportIndexStage[MAXPLAYERS + 1];
+bool g_bNewReplayStage[MAXPLAYERS + 1];							// Don't allow starting a new run if saving a record run
+Handle g_hLoadedRecordsAdditionalTeleportStage = null; 			// No idea what this does, i'm just copy pasting code :c
+bool g_bReplayingStage;											// The bot is replaying a stage records
+int g_iStageToBeReplayed = 0;									// Number of stage to be replayed
+float g_previousSnapshotSpeed[MAXPLAYERS + 1];					// Previous snapshot speed
+
+
 //----- End Stage Replay vars
 bool g_bNewRecordBot; 											// Checks if the bot is new, if so, set weapon
 Handle g_hTeleport = null; 										// Used to track teleportations
@@ -614,7 +621,6 @@ int g_iCurrentBonusReplayIndex;
 int g_iBonusToReplay[MAXZONEGROUPS + 1];
 float g_fReplayTimes[MAXZONEGROUPS];
 bool g_savingRecord[MAXPLAYERS+1];								//Checks if a record is being saved
-bool g_startRecordingOnZoneLeave[MAXPLAYERS+1];					//If a record was being saved when a player entered a zone, it will start recording
 
 /*----------  Misc  ----------*/
 Handle g_MapList = null; 										// Used to load the mapcycle
@@ -1116,6 +1122,7 @@ public void OnClientPutInServer(int client)
 	if (IsFakeClient(client))
 	{
 		g_hRecordingAdditionalTeleport[client] = CreateArray(view_as<int>(AdditionalTeleport));
+		g_hRecordingAdditionalTeleportStage[client] = CreateArray(view_as<int>(AdditionalTeleport));
 		CS_SetMVPCount(client, 1);
 		return;
 	}
@@ -1268,6 +1275,9 @@ public void OnClientDisconnect(int client)
 	if (g_hRecording[client] != null)
 		StopRecording(client);
 
+	if (g_hRecordingStage[client] != null)
+		StopRecordingStage(client);
+		
 	if(AreClientCookiesCached(client))
 	{
 		new String:SprayString[12];
@@ -1995,6 +2005,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_resettimes", Admin_DropAllMapRecords, ADMFLAG_ROOT, "[SurfLatam] Resets all player times (drops table playertimes) - requires z flag");
 	RegAdminCmd("sm_resetranks", Admin_DropPlayerRanks, ADMFLAG_ROOT, "[SurfLatam] Resets the all player points  (drops table playerrank - requires z flag)");
 	RegAdminCmd("sm_resetmaptimes", Admin_ResetMapRecords, ADMFLAG_ROOT, "[SurfLatam] Resets player times for given map - requires z flag");
+	RegAdminCmd("sm_resetstagetimes", Admin_ResetStageRecords, ADMFLAG_ROOT, "[SurfLatam] Resets stage times for given map - requires z flag");
 	RegAdminCmd("sm_resetplayerchallenges", Admin_ResetChallenges, ADMFLAG_ROOT, "[SurfLatam] Resets (won) challenges for given steamid - requires z flag");
 	RegAdminCmd("sm_resetplayertimes", Admin_ResetRecords, ADMFLAG_ROOT, "[SurfLatam] Resets pro map times (+extrapoints) for given steamid with or without given map - requires z flag");
 	RegAdminCmd("sm_resetplayermaptime", Admin_ResetMapRecord, ADMFLAG_ROOT, "[SurfLatam] Resets pro map time for given steamid and map - requires z flag");
@@ -2070,6 +2081,8 @@ public void OnPluginStart()
 	CheatFlag("bot_zombie", false, true);
 	CheatFlag("bot_mimic", false, true);
 	g_hLoadedRecordsAdditionalTeleport = CreateTrie();
+	g_hLoadedRecordsAdditionalTeleportStage = CreateTrie();
+
 	Handle hGameData = LoadGameConfigFile("sdktools.games");
 	if (hGameData == null)
 	{
@@ -2340,6 +2353,7 @@ public Action:GetSpray(client, args)
 	}
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, 0);
+	return Plugin_Handled;
 }
 
 public DIDMenuHandler(Handle:menu, MenuAction:action, client, itemNum) 

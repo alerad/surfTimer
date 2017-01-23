@@ -188,6 +188,22 @@ public void StartTouch(int client, int action[3])
 						StartRecording(client);
 					}
 				}
+
+				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
+				{
+					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+					}
+					else
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+						StartRecordingStage(client);
+					}
+				}
+
 				g_Stage[g_iClientInZone[client][2]][client] = 1;
 				
 				Client_Stop(client, 1);
@@ -237,6 +253,9 @@ public void StartTouch(int client, int action[3])
 				if (FindConVar("ck_pre_stage_speed").FloatValue < 500){
 					LimitSpeed(client, true);
 				}
+
+
+				
 				// Announcing checkpoint
 				if (action[1] != lastCheckpoint[g_iClientInZone[client][2]][client] && g_iClientInZone[client][2] == action[2])
 				{
@@ -245,6 +264,21 @@ public void StartTouch(int client, int action[3])
 					lastCheckpoint[g_iClientInZone[client][2]][client] = action[1];
 					if (g_stageTimerActivated[client]){
 						CL_OnEndStageTimerPressStageStart(client);
+					}
+				}
+
+				if ((!IsFakeClient(client) && GetConVarBool(g_hReplayBot)))
+				{
+					if (!IsPlayerAlive(client) || GetClientTeam(client) == 1)
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+					}
+					else
+					{
+						if (g_hRecordingStage[client] != null)
+							StopRecordingStage(client);
+						StartRecordingStage(client);
 					}
 				}
 			}
@@ -277,7 +311,7 @@ public void StartTouch(int client, int action[3])
             	This is so you don't have to create Stage End zones in order.*/
             	g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
             	g_fFinalTime[client] = g_stageFinalTime[client];
-   				FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
+            	FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
    				g_passedThroughStageEnd[client] = true;     
    				LogError("StageFinaltime es %f", g_stageFinalTime[client]);        
             }
@@ -323,7 +357,8 @@ public void EndTouch(int client, int action[3])
                 {
                     PrintToChat(client, "%cSurfLatam%c |  You are noclipping or have noclipped recently, timer disabled.", MOSSGREEN, WHITE);
                     ClientCommand(client, "play buttons\\button10.wav");
-                } else {
+                }
+                else {
                 	g_doingStage[client] = action[1] + 2;
                     g_stageStartTime[client] = GetGameTime();
                     g_stageFinalTime[client] = 0.0;

@@ -81,6 +81,7 @@ public Action Event_OnPlayerSpawn(Handle event, const char[] name, bool dontBroa
 		{
 			g_BotMimicTick[client] = 0;
 			g_CurrentAdditionalTeleportIndex[client] = 0;
+			g_CurrentAdditionalTeleportIndexStage[client] = 0;
 		}
 		
 		if (IsFakeClient(client))
@@ -401,6 +402,7 @@ public Action Event_OnPlayerDeath(Handle event, const char[] name, bool dontBroa
 			{
 				g_BotMimicTick[client] = 0;
 				g_CurrentAdditionalTeleportIndex[client] = 0;
+				g_CurrentAdditionalTeleportIndexStage[client] = 0;
 				if (GetClientTeam(client) >= CS_TEAM_T)
 					CreateTimer(1.0, RespawnBot, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 			}
@@ -685,6 +687,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 {
 
+	PrintToServer("Entra a teleport hook");
 	if (!IsValidClient(client))
 		return MRES_Ignored;
 
@@ -712,8 +715,10 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	}
 	
 	// Don't care if he's not recording.
-	if (g_hRecording[client] == null)
+	if (g_hRecording[client] == null && g_hRecordingStage[client] == null)
 		return MRES_Ignored;
+
+	PrintToServer("Llega al final del hook, no se retuirnea");
 
 	bool bOriginNull = DHookIsNullParam(hParams, 1);
 	bool bAnglesNull = DHookIsNullParam(hParams, 2);
@@ -749,8 +754,13 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	if (!bVelocityNull)
 		iAT[atFlags] |= ADDITIONAL_FIELD_TELEPORTED_VELOCITY;
 		
-	if (g_hRecordingAdditionalTeleport[client] != null)
+	if (g_hRecordingAdditionalTeleport[client] != null){
 		PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT, AT_SIZE);
+	}
+	
+	if (g_hRecordingAdditionalTeleportStage[client] != null){
+		PushArrayArray(g_hRecordingAdditionalTeleportStage[client], iAT, AT_SIZE);
+	}
 	
 	return MRES_Ignored;
 }

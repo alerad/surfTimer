@@ -3014,6 +3014,15 @@ public Action Command_Replay(int client, int args)
 
 	menu.AddItem("map", "Map");
 
+	//Si no es vip
+	// if (!g_bflagTitles[client][0])
+	// {
+	// 	menu.AddItem("map", "Select Stage (VIP ONLY)", ITEMDRAW_DISABLED);
+	// } else {
+		menu.AddItem("map", "Select Stage");
+	// }
+
+
 	for (int i = 1; i < g_mapZoneGroupCount; i++)
 	{
 		menu.AddItem(g_szZoneGroupName[i], g_szZoneGroupName[i]);
@@ -3028,12 +3037,17 @@ public Action Command_Replay(int client, int args)
 public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int item) {
 	if (action != MenuAction_Select) return 0;
 
+	if (item == 1){
+		StageBotMenu(client, 0);
+		return 0;
+	}
+
 	g_ReplayRequester = client;
 	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
 
 	g_CurrentReplay = item;
 
-	PlayRecord(g_RecordBot, item);
+	PlayRecord(g_RecordBot, item, false);
 
 	ChangeClientTeam(client, 1);
 	SetEntPropEnt(client, Prop_Send, "m_hObserverTarget", g_RecordBot);
@@ -3042,3 +3056,51 @@ public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int ite
 	return 0;
 }
 
+public Action StageBotMenu(int client, int args)
+{
+	// if (!g_bflagTitles[client][0])
+	// {
+	// 	PrintToChat(client, "This feature is only for VIPs.");
+	// 	return Plugin_Handled;
+	// }
+	Menu menu = new Menu(StageBotMenu_Handler);
+	menu.SetTitle("Select a stage to replay");
+	char panelName[64];
+	char panelItemName[64];
+	char buffer[3];
+
+	
+
+	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
+	
+	for (int i = 1; i <= stageCount; i++)
+	{
+		char sPath[256];
+		Format(sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, i);
+		BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
+		char stageName[64];
+		IntToString(i, buffer, 3);
+		Format(stageName, 64, "Stage %i", i);
+		if (FileExists(sPath)) {
+			menu.AddItem(buffer, stageName);
+		} else {
+			menu.AddItem(buffer, stageName, ITEMDRAW_DISABLED);
+		}
+	}
+
+	menu.ExitButton = true;
+	menu.Display(client, 60);
+ 
+	return Plugin_Handled;
+}
+
+public int StageBotMenu_Handler(Menu menu, MenuAction action, int client, int item) {
+	if (action != MenuAction_Select) return 0;
+
+	g_ReplayRequester = client;
+	g_iStageToBeReplayed = item+1;
+	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
+	g_bReplayingStage = true;
+	PlayRecord(g_RecordBot, item, true);
+	return 0;
+}
