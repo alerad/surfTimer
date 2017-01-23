@@ -156,6 +156,8 @@ char sql_resetRecords2[] = "DELETE FROM ck_playertimes WHERE steamid = '%s' AND 
 char sql_resetRecordPro[] = "UPDATE ck_playertimes SET runtimepro = '-1.0' WHERE steamid = '%s' AND mapname LIKE '%s';";
 char sql_resetCheckpoints[] = "DELETE FROM ck_checkpoints WHERE steamid = '%s' AND mapname LIKE '%s';";
 char sql_resetMapRecords[] = "DELETE FROM ck_playertimes WHERE mapname = '%s'";
+char sql_resetStageRecords[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
+
 
 ////////////////////////
 //// DATABASE SETUP/////
@@ -6723,6 +6725,26 @@ public void db_resetMapRecords(int client, char szMapName[128])
 	Format(szQuery, 255, sql_resetMapRecords, szMapName);
 	SQL_TQuery(g_hDb, SQL_CheckCallback2, szQuery, DBPrio_Low);
 	PrintToConsole(client, "player times on %s cleared.", szMapName);
+	if (StrEqual(szMapName, g_szMapName))
+	{
+		for (int i = 1; i <= MaxClients; i++)
+		{
+			if (IsValidClient(i))
+			{
+				Format(g_szPersonalRecord[i], 64, "NONE");
+				g_fPersonalRecord[i] = 0.0;
+				g_MapRank[i] = 99999;
+			}
+		}
+	}
+}
+
+public void db_resetStageRecords(int client, char szMapName[128])
+{
+	char szQuery[255];
+	Format(szQuery, 255, sql_resetStageRecords, szMapName);
+	SQL_TQuery(g_hDb, SQL_CheckCallback2, szQuery, DBPrio_Low);
+	PrintToConsole(client, "player stage times on %s cleared.", szMapName);
 	if (StrEqual(szMapName, g_szMapName))
 	{
 		for (int i = 1; i <= MaxClients; i++)

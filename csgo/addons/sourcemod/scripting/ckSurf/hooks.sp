@@ -687,6 +687,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 {
 
+	PrintToServer("Entra a teleport hook");
 	if (!IsValidClient(client))
 		return MRES_Ignored;
 
@@ -717,6 +718,7 @@ public MRESReturn DHooks_OnTeleport(int client, Handle hParams)
 	if (g_hRecording[client] == null && g_hRecordingStage[client] == null)
 		return MRES_Ignored;
 
+	PrintToServer("Llega al final del hook, no se retuirnea");
 
 	bool bOriginNull = DHookIsNullParam(hParams, 1);
 	bool bAnglesNull = DHookIsNullParam(hParams, 2);

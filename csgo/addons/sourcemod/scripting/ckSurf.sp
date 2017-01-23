@@ -585,6 +585,8 @@ bool g_bNewReplayStage[MAXPLAYERS + 1];							// Don't allow starting a new run 
 Handle g_hLoadedRecordsAdditionalTeleportStage = null; 			// No idea what this does, i'm just copy pasting code :c
 bool g_bReplayingStage;											// The bot is replaying a stage records
 int g_iStageToBeReplayed = 0;									// Number of stage to be replayed
+float g_previousSnapshotSpeed[MAXPLAYERS + 1];					// Previous snapshot speed
+
 
 //----- End Stage Replay vars
 bool g_bNewRecordBot; 											// Checks if the bot is new, if so, set weapon
@@ -2003,6 +2005,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_resettimes", Admin_DropAllMapRecords, ADMFLAG_ROOT, "[SurfLatam] Resets all player times (drops table playertimes) - requires z flag");
 	RegAdminCmd("sm_resetranks", Admin_DropPlayerRanks, ADMFLAG_ROOT, "[SurfLatam] Resets the all player points  (drops table playerrank - requires z flag)");
 	RegAdminCmd("sm_resetmaptimes", Admin_ResetMapRecords, ADMFLAG_ROOT, "[SurfLatam] Resets player times for given map - requires z flag");
+	RegAdminCmd("sm_resetstagetimes", Admin_ResetStageRecords, ADMFLAG_ROOT, "[SurfLatam] Resets stage times for given map - requires z flag");
 	RegAdminCmd("sm_resetplayerchallenges", Admin_ResetChallenges, ADMFLAG_ROOT, "[SurfLatam] Resets (won) challenges for given steamid - requires z flag");
 	RegAdminCmd("sm_resetplayertimes", Admin_ResetRecords, ADMFLAG_ROOT, "[SurfLatam] Resets pro map times (+extrapoints) for given steamid with or without given map - requires z flag");
 	RegAdminCmd("sm_resetplayermaptime", Admin_ResetMapRecord, ADMFLAG_ROOT, "[SurfLatam] Resets pro map time for given steamid and map - requires z flag");

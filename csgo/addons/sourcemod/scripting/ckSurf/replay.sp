@@ -331,7 +331,8 @@ public void WriteRecordToDisk(const char[] sPath, iFileHeader[FILE_HEADER_LENGTH
 	}
 	
 	CloseHandle(hFile);
-	LoadReplays();
+	if (!isStage)
+		LoadReplays();
 }
 
 public void PlayRecord(int client, int type, bool isStage)
@@ -699,8 +700,10 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 
 		if (g_hRecording[client] != null || g_hRecordingStage[client] != null) {
 			// Save the current position 
-			if (g_OriginSnapshotInterval[client] > ORIGIN_SNAPSHOT_INTERVAL)
-			{
+			if (g_OriginSnapshotInterval[client] > ORIGIN_SNAPSHOT_INTERVAL || (GetSpeed(client) > g_previousSnapshotSpeed[client] + 1000))
+			{	
+				g_OriginSnapshotInterval[client] = 0;
+				g_previousSnapshotSpeed[client] = GetSpeed(client);
 				int iAT[AdditionalTeleport];
 				float fBuffer[3];
 				GetClientAbsOrigin(client, fBuffer);
@@ -708,13 +711,13 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 				
 				iAT[atFlags] = ADDITIONAL_FIELD_TELEPORTED_ORIGIN;
 
-				// if (g_OriginSnapshotInterval[client] > ORIGIN_SNAPSHOT_INTERVAL){
-				g_OriginSnapshotInterval[client] = 0;
-				if (g_hRecording[client] != null)
+				if (g_hRecording[client] != null){
 					PushArrayArray(g_hRecordingAdditionalTeleport[client], iAT[0], view_as<int>(AdditionalTeleport));
+				}
 
-				if (g_hRecordingStage[client] != null)
+				if (g_hRecordingStage[client] != null){
 					PushArrayArray(g_hRecordingAdditionalTeleportStage[client], iAT[0], view_as<int>(AdditionalTeleport));
+				}
 
 			}
 			g_OriginSnapshotInterval[client]++;
@@ -864,7 +867,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 				}
 
 				if (hAdditionalTeleport != null && g_bReplayingStage){
-					PrintToServer("Entro aca if xd");
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndexStage[client], iAT, 10);
 				} else if (hAdditionalTeleport != null) {
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndex[client], iAT, 10);
@@ -1011,7 +1013,8 @@ public void StartRecordingStage(int client)
 
 	GetClientEyeAngles(client, g_fInitialAnglesStage[client]);
 	g_RecordedTicksStage[client] = 0;
-	g_OriginSnapshotIntervalStage[client] = 0;
+	g_OriginSnapshotInterval[client] = 0;
+	g_previousSnapshotSpeed[client] = 0;
 }
 
 
@@ -1020,8 +1023,6 @@ public void StopRecordingStage(int client)
 	if (!IsValidClient(client) || g_hRecordingStage[client] == null)
 		return;
 	
-	PrintToServer("Paro a grabar stage");
-
 	CloseHandle(g_hRecordingStage[client]);
 	CloseHandle(g_hRecordingAdditionalTeleportStage[client]);	
 	g_hRecordingStage[client] = null;
@@ -1029,5 +1030,5 @@ public void StopRecordingStage(int client)
 
 	g_RecordedTicksStage[client] = 0;
 	g_CurrentAdditionalTeleportIndexStage[client] = 0;
-	g_OriginSnapshotIntervalStage[client] = 0;
+	g_OriginSnapshotInterval[client] = 0;
 }

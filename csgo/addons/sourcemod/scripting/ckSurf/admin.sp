@@ -1314,6 +1314,22 @@ public Action Admin_ResetMapRecords(int client, int args)
 	return Plugin_Handled;
 }
 
+public Action Admin_ResetStageRecords(int client, int args)
+{
+	if (args != 1)
+	{
+		ReplyToCommand(client, "[CK] Usage: sm_resetstagetimes <mapname>");
+		return Plugin_Handled;
+	}
+	if (args == 1)
+	{
+		char szMapName[128];
+		GetCmdArg(1, szMapName, 128);
+		db_resetStageRecords(client, szMapName);
+	}
+	return Plugin_Handled;
+}
+
 public Action Admin_DeleteMapReplay(int client, int args)
 {
 	if (args == 0)
