@@ -12,7 +12,7 @@ void setReplayTime(int zGrp)
 		BuildPath(Path_SM, sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, g_szMapName);
 
 	int iFileHeader[FILE_HEADER_LENGTH];
-	LoadRecordFromFile(sPath, iFileHeader);
+	LoadRecordFromFile(sPath, iFileHeader, false);
 	Format(sTime, sizeof(sTime), "%s", iFileHeader[view_as<int>(FH_Time)]);
 
 	ExplodeString(sTime, ":", sBuffer, 4, 54);
@@ -235,7 +235,7 @@ public void LoadReplays()
 		int iFileHeader[FILE_HEADER_LENGTH];
 		float initPos[3];
 		char newPath[256];
-		LoadRecordFromFile(sPath, iFileHeader);
+		LoadRecordFromFile(sPath, iFileHeader, false);
 		Array_Copy(iFileHeader[view_as<int>(FH_initialPosition)], initPos, 3);
 		int zId = IsInsideZone(initPos, 50.0);
 		if (zId != -1 && g_mapZones[zId][zoneGroup] != 0)
@@ -362,8 +362,7 @@ public void PlayRecord(int client, int type, bool isStage)
 		return;
 	}
 
-
-	LoadRecordFromFile(sPath, iFileHeader);
+	LoadRecordFromFile(sPath, iFileHeader, isStage);
 	
 	if (type == 0)
 	{
@@ -406,7 +405,7 @@ public void PlayRecord(int client, int type, bool isStage)
 	g_bIsPlayingReplay = true;
 }
 
-public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LENGTH])
+public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LENGTH], bool isStage)
 {
 	Handle hFile = OpenFile(path, "rb");
 	if (hFile == null)
@@ -480,11 +479,14 @@ public void LoadRecordFromFile(const char[] path, int headerInfo[FILE_HEADER_LEN
 	
 	headerInfo[view_as<int>(FH_frames)] = hRecordFrames;
 	
-	if (GetArraySize(hAdditionalTeleport) > 0)
-		SetTrieValue(g_hLoadedRecordsAdditionalTeleport, path, hAdditionalTeleport);
+	if (GetArraySize(hAdditionalTeleport) > 0){
+		if (isStage){
+			SetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, path, hAdditionalTeleport);
+		} else {
+			SetTrieValue(g_hLoadedRecordsAdditionalTeleport, path, hAdditionalTeleport);
+		}
+	}
 
-	if (GetArraySize(hAdditionalTeleport) > 0)
-		SetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, path, hAdditionalTeleport);
 	CloseHandle(hFile);
 	
 	return;
@@ -851,24 +853,29 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			}
 			else if (g_CurrentReplay > 0 && !g_bReplayingStage){
 				Format(sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, g_szMapName, g_iBonusToReplay[g_iCurrentBonusReplayIndex]);
-			} else if (g_CurrentReplay > 0 && g_bReplayingStage){
+			} else if (g_iStageToBeReplayed > 0 && g_bReplayingStage){
 				Format(sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, g_iStageToBeReplayed);
 			}
 
 			BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
-			if (g_hLoadedRecordsAdditionalTeleport != null)
+			if (g_hLoadedRecordsAdditionalTeleport != null || g_hLoadedRecordsAdditionalTeleportStage != null)
 			{
-				if (g_bReplayingStage){
-					if (g_hLoadedRecordsAdditionalTeleportStage != null) {
-						GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
-					}
+
+				if (g_bReplayingStage){ 
+					PrintToServer("Path %s", sPath); //solo hasta /sourcemod
+					GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
 				} else {
+					PrintToServer("Path %s", sPath); // me da todo el path
 					GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
 				}
 
+			//Si no miras el mapa antes, hAdditionalTeleport es null, ese e el bu
+
 				if (hAdditionalTeleport != null && g_bReplayingStage){
+					PrintToServer("Entra en esta");
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndexStage[client], iAT, 10);
 				} else if (hAdditionalTeleport != null) {
+					PrintToServer("Entra en esta plal normal");
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndex[client], iAT, 10);
 				}
 				
