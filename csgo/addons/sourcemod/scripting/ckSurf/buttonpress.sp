@@ -114,7 +114,7 @@ public void CL_OnStartTimerPress(int client)
 		if (!IsFakeClient(client))
 		{	
 			if (g_PlayerJumpsInStage[client] > 1) {
-				PrintToChat(client, "Perdon, ya arregle esto. Los records sacados con prehop van a ser borrados a lo largo del mes.");
+				PrintToChat(client, "Prehopeaste, tu speed se bajo a 280 y todos tus tiempos fueron reiniciados.");
 				ForceSpeedLimit(client, 265.0);
 			}
 
