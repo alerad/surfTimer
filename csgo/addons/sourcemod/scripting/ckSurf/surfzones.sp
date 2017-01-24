@@ -359,6 +359,11 @@ public void EndTouch(int client, int action[3])
                     ClientCommand(client, "play buttons\\button10.wav");
                 }
                 else {
+                	//TODO ACA DEBERIA LLAMAR AL DE BUTTONPRESS Y NO SER UN CABEZA
+                	if (g_PlayerJumpsInStage[client] > 1) {
+						PrintToChat(client, "Perdon, ya arregle esto. Los records sacados con prehop van a ser borrados a lo largo del mes.");
+						ForceSpeedLimit(client, 265.0);
+					}
                 	g_doingStage[client] = action[1] + 2;
                     g_stageStartTime[client] = GetGameTime();
                     g_stageFinalTime[client] = 0.0;

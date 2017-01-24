@@ -39,6 +39,7 @@ public void CL_OnStageTimerPress(int client){
             return;
     }
 
+    
 	
     //Reset stage variables for client
     g_stageStartTime[client] = GetGameTime();
@@ -112,6 +113,11 @@ public void CL_OnStartTimerPress(int client)
 		
 		if (!IsFakeClient(client))
 		{	
+			if (g_PlayerJumpsInStage[client] > 1) {
+				PrintToChat(client, "Perdon, ya arregle esto. Los records sacados con prehop van a ser borrados a lo largo del mes.");
+				ForceSpeedLimit(client, 265.0);
+			}
+
 			// Reset checkpoint times
 			for (int i = 0; i < CPLIMIT; i++)
 				g_fCheckpointTimesNew[g_iClientInZone[client][2]][client][i] = 0.0;

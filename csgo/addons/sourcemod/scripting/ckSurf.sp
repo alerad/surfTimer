@@ -660,6 +660,8 @@ char g_szCountryCode[MAXPLAYERS + 1][16];						// Country codes
 char g_szSteamID[MAXPLAYERS + 1][32];							// Client's steamID
 char g_BlockedChatText[256][256];								// Blocked chat commands
 float g_fLastOverlay[MAXPLAYERS + 1];							// Last time an overlay was displayed
+bool g_bPlayerIsJumping[MAXPLAYERS+1];							// Checks if player is jumping
+int g_PlayerJumpsInStage[MAXPLAYERS + 1];						// Amount of jumps in stage
 
 
 /*----------  Player location restoring  ----------*/

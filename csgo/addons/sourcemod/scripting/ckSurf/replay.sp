@@ -862,20 +862,16 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			{
 
 				if (g_bReplayingStage){ 
-					PrintToServer("Path %s", sPath); //solo hasta /sourcemod
 					GetTrieValue(g_hLoadedRecordsAdditionalTeleportStage, sPath, hAdditionalTeleport);
 				} else {
-					PrintToServer("Path %s", sPath); // me da todo el path
 					GetTrieValue(g_hLoadedRecordsAdditionalTeleport, sPath, hAdditionalTeleport);
 				}
 
 			//Si no miras el mapa antes, hAdditionalTeleport es null, ese e el bu
 
 				if (hAdditionalTeleport != null && g_bReplayingStage){
-					PrintToServer("Entra en esta");
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndexStage[client], iAT, 10);
 				} else if (hAdditionalTeleport != null) {
-					PrintToServer("Entra en esta plal normal");
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndex[client], iAT, 10);
 				}
 				

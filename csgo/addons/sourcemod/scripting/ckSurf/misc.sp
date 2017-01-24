@@ -1268,6 +1268,15 @@ public void LimitSpeed(int client, bool isEnteringZone)
 	}
 }
 
+public void ForceSpeedLimit(int client, float speed){
+	float CurVelVec[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+	NormalizeVector(CurVelVec, CurVelVec);
+	ScaleVector(CurVelVec, speed);
+	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+}
+
 public void changeTrailColor(int client)
 {
 	if (!IsValidClient(client))

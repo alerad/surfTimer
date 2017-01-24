@@ -3042,8 +3042,14 @@ public int ReplayMenu_Handler(Menu tMenu, MenuAction action, int client, int ite
 		return 0;
 	}
 
+	if (item > 1) {
+		item--;
+	}
+	
 	g_ReplayRequester = client;
 	Format(g_sReplayRequester, sizeof(g_sReplayRequester), "%N", client);
+
+
 
 	g_CurrentReplay = item;
 
