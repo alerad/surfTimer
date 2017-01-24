@@ -437,6 +437,7 @@ bool g_bAutoBhop;
 ConVar g_hDynamicTimelimit = null; 								// Dynamic timelimit?
 ConVar g_hAdminClantag = null;									// Admin clan tag?
 ConVar g_hConnectMsg = null; 									// Connect message?
+ConVar g_hServerId = null;
 ConVar g_hDisconnectMsg = null; 								// Disconnect message?
 ConVar g_hRadioCommands = null; 								// Allow radio commands?
 ConVar g_hInfoBot = null; 										// Info bot?
@@ -970,6 +971,7 @@ public void OnMapStart()
 	CreateTimer(1.0, CKTimer2, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(60.0, AttackTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
 	CreateTimer(600.0, PlayerRanksTimer, INVALID_HANDLE, TIMER_FLAG_NO_MAPCHANGE | TIMER_REPEAT);
+	CreateTimer(20.0, Check_Server_Records, _, TIMER_REPEAT);
 	g_hZoneTimer = CreateTimer(GetConVarFloat(g_hChecker), BeamBoxAll, _, TIMER_REPEAT);
 		
 	//AutoBhop?
@@ -1692,6 +1694,7 @@ public void OnPluginStart()
 	//language file
 	LoadTranslations("ckSurf.phrases");
 	
+	g_hServerId = CreateConVar("ck_serverid", 1, "Server Id, change it only if you run more than one server. Set them different values so announcements work");
 	CreateConVar("surftimer_version", VERSION, "Surf Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
 	
 	g_hConnectMsg = CreateConVar("ck_connect_msg", "1", "on/off - Enables a player connect message with country", FCVAR_NOTIFY, true, 0.0, true, 1.0);

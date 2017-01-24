@@ -50,6 +50,11 @@ char sql_updatemaptier[] = "UPDATE ck_maptier SET tier = %i WHERE mapname ='%s'"
 char sql_updateBonusTier[] = "UPDATE ck_maptier SET btier%i = %i WHERE mapname ='%s'";
 char sql_insertBonusTier[] = "INSERT INTO ck_maptier (mapname, btier%i) VALUES ('%s', '%i');";
 
+//CROSS-SERVER SYNCHRONIZATIONS | serverId | alerted | message
+char sql_createCrossServerAlerts = "CREATE TABLE IF NOT EXISTS ck_crossserveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN)";
+char sql_getNonAlerted = "SELECT message, serverId FROM ck_crossserveralerts WHERE alerted = false";
+
+
 //TABLE STAGE RECORDS
 char sql_createStageRecord[] = "CREATE TABLE IF NOT EXISTS ar_stage (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), runtime FLOAT NOT NULL DEFAULT '-1.0', zonegroup INT(12) NOT NULL DEFAULT 1, PRIMARY KEY(steamid, mapname, zonegroup));";
 char sql_createStageRecordIndex[] = "CREATE INDEX stagerank ON ar_stage (mapname,runtime,zonegroup);";
@@ -479,6 +484,7 @@ public void db_createTables()
 	SQL_AddQuery(createTableTnx, sql_createStageRecordIndex);
 	SQL_AddQuery(createTableTnx, sql_createSpawnLocations);
 	SQL_AddQuery(createTableTnx, sql_createPlayerFlags);
+	SQL_AddQuery(createTableTnx, sql_createCrossServerAlerts);
 	
 	SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 	
@@ -7342,3 +7348,34 @@ public void RecordPanelHandler2(Handle menu, MenuAction action, int param1, int 
 		ckTopMenu(param1);
 	}
 } 
+
+public void db_getAnnouncements()
+{
+	char szQuery[512];
+	Format(szQuery, 512, sql_getNonAlerted);
+	SQL_TQuery(g_hDb, db_sql_selectMapRecordHoldersCallback, szQuery, client);
+}
+
+public void Announcements_Callback (Handle owner, Handle hndl, const char[] error, any data)
+{
+	
+	if (hndl == null)
+	{
+		LogError("[SurfLatam] SQL Error (on getting cross server announcments): %s ", error);
+		return;
+	}
+	
+	if (SQL_HasResultSet(hndl))
+	{
+		while (SQL_FetchRow(hndl))
+		{
+			char szMessage[64];
+			SQL_FetchString(hndl, 0, szMessage, 64);
+			int serverId = SQL_FetchInt(hndl, 1);
+			if (serverId!=)
+		}
+	}
+	return;
+}
+
+

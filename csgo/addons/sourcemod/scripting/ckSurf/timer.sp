@@ -590,3 +590,10 @@ public Action LoadPlayerSettings(Handle timer)
 }
 
 
+public Action Check_Server_Records(Handle timer)
+{
+	db_getAnnouncements();
+	return Plugin_Continue;
+}
+
+
