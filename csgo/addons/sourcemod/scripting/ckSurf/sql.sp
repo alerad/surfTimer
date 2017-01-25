@@ -7381,20 +7381,18 @@ public void Announcements_Callback (Handle owner, Handle hndl, const char[] erro
 			char updateQuery[256];
 			Format(updateQuery, 256, sql_updateAlert, szMessage);
 			PrintToServer("Aca entro al while, el message es %s", szMessage);
+
 			if (serverId!=GetConVarInt(g_hServerId)){
 				PrintToChatAll(szMessage);
-				
-
-				//Every server was announced, i don't need the announcement anymore
-				if (serverCount > GetConVarInt(g_hServerCount)){
-					SQL_TQuery(g_hDb, Delete_Announcement_Callback, szQuery, 1, DBPrio_Low);
-				} else {
-					SQL_TQuery(g_hDb, Announcements_Callback, updateQuery, 1, DBPrio_High);
-				}
-			}else {
-				PrintToServer("Updateo");
+			}
+			
+			//Every server was announced, i don't need the announcement anymore
+			if (serverCount > GetConVarInt(g_hServerCount)){
+				SQL_TQuery(g_hDb, Delete_Announcement_Callback, szQuery, 1, DBPrio_Low);
+			} else {
 				SQL_TQuery(g_hDb, Announcements_Callback, updateQuery, 1, DBPrio_High);
 			}
+				
 		} 
 	}
 	return;
