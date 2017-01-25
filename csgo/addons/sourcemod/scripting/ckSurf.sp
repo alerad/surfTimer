@@ -438,6 +438,7 @@ ConVar g_hDynamicTimelimit = null; 								// Dynamic timelimit?
 ConVar g_hAdminClantag = null;									// Admin clan tag?
 ConVar g_hConnectMsg = null; 									// Connect message?
 ConVar g_hServerId = null;
+ConVar g_hServerCount = null;
 ConVar g_hDisconnectMsg = null; 								// Disconnect message?
 ConVar g_hRadioCommands = null; 								// Allow radio commands?
 ConVar g_hInfoBot = null; 										// Info bot?
@@ -1694,6 +1695,7 @@ public void OnPluginStart()
 	//language file
 	LoadTranslations("ckSurf.phrases");
 	
+	g_hServerCount = CreateConVar("ck_servercount", "1", "Server count, change this number to the amount of servers you are running.");
 	g_hServerId = CreateConVar("ck_serverid", "1", "Server Id, change it only if you run more than one server. Set them different values so announcements work");
 	CreateConVar("surftimer_version", VERSION, "Surf Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
 	

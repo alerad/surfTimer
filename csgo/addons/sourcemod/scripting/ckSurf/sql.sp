@@ -51,11 +51,12 @@ char sql_updateBonusTier[] = "UPDATE ck_maptier SET btier%i = %i WHERE mapname =
 char sql_insertBonusTier[] = "INSERT INTO ck_maptier (mapname, btier%i) VALUES ('%s', '%i');";
 
 //CROSS-SERVER SYNCHRONIZATIONS | serverId | alerted | message
-char sql_createCrossServerAlerts[] = "CREATE TABLE IF NOT EXISTS ck_serveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN)";
-char sql_getNonAlerted[] = "SELECT message, serverId FROM ck_serveralerts WHERE alerted = 0";
+char sql_createCrossServerAlerts[] = "CREATE TABLE IF NOT EXISTS ck_serveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN, serverCount INT(12), runtime (VARCHAR(32), PRIMARY KEY(runtime))";
+char sql_getNonAlerted[] = "SELECT message, serverId, serverCount FROM ck_serveralerts WHERE alerted = 0 and serverCount = %i";
 char sql_insertAlert[] = "INSERT INTO ck_serveralerts (serverId, message, alerted) VALUES ('%i', '%s', 0)";
 char sql_deleteAlerts[] = "DELETE FROM ck_serveralerts";
-
+char sql_deleteDoneAlerts[] =	"DELETE FROM ck_serveralerts WHERE serverCount = %i"; //Pass the max servers ammount
+char sql_updateAlert[] = "UPDATE ck_serveralerts SET serverCount WHERE message = '%s'";
 
 //TABLE STAGE RECORDS
 char sql_createStageRecord[] = "CREATE TABLE IF NOT EXISTS ar_stage (steamid VARCHAR(32), name VARCHAR(32), mapname VARCHAR(32), runtime FLOAT NOT NULL DEFAULT '-1.0', zonegroup INT(12) NOT NULL DEFAULT 1, PRIMARY KEY(steamid, mapname, zonegroup));";
@@ -7351,8 +7352,8 @@ public void RecordPanelHandler2(Handle menu, MenuAction action, int param1, int 
 
 public void db_getAnnouncements()
 {
-	char szQuery[512];
-	Format(szQuery, 512, sql_getNonAlerted);
+	char szQuery[512]; //Where servercount = serverId
+	Format(szQuery, 512, sql_getNonAlerted, GetConVarInt(g_hServerId));
 	SQL_TQuery(g_hDb, Announcements_Callback, szQuery, 1, DBPrio_Low);
 }
 
@@ -7372,16 +7373,29 @@ public void Announcements_Callback (Handle owner, Handle hndl, const char[] erro
 			char szMessage[512];
 			SQL_FetchString(hndl, 0, szMessage, 512);
 			int serverId = SQL_FetchInt(hndl, 1);
+			int serverCount = SQL_FetchInt(hndl, 2);
+
 			if (serverId!=GetConVarInt(g_hServerId)){
 				PrintToChatAll(szMessage);
 				char szQuery[256];
 				Format(szQuery, 256, sql_deleteAlerts);
-				SQL_TQuery(g_hDb, Delete_Announcement_Callback, szQuery, 1, DBPrio_Low);
+
+				char updateQuery[256];
+				Format(updateQuery, 256, sql_updateAlert, szMessage);
+
+				//Every server was announced, i don't need the announcement anymore
+				if (serverCount >= GetConVarInt(g_hServerCount)){
+					SQL_TQuery(g_hDb, Delete_Announcement_Callback, szQuery, 1, DBPrio_Low);
+				} else {
+					SQL_TQuery(g_hDb, Announcements_Callback, updateQuery, 1, DBPrio_High)
+				}
 			}
 		}
 	}
 	return;
 }
+
+// public void Update_Announcement_Callback()
 
 
 public void db_insertAnnouncement(int serverId, char message[512]){
