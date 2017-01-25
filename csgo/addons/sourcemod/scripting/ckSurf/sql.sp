@@ -51,7 +51,7 @@ char sql_updateBonusTier[] = "UPDATE ck_maptier SET btier%i = %i WHERE mapname =
 char sql_insertBonusTier[] = "INSERT INTO ck_maptier (mapname, btier%i) VALUES ('%s', '%i');";
 
 //CROSS-SERVER SYNCHRONIZATIONS | serverId | alerted | message
-char sql_createCrossServerAlerts[] = "CREATE TABLE IF NOT EXISTS ck_serveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN, serverCount INT(12), runtime VARCHAR(32))";
+char sql_createCrossServerAlerts[] = "CREATE TABLE IF NOT EXISTS ck_serveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN, serverCount INT(12), runtime VARCHAR(512))";
 char sql_getNonAlerted[] = "SELECT message, serverId, serverCount FROM ck_serveralerts WHERE alerted = 0 AND serverCount = %i";
 char sql_insertAlert[] = "INSERT INTO ck_serveralerts (serverId, message, alerted, serverCount) VALUES ('%i', '%s', 0, 1)";
 char sql_deleteAlerts[] = "DELETE FROM ck_serveralerts";
