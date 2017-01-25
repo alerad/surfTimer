@@ -361,7 +361,7 @@ public void EndTouch(int client, int action[3])
                 else {
                 	//TODO ACA DEBERIA LLAMAR AL DE BUTTONPRESS Y NO SER UN CABEZA
                 	if (g_PlayerJumpsInStage[client] > 1) {
-						PrintToChat(client, "Prehopeaste, tu speed se bajo a 280 y todos tus tiempos fueron reiniciados.")
+						PrintToChat(client, "Prehopeaste, tu speed se bajo a 280 y todos tus tiempos fueron reiniciados.");
 						ForceSpeedLimit(client, 265.0);
 					}
                 	g_doingStage[client] = action[1] + 2;

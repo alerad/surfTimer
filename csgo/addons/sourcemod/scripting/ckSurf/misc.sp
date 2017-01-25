@@ -1728,6 +1728,8 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 {
 	if (IsValidClient(client))
 	{
+		bool recordObtained = false;
+		char szRecordMessage[512];
 		char szName[MAX_NAME_LENGTH];
 		GetClientName(client, szName, MAX_NAME_LENGTH);
 		int count = g_MapTimesCount;
@@ -1743,6 +1745,7 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		{
 			for (int i = 1; i <= GetMaxClients(); i++)
 			{
+				
 				if (IsValidClient(i) && !IsFakeClient(i))
 				{
 					if (g_bMapFirstRecord[client]) // 1st time finishing
@@ -1768,6 +1771,8 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 					{
 						PlayRecordSound(2);
 						PrintToChat(i, "%t", "NewMapRecord", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, DARKBLUE);
+						recordObtained = true;
+						Format(szRecordMessage, sizeof(szRecordMessage), "%t", "NewMapRecordAlert", MOSSGREEN, WHITE, LIMEGREEN, szName, GRAY, LIGHTRED, PURPLE, g_szMapName, WHITE, WHITE);
 						PrintToConsole(i, "[CK] %s scored a new MAP RECORD", szName);
 					}
 				}
@@ -1820,6 +1825,10 @@ stock void MapFinishedMsgs(int client, int rankThisRun = 0)
 		Call_PushCell(count);
 		/* Finish the call, get the result */
 		Call_Finish();
+
+		if (recordObtained){
+			db_insertAnnouncement(GetConVarInt(g_hServerId), szRecordMessage);
+		}
 		
 	}
 	//recalc avg

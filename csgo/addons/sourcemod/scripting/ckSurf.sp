@@ -1694,7 +1694,7 @@ public void OnPluginStart()
 	//language file
 	LoadTranslations("ckSurf.phrases");
 	
-	g_hServerId = CreateConVar("ck_serverid", 1, "Server Id, change it only if you run more than one server. Set them different values so announcements work");
+	g_hServerId = CreateConVar("ck_serverid", "1", "Server Id, change it only if you run more than one server. Set them different values so announcements work");
 	CreateConVar("surftimer_version", VERSION, "Surf Timer Version.", FCVAR_DONTRECORD | FCVAR_SPONLY | FCVAR_REPLICATED | FCVAR_NOTIFY);
 	
 	g_hConnectMsg = CreateConVar("ck_connect_msg", "1", "on/off - Enables a player connect message with country", FCVAR_NOTIFY, true, 0.0, true, 1.0);
@@ -2025,6 +2025,7 @@ public void OnPluginStart()
 	RegAdminCmd("sm_givetitle", Admin_giveTitle, ADMFLAG_ROOT, "[SurfLatam] Gives a player a title");
 	RegAdminCmd("sm_removetitles", Admin_deleteTitles, ADMFLAG_ROOT, "[SurfLatam] Removes player's all titles");
 	RegAdminCmd("sm_removetitle", Admin_deleteTitle, ADMFLAG_ROOT, "[SurfLatam] Removes specific title from a player");
+	RegAdminCmd("sm_announcetoservers", Admin_AnnounceToServers, ADMFLAG_ROOT, "[SurfLatam] cross server announcements");
 	
 	RegAdminCmd("sm_addmaptier", Admin_insertMapTier, g_AdminMenuFlag, "[SurfLatam] Changes maps tier");
 	RegAdminCmd("sm_amt", Admin_insertMapTier, g_AdminMenuFlag, "[SurfLatam] Changes maps tier");

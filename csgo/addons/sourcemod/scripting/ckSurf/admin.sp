@@ -1374,3 +1374,19 @@ public Action Admin_DeleteCheckpoints(int client, int args)
 	
 	db_deleteCheckpoints();
 } 
+
+public Action Admin_AnnounceToServers(int client, int args)
+{
+	if (args == 0)
+	{
+		ReplyToCommand(client, "[CK] Usage: sm_announcetoservers message");
+		return Plugin_Handled;
+	}
+	if (args > 0)
+	{
+		char message[512];
+		GetCmdArgString(message, sizeof(message));
+		db_insertAnnouncement(99, message);
+	}
+	return Plugin_Handled;
+}

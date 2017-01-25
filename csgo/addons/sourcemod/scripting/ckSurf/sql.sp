@@ -51,8 +51,10 @@ char sql_updateBonusTier[] = "UPDATE ck_maptier SET btier%i = %i WHERE mapname =
 char sql_insertBonusTier[] = "INSERT INTO ck_maptier (mapname, btier%i) VALUES ('%s', '%i');";
 
 //CROSS-SERVER SYNCHRONIZATIONS | serverId | alerted | message
-char sql_createCrossServerAlerts = "CREATE TABLE IF NOT EXISTS ck_crossserveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN)";
-char sql_getNonAlerted = "SELECT message, serverId FROM ck_crossserveralerts WHERE alerted = false";
+char sql_createCrossServerAlerts[] = "CREATE TABLE IF NOT EXISTS ck_serveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN)";
+char sql_getNonAlerted[] = "SELECT message, serverId FROM ck_serveralerts WHERE alerted = 0";
+char sql_insertAlert[] = "INSERT INTO ck_serveralerts (serverId, message, alerted) VALUES ('%i', '%s', 0)";
+char sql_deleteAlerts[] = "DELETE FROM ck_serveralerts";
 
 
 //TABLE STAGE RECORDS
@@ -228,10 +230,9 @@ public void db_setupDatabase()
 	//TODO Tengo que hacer que si no esta creada nomas que la cree, sino se rompe todo.
 	//Creo stageRecord table
 	Transaction createTableTnx = SQL_CreateTransaction();
-	SQL_AddQuery(createTableTnx, sql_createStageRecord);
-	SQL_AddQuery(createTableTnx, sql_createStageRecordIndex);
+	SQL_AddQuery(createTableTnx, sql_createCrossServerAlerts);
 	
-	// SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
+	SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 	
 	// 1.17 Command to disable checkpoint messages
 	SQL_FastQuery(g_hDb, "ALTER TABLE ck_playeroptions ADD checkpoints INT DEFAULT 1;");
@@ -484,7 +485,6 @@ public void db_createTables()
 	SQL_AddQuery(createTableTnx, sql_createStageRecordIndex);
 	SQL_AddQuery(createTableTnx, sql_createSpawnLocations);
 	SQL_AddQuery(createTableTnx, sql_createPlayerFlags);
-	SQL_AddQuery(createTableTnx, sql_createCrossServerAlerts);
 	
 	SQL_ExecuteTransaction(g_hDb, createTableTnx, SQLTxn_CreateDatabaseSuccess, SQLTxn_CreateDatabaseFailed);
 	
@@ -7353,7 +7353,7 @@ public void db_getAnnouncements()
 {
 	char szQuery[512];
 	Format(szQuery, 512, sql_getNonAlerted);
-	SQL_TQuery(g_hDb, db_sql_selectMapRecordHoldersCallback, szQuery, client);
+	SQL_TQuery(g_hDb, Announcements_Callback, szQuery, 1, DBPrio_Low);
 }
 
 public void Announcements_Callback (Handle owner, Handle hndl, const char[] error, any data)
@@ -7369,13 +7369,42 @@ public void Announcements_Callback (Handle owner, Handle hndl, const char[] erro
 	{
 		while (SQL_FetchRow(hndl))
 		{
-			char szMessage[64];
-			SQL_FetchString(hndl, 0, szMessage, 64);
+			char szMessage[512];
+			SQL_FetchString(hndl, 0, szMessage, 512);
 			int serverId = SQL_FetchInt(hndl, 1);
-			if (serverId!=)
+			if (serverId!=GetConVarInt(g_hServerId)){
+				PrintToChatAll(szMessage);
+				char szQuery[256];
+				Format(szQuery, 256, sql_deleteAlerts);
+				SQL_TQuery(g_hDb, Delete_Announcement_Callback, szQuery, 1, DBPrio_Low);
+			}
 		}
 	}
 	return;
 }
 
 
+public void db_insertAnnouncement(int serverId, char message[512]){
+	char szQuery[256];
+	Format(szQuery, 256, sql_insertAlert, serverId, message);
+	SQL_TQuery(g_hDb, Insert_Announcement_Callback, szQuery, 1, DBPrio_Low);
+}
+
+public void Insert_Announcement_Callback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfLatam] SQL Error (DB_INSERTANNOUNCEMENT): %s", error);
+		return;
+	}
+	
+}
+
+public void Delete_Announcement_Callback(Handle owner, Handle hndl, const char[] error, any data)
+{
+	if (hndl == null)
+	{
+		LogError("[SurfLatam] SQL Error (DB_DELETEANNOUNCEMENT): %s", error);
+		return;
+	}
+}
