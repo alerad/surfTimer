@@ -52,10 +52,10 @@ char sql_insertBonusTier[] = "INSERT INTO ck_maptier (mapname, btier%i) VALUES (
 
 //CROSS-SERVER SYNCHRONIZATIONS | serverId | alerted | message
 char sql_createCrossServerAlerts[] = "CREATE TABLE IF NOT EXISTS ck_serveralerts (serverId VARCHAR(32), message VARCHAR(32), alerted BOOLEAN, serverCount INT(12), runtime VARCHAR(512))";
-char sql_getNonAlerted[] = "SELECT message, serverId, serverCount FROM ck_serveralerts WHERE alerted = 0 AND serverCount = %i";
+char sql_getNonAlerted[] = "SELECT message, serverId, serverCount FROM ck_serveralerts WHERE alerted = 0 AND serverCount <= %i";
 char sql_insertAlert[] = "INSERT INTO ck_serveralerts (serverId, message, alerted, serverCount) VALUES ('%i', '%s', 0, 1)";
 char sql_deleteAlerts[] = "DELETE FROM ck_serveralerts";
-char sql_deleteDoneAlerts[] =	"DELETE FROM ck_serveralerts WHERE serverCount = %i"; //Pass the max servers ammount
+// char sql_deleteDoneAlerts[] =	"DELETE FROM ck_serveralerts WHERE serverCount = %i"; //Pass the max servers ammount
 char sql_updateAlert[] = "UPDATE ck_serveralerts SET serverCount = serverCount + 1 WHERE message = '%s'";
 
 //TABLE STAGE RECORDS
@@ -68,7 +68,7 @@ char sql_selectPersonalStageRecords[] = "SELECT runtime, zonegroup FROM ar_stage
 char sql_selectPlayerRankStage[] = "SELECT name FROM ar_stage WHERE runtime <= (SELECT runtime FROM ar_stage WHERE steamid = '%s' AND mapname= '%s' AND runtime > 0.0 AND zonegroup = %i) AND mapname = '%s' AND zonegroup = %i;";
 char sql_selectFastestStage[] = "SELECT name, MIN(runtime), zonegroup FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup;";
 char sql_selectAllStageTimesinMap[] = "SELECT zonegroup, runtime from ar_stage WHERE mapname = '%s';";
-char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
+// char sql_deleteStageRecord[] = "DELETE FROM ar_stage WHERE mapname = '%s'";
 char sql_selectStageCount[] = "SELECT zonegroup, count(1) FROM ar_stage WHERE mapname = '%s' GROUP BY zonegroup";
 char sql_selectTopStageSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ar_stage as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
 char sql_selectTotalStageCount[] = "SELECT mapname, zoneid, zonetype, zonetypeid, pointa_x, pointa_y, pointa_z, pointb_x, pointb_y, pointb_z, vis, team, zonegroup, zonename FROM ck_zones WHERE zonetype = 3 GROUP BY mapname, zonegroup;";

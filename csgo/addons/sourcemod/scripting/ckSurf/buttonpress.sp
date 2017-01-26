@@ -114,8 +114,7 @@ public void CL_OnStartTimerPress(int client)
 		if (!IsFakeClient(client))
 		{	
 			if (g_PlayerJumpsInStage[client] > 1) {
-				PrintToChat(client, "Prehopeaste, tu speed se bajo a 280 y todos tus tiempos fueron reiniciados.");
-				ForceSpeedLimit(client, 265.0);
+				ForceSpeedLimit(client, 255.0);
 			}
 
 			// Reset checkpoint times
@@ -126,9 +125,9 @@ public void CL_OnStartTimerPress(int client)
 			if (g_iClientInZone[client][2] == 0)
 			{
 				g_stageStartTime[client] = GetGameTime();
-			    g_stageFinalTime[client] = 0.0;
-			    g_stageTimerActivated[client] = true;
-			    g_doingStage[client]=1;
+				g_stageFinalTime[client] = 0.0;
+				g_stageTimerActivated[client] = true;
+				g_doingStage[client]=1;
 				if (g_fPersonalRecord[client] > 0.0)
 					g_bMissedMapBest[client] = false;
 			}
@@ -143,9 +142,9 @@ public void CL_OnStartTimerPress(int client)
 			if (g_bFirstTimerStart[client])
 			{
 				g_stageStartTime[client] = GetGameTime();
-			    g_stageFinalTime[client] = 0.0;
-			    g_stageTimerActivated[client] = true;
-			    g_doingStage[client]=1;
+				g_stageFinalTime[client] = 0.0;
+				g_stageTimerActivated[client] = true;
+				g_doingStage[client]=1;
 				g_bFirstTimerStart[client] = false;
 				Client_Avg(client, 0);
 			}
@@ -597,7 +596,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 		g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
 		g_fFinalTime[client] = g_stageFinalTime[client];
 
-	    FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
+		FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
 	} else {
 		g_passedThroughStageEnd[client] = false;
 	}
@@ -613,7 +612,6 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	//Record bools init
 	if (g_stageTimerActivated[client] && !StrEqual(g_szSteamID[client], "")) {
 		char szDiff[54];
-		char szZoneGroupName[128];
 		float diff;
 		g_stageFirstRecord[client] = false;
 		g_stagePBRecord[client] = false;
@@ -634,7 +632,7 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 		g_tmpStageCount[zGroup] = g_iStageCount[zGroup];
 
 		if (g_iStageCount[zGroup] > 0)
-		{  // If the server already has a stage record
+		{// If the server already has a stage record
 			if (g_stageFinalTime[client] < g_stageFastest[zGroup])
 			{  // New fastest time in current stage
 				g_fOldStageRecordTime[zGroup] = g_stageFastest[zGroup];

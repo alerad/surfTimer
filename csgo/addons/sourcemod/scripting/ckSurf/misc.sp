@@ -503,7 +503,7 @@ public void readMultiServerMapcycle()
 
 public void readMapycycle()
 {
-	char map[128];
+	char mapfromcycle[128];
 	char map2[128];
 	int mapListSerial = -1;
 	g_pr_MapCount = 0;
@@ -520,12 +520,12 @@ public void readMapycycle()
 	}
 	for (int i = 0; i < GetArraySize(g_MapList); i++)
 	{
-		GetArrayString(g_MapList, i, map, sizeof(map));
-		if (!StrEqual(map, "", false))
+		GetArrayString(g_MapList, i, mapfromcycle, sizeof(mapfromcycle));
+		if (!StrEqual(mapfromcycle, "", false))
 		{
 			//fix workshop map name			
 			char mapPieces[6][128];
-			int lastPiece = ExplodeString(map, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
+			int lastPiece = ExplodeString(mapfromcycle, "/", mapPieces, sizeof(mapPieces), sizeof(mapPieces[]));
 			Format(map2, sizeof(map2), "%s", mapPieces[lastPiece - 1]);
 			SetArrayString(g_MapList, i, map2);
 			g_pr_MapCount++;
@@ -581,18 +581,18 @@ public bool loadCustomTitles()
 	
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", CUSTOM_TITLE_PATH);
 	
-	Handle kv = CreateKeyValues("Custom Titles");
-	FileToKeyValues(kv, sPath);
+	Handle titlekv = CreateKeyValues("Custom Titles");
+	FileToKeyValues(titlekv, sPath);
 	
-	if (!KvGotoFirstSubKey(kv))
+	if (!KvGotoFirstSubKey(titlekv))
 	{
 		return false;
 	}
 	
 	for (int i = 0; i < TITLE_COUNT; i++)
 	{
-		KvGetString(kv, "title_name", g_szflagTitle_Colored[i], 128);
-		KvGetString(kv, "title_name", g_szflagTitle[i], 128);
+		KvGetString(titlekv, "title_name", g_szflagTitle_Colored[i], 128);
+		KvGetString(titlekv, "title_name", g_szflagTitle[i], 128);
 		if (!g_szflagTitle[i][0])
 		{
 			// Disable unused titles from all players
@@ -606,10 +606,10 @@ public bool loadCustomTitles()
 		addColorToString(g_szflagTitle_Colored[i], 32);
 		parseColorsFromString(g_szflagTitle[i], 32);
 
-		if (!KvGotoNextKey(kv))
+		if (!KvGotoNextKey(titlekv))
 			break;
 	}
-	CloseHandle(kv);
+	CloseHandle(titlekv);
 	return true;
 }
 
@@ -1000,7 +1000,6 @@ public void SetServerTags()
 {
 	Handle CvarHandle;
 	CvarHandle = FindConVar("sv_tags");
-	char szServerTags[2048];
 	if (CvarHandle != null)
 		CloseHandle(CvarHandle);
 }
@@ -1271,7 +1270,7 @@ public void LimitSpeed(int client, bool isEnteringZone)
 public void ForceSpeedLimit(int client, float speed){
 	float CurVelVec[3];
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
-	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
+	// float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
 	NormalizeVector(CurVelVec, CurVelVec);
 	ScaleVector(CurVelVec, speed);
 	TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
@@ -2962,7 +2961,7 @@ public void CreateNavFiles()
 		LogError("<ckSurf> Failed to create .nav files. Reason: %s doesn't exist!", SourceFile);
 		return;
 	}
-	char map[256];
+	char mapChar[256];
 	int mapListSerial = -1;
 	if (ReadMapList(g_MapList, mapListSerial, "mapcyclefile", MAPLIST_FLAG_CLEARARRAY | MAPLIST_FLAG_NO_DEFAULT) == null)
 		if (mapListSerial == -1)
@@ -2970,10 +2969,10 @@ public void CreateNavFiles()
 	
 	for (int i = 0; i < GetArraySize(g_MapList); i++)
 	{
-		GetArrayString(g_MapList, i, map, sizeof(map));
-		if (map[0])
+		GetArrayString(g_MapList, i, mapChar, sizeof(mapChar));
+		if (mapChar[0])
 		{
-			Format(DestFile, sizeof(DestFile), "maps/%s.nav", map);
+			Format(DestFile, sizeof(DestFile), "maps/%s.nav", mapChar);
 			if (!FileExists(DestFile))
 				File_Copy(SourceFile, DestFile);
 		}

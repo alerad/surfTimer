@@ -637,14 +637,14 @@ public bool IsPlayerMimicing(int client)
 	return g_hBotMimicsRecord[client] != null;
 }
 
-void DeleteReplay(int client, int zonegroup, char[] map)
+void DeleteReplay(int client, int zonegroup, char[] mapToDelete)
 {
 	char sPath[PLATFORM_MAX_PATH + 1];
 	if (zonegroup == 0) // Record
-		Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, map);
+		Format(sPath, sizeof(sPath), "%s%s.rec", CK_REPLAY_PATH, mapToDelete);
 	else
 		if (zonegroup > 0) // Bonus
-			Format(sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, map, g_CurrentReplay);
+			Format(sPath, sizeof(sPath), "%s%s_bonus_%i.rec", CK_REPLAY_PATH, mapToDelete, g_CurrentReplay);
 	BuildPath(Path_SM, sPath, sizeof(sPath), "%s", sPath);
 	
 	// Delete the file
@@ -659,14 +659,14 @@ void DeleteReplay(int client, int zonegroup, char[] map)
 		if (zonegroup > 0)
 		{
 			g_bMapBonusReplay[zonegroup] = false;
-			PrintToConsole(client, "Bonus Replay %s_bonus_%i.rec deleted.", map, zonegroup);
+			PrintToConsole(client, "Bonus Replay %s_bonus_%i.rec deleted.", mapToDelete, zonegroup);
 		}
 		else
 		{
 			g_bMapReplay = false;
-			PrintToConsole(client, "Record Replay %s.rec deleted.", map);
+			PrintToConsole(client, "Record Replay %s.rec deleted.", mapToDelete);
 		}
-		if (StrEqual(map, g_szMapName))
+		if (StrEqual(mapToDelete, g_szMapName))
 		{
 			if (zonegroup == 0 && IsValidClient(g_RecordBot))
 			{

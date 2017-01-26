@@ -309,11 +309,11 @@ public void StartTouch(int client, int action[3])
             if (!g_bPracticeMode[client] && g_stageTimerActivated[client]){
             	/*Setting the stage final time. Not updating points or anything since i run the validation on the next stage zone.
             	This is so you don't have to create Stage End zones in order.*/
-            	g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
-            	g_fFinalTime[client] = g_stageFinalTime[client];
-            	FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
-   				g_passedThroughStageEnd[client] = true;     
-   				LogError("StageFinaltime es %f", g_stageFinalTime[client]);        
+				g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
+				g_fFinalTime[client] = g_stageFinalTime[client];
+				FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
+   				g_passedThroughStageEnd[client] = true;
+   				LogError("StageFinaltime es %f", g_stageFinalTime[client]);
             }
         }
 	}
@@ -358,18 +358,17 @@ public void EndTouch(int client, int action[3])
                     PrintToChat(client, "%cSurfLatam%c |  You are noclipping or have noclipped recently, timer disabled.", MOSSGREEN, WHITE);
                     ClientCommand(client, "play buttons\\button10.wav");
                 }
-                else {
+				else {
                 	//TODO ACA DEBERIA LLAMAR AL DE BUTTONPRESS Y NO SER UN CABEZA
-                	if (g_PlayerJumpsInStage[client] > 1) {
-						PrintToChat(client, "Prehopeaste, tu speed se bajo a 280 y todos tus tiempos fueron reiniciados.");
-						ForceSpeedLimit(client, 265.0);
+					if (g_PlayerJumpsInStage[client] > 1 && GetConVarFloat(g_hStagePreSpeed) < 400) {
+						ForceSpeedLimit(client, 255.0);
 					}
-                	g_doingStage[client] = action[1] + 2;
-                    g_stageStartTime[client] = GetGameTime();
-                    g_stageFinalTime[client] = 0.0;
-                    g_stageTimerActivated[client] = true;
-                }
-            }
+					g_doingStage[client] = action[1] + 2;
+					g_stageStartTime[client] = GetGameTime();
+					g_stageFinalTime[client] = 0.0;
+					g_stageTimerActivated[client] = true;
+				}
+			}
 		}
 
 

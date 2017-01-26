@@ -131,6 +131,11 @@
 #define TITLE_COUNT 23		// The amount of custom titles that can be configured in custom_chat_titles.txt
 
 
+//SM_SKINCHOOSER
+#define MAX_FILE_LEN 1024
+#define MODELS_PER_TEAM 128
+
+#define SM_SKINCHOOSER_VERSION		"4.0"
 
 
 /*====================================
@@ -581,7 +586,6 @@ Handle g_hRecordingAdditionalTeleportStage[MAXPLAYERS + 1];		// No idea what thi
 float g_fInitialPositionStage[MAXPLAYERS + 1][3];				// Replay start position
 float g_fInitialAnglesStage[MAXPLAYERS + 1][3]; 				// Replay start angle
 int g_RecordedTicksStage[MAXPLAYERS + 1];						// No idea what this does, i'm just copy pasting code :c
-int g_OriginSnapshotIntervalStage[MAXPLAYERS + 1];				// ^
 int g_CurrentAdditionalTeleportIndexStage[MAXPLAYERS + 1];
 bool g_bNewReplayStage[MAXPLAYERS + 1];							// Don't allow starting a new run if saving a record run
 Handle g_hLoadedRecordsAdditionalTeleportStage = null; 			// No idea what this does, i'm just copy pasting code :c
@@ -770,6 +774,58 @@ new Handle:c_GameSprays = INVALID_HANDLE;
 new g_sprays[128][Listado];
 new g_sprayCount = 0;
 new g_sprayElegido[MAXPLAYERS + 1];
+
+
+//Skinchooser
+
+Handle g_version;
+Handle g_enabled;
+Handle g_steamid;
+Handle g_arms_enabled;
+Handle g_autodisplay;
+Handle g_displaytimer;
+Handle g_AdminGroup;
+Handle g_AdminOnly;
+Handle g_PlayerSpawnTimer;
+Handle g_SkinBots;
+Handle g_SkinAdmin;
+Handle g_ForcePlayerSkin;
+Handle g_CommandCountsEnabled;
+Handle g_CloseMenuTimer;
+Handle g_menustarttime;
+Handle g_CommandCounts;
+Handle g_mapbased;
+
+Handle playermodelskv;
+Handle playermodelskva;
+Handle kv;
+Handle kva;
+Handle mainmenu = INVALID_HANDLE;
+Handle armsmainmenu = INVALID_HANDLE;
+
+
+char g_ModelsAdminTeam2[MODELS_PER_TEAM][MAX_FILE_LEN];
+char g_ModelsAdminTeam3[MODELS_PER_TEAM][MAX_FILE_LEN];
+char g_ModelsAdmin_Count_Team2;
+char g_ModelsAdmin_Count_Team3;
+char g_ModelsPlayerTeam2[MODELS_PER_TEAM][MAX_FILE_LEN];
+char g_ModelsPlayerTeam3[MODELS_PER_TEAM][MAX_FILE_LEN];
+char g_ModelsPlayer_Count_Team2;
+char g_ModelsPlayer_Count_Team3;
+char g_ModelsBotsTeam2[MODELS_PER_TEAM][MAX_FILE_LEN];
+char g_ModelsBotsTeam3[MODELS_PER_TEAM][MAX_FILE_LEN];
+char g_ModelsBots_Count_Team2;
+char g_ModelsBots_Count_Team3;
+
+char authid[MAXPLAYERS+1][64];
+char map[256];
+char mediatype[256];
+int downloadtype;
+
+char g_CmdCount[MAXPLAYERS+1];
+char Game[64];
+
+
 /*=========================================
 =            Predefined arrays            =
 =========================================*/
@@ -818,6 +874,7 @@ char RGB_COLOR_NAMES[][] =  // Store RGB color names in an array also
 #include "ckSurf/buttonpress.sp"
 #include "ckSurf/sql.sp"
 #include "ckSurf/timer.sp"
+#include "ckSurf/sm_skinchooser.sp"
 #include "ckSurf/replay.sp"
 #include "ckSurf/surfzones.sp"
 
@@ -895,6 +952,10 @@ public void OnPluginEnd()
 			OnClientDisconnect(client);
 		}
 	}
+
+	//SM_SKINCHOOSER
+	CloseHandle(g_version);
+	CloseHandle(g_enabled);
 }
 
 public void OnLibraryRemoved(const char[] name)
@@ -1052,6 +1113,62 @@ public void OnMapEnd()
 	g_hBotTrail[1] = null;
 	
 	Format(g_szMapName, sizeof(g_szMapName), "");
+
+	//SM_SKINCHOOSER
+	// Write the last choosen Model
+	char filea[PLATFORM_MAX_PATH];
+	char fileb[PLATFORM_MAX_PATH];
+	char curmap[PLATFORM_MAX_PATH];
+	GetCurrentMap(curmap, sizeof(curmap));
+	
+	if(GetConVarInt(g_mapbased) == 1)	
+	{	
+		if (strncmp(curmap, "workshop", 8) == 0)
+		{
+			BuildPath(Path_SM, fileb, sizeof(fileb), "data/%s_skinchooser_playermodels.ini", curmap[19]);
+			KeyValuesToFile(playermodelskv, fileb);
+			CloseHandle(playermodelskv);
+		}
+		else
+		{
+			BuildPath(Path_SM, fileb, sizeof(fileb), "data/%s_skinchooser_playermodels.ini", curmap);	
+			KeyValuesToFile(playermodelskv, fileb);
+			CloseHandle(playermodelskv);
+		}
+		// Write the last choosen Arms if Game is CSGO
+		if (StrEqual(Game, "csgo") && GetConVarInt(g_arms_enabled) == 1)	
+		{	
+			if (strncmp(curmap, "workshop", 8) == 0)
+			{
+				BuildPath(Path_SM, filea, sizeof(filea), "data/%s_skinchooser_armsmodels.ini", curmap[19]);
+				KeyValuesToFile(playermodelskva, filea);
+				CloseHandle(playermodelskva);
+			}
+			else
+			{
+				BuildPath(Path_SM, filea, sizeof(filea), "data/%s_skinchooser_armsmodels.ini", curmap);	
+				KeyValuesToFile(playermodelskva, filea);
+				CloseHandle(playermodelskva);		
+			}
+		}
+		CloseHandle(kv);
+		CloseHandle(kva);
+	}
+	if(GetConVarInt(g_mapbased) == 0)	
+	{	
+		BuildPath(Path_SM, fileb, sizeof(fileb), "data/skinchooser_playermodels.ini");
+		KeyValuesToFile(playermodelskv, fileb);
+		CloseHandle(playermodelskv);
+		
+		if (StrEqual(Game, "csgo") && GetConVarInt(g_arms_enabled) == 1)	
+		{		
+			BuildPath(Path_SM, filea, sizeof(filea), "data/skinchooser_armsmodels.ini");	
+			KeyValuesToFile(playermodelskva, filea);
+			CloseHandle(playermodelskva);	
+		}
+		CloseHandle(kv);
+		CloseHandle(kva);
+	}		
 }
 
 public void OnConfigsExecuted()
@@ -1078,6 +1195,168 @@ public void OnConfigsExecuted()
 		ServerCommand("mp_respawn_on_death_ct 0;mp_respawn_on_death_t 0");
 
 	ServerCommand("sv_infinite_ammo 2;mp_endmatch_votenextmap 0;mp_do_warmup_period 0;mp_warmuptime 0;mp_match_can_clinch 1;mp_match_end_changelevel 1;mp_match_restart_delay 10;mp_endmatch_votenextleveltime 10;mp_endmatch_votenextmap 0;mp_halftime 0;	bot_zombie 1;mp_do_warmup_period 0;mp_maxrounds 1");
+
+
+	//SM_SKINCHOOSER
+	if(GetConVarInt(g_enabled) == 1)	
+	{			
+		// Declare string to load skin's config from sourcemod/configs folder
+		char file[PLATFORM_MAX_PATH];
+		char files[PLATFORM_MAX_PATH];
+		char filea[PLATFORM_MAX_PATH];
+		char fileb[PLATFORM_MAX_PATH];
+		char curmap[PLATFORM_MAX_PATH];
+		GetCurrentMap(curmap, sizeof(curmap));
+		
+		if(GetConVarInt(g_mapbased) == 1)	
+		{
+			// Does current map string contains a "workshop" prefix at a start?
+			if (strncmp(curmap, "workshop", 8) == 0)
+			{
+				// If yes - skip the first 19 characters to avoid comparing the "workshop/12345678" prefix
+				BuildPath(Path_SM, file, sizeof(file), "configs/sm_skinchooser/%s_skins.ini", curmap[19]);			
+				BuildPath(Path_SM, files, sizeof(files), "configs/sm_skinchooser/%s_skins_downloads.ini", curmap[19]);
+			}
+			else /* That's not a workshop map */
+			{
+				// Let's check that custom skin configuration file is exists for current map
+				BuildPath(Path_SM, file, sizeof(file), "configs/sm_skinchooser/%s_skins.ini", curmap);
+				BuildPath(Path_SM, files, sizeof(files), "configs/sm_skinchooser/%s_skins_downloads.ini", curmap);	
+			}
+	
+			// Unfortunately config for current map is not exists
+			if (!FileExists(file))
+			{
+			// Then use default one
+				BuildPath(Path_SM, file, sizeof(file), "configs/sm_skinchooser/default_skins.ini");
+			}
+				
+			if (!FileExists(files))
+			{			
+				BuildPath(Path_SM, files, sizeof(files), "configs/sm_skinchooser/default_skins_downloads.ini");
+			}
+			
+			if (StrEqual(Game, "csgo") && GetConVarInt(g_arms_enabled) == 1)
+			{			
+				if (strncmp(curmap, "workshop", 8) == 0)
+				{			
+					BuildPath(Path_SM, filea, sizeof(filea), "configs/sm_skinchooser/%s_arms.ini", curmap[19]);
+					BuildPath(Path_SM, fileb, sizeof(fileb), "configs/sm_skinchooser/%s_arms_downloads.ini", curmap[19]);			
+				}	
+				else /* That's not a workshop map */
+				{		
+					BuildPath(Path_SM, filea, sizeof(filea), "configs/sm_skinchooser/%s_arms.ini", curmap);
+					BuildPath(Path_SM, fileb, sizeof(fileb), "configs/sm_skinchooser/%s_arms_downloads.ini", curmap);		
+				}
+			
+				if (!FileExists(filea))
+				{
+					BuildPath(Path_SM, filea, sizeof(filea), "configs/sm_skinchooser/default_arms.ini");
+				}			
+				if (!FileExists(fileb))
+				{						
+					BuildPath(Path_SM, fileb, sizeof(fileb), "configs/sm_skinchooser/default_arms_downloads.ini");
+				}
+			}
+		}
+		
+		else if(GetConVarInt(g_mapbased) == 0)	
+		{		
+			BuildPath(Path_SM, file, sizeof(file), "configs/sm_skinchooser/default_skins.ini");	
+			BuildPath(Path_SM, files, sizeof(files), "configs/sm_skinchooser/default_skins_downloads.ini");
+			
+			if (StrEqual(Game, "csgo") && GetConVarInt(g_arms_enabled) == 1)
+			{	
+				BuildPath(Path_SM, filea, sizeof(filea), "configs/sm_skinchooser/default_arms.ini");
+				BuildPath(Path_SM, fileb, sizeof(fileb), "configs/sm_skinchooser/default_arms_downloads.ini");
+			}
+		}
+	
+		LoadMapFile(file);	
+		ReadDownloads(files);
+		
+		if (StrEqual(Game, "csgo") && GetConVarInt(g_arms_enabled) == 1)
+		{			
+			LoadArmsMapFile(filea);	
+			ReadArmsDownloads(fileb);
+		}
+		
+		if(GetConVarInt(g_ForcePlayerSkin) == 1)	
+		{			
+			g_ModelsPlayer_Count_Team2 = 0;
+			g_ModelsPlayer_Count_Team3 = 0;
+			g_ModelsPlayer_Count_Team2 = LoadModels(g_ModelsPlayerTeam2, "configs/sm_skinchooser/forceskinsplayer_team2.ini");
+			g_ModelsPlayer_Count_Team3  = LoadModels(g_ModelsPlayerTeam3,  "configs/sm_skinchooser/forceskinsplayer_team3.ini");		
+		}
+		if(GetConVarInt(g_SkinBots) == 1)	
+		{	
+			g_ModelsBots_Count_Team2 = 0;
+			g_ModelsBots_Count_Team3 = 0;
+			g_ModelsBots_Count_Team2 = LoadModels(g_ModelsBotsTeam2, "configs/sm_skinchooser/forceskinsbots_team2.ini");
+			g_ModelsBots_Count_Team3  = LoadModels(g_ModelsBotsTeam3,  "configs/sm_skinchooser/forceskinsbots_team3.ini");				
+		}
+		if(GetConVarInt(g_SkinAdmin) == 1)	
+		{		
+			g_ModelsAdmin_Count_Team2 = 0;
+			g_ModelsAdmin_Count_Team3 = 0;
+			g_ModelsAdmin_Count_Team2 = LoadModels(g_ModelsAdminTeam2, "configs/sm_skinchooser/forceskinsadmin_team2.ini");
+			g_ModelsAdmin_Count_Team3  = LoadModels(g_ModelsAdminTeam3,  "configs/sm_skinchooser/forceskinsadmin_team3.ini");			
+		}
+	}
+	// Load Player last choosen Models
+	char filex[PLATFORM_MAX_PATH];
+	char filey[PLATFORM_MAX_PATH];
+	char curmapa[PLATFORM_MAX_PATH];
+	GetCurrentMap(curmapa, sizeof(curmapa));
+	
+	if(GetConVarInt(g_mapbased) == 1)	
+	{		
+		if (strncmp(curmapa, "workshop", 8) == 0)
+		{
+			BuildPath(Path_SM, filex, sizeof(filex), "data/%s_skinchooser_playermodels.ini", curmapa[19]);
+			playermodelskv = CreateKeyValues("Models");
+			FileToKeyValues(playermodelskv, filex);
+		}
+		else
+		{
+			BuildPath(Path_SM, filex, sizeof(filex), "data/%s_skinchooser_playermodels.ini", curmapa);	
+			playermodelskv = CreateKeyValues("Models");
+			FileToKeyValues(playermodelskv, filex);		
+		}	
+	
+		// If Game is CSGO load the last choosen Armmodel
+		if (StrEqual(Game, "csgo") && GetConVarInt(g_arms_enabled) == 1)	
+		{	
+			if (strncmp(curmapa, "workshop", 8) == 0)
+			{
+				BuildPath(Path_SM, filey, sizeof(filey), "data/%s_skinchooser_armsmodels.ini", curmapa[19]);
+				playermodelskva = CreateKeyValues("Arms");
+				FileToKeyValues(playermodelskva, filey);
+			}
+			else
+			{
+				BuildPath(Path_SM, filey, sizeof(filey), "data/%s_skinchooser_armsmodels.ini", curmapa);	
+				playermodelskva = CreateKeyValues("Arms");
+				FileToKeyValues(playermodelskva, filey);		
+			}
+		}
+	}
+	else if(GetConVarInt(g_mapbased) == 0)	
+	{
+		BuildPath(Path_SM, filex, sizeof(filex), "data/skinchooser_playermodels.ini");	
+		playermodelskv = CreateKeyValues("Models");
+		FileToKeyValues(playermodelskv, filex);	
+		
+		if (StrEqual(Game, "csgo") && GetConVarInt(g_arms_enabled) == 1)	
+		{	
+			BuildPath(Path_SM, filey, sizeof(filey), "data/skinchooser_armsmodels.ini");	
+			playermodelskva = CreateKeyValues("Arms");
+			FileToKeyValues(playermodelskva, filey);
+		}
+	}		
+
+
+
 }
 
 
@@ -2144,6 +2423,48 @@ public void OnPluginStart()
 	Format(szORANGE, 12, "%c", ORANGE);
 
 
+	/*===============================
+	=            Sm_Skinchooser     =
+	===============================*/
+	g_version = CreateConVar("sm_skinchooser_version",SM_SKINCHOOSER_VERSION,"SM SKINCHOOSER VERSION",FCVAR_NOTIFY);
+	SetConVarString(g_version,SM_SKINCHOOSER_VERSION);
+	g_enabled = CreateConVar("sm_skinchooser_enabled", "1", "0 = Disabled , 1 = Enables the Plugin.", _, true, 0.0, true, 1.0);
+	g_arms_enabled = CreateConVar("sm_skinchooser_arms_enabled","1", "0 = disabled , 1 = Enables the usage for Armmodels in CSGO.", _, true, 0.0, true, 1.0);
+	g_steamid  = CreateConVar("sm_skinchooser_steamid_format","1", "0 = SteamId 2 , 1 = SteamId 3", _, true, 0.0, true, 1.0);
+	g_mapbased = CreateConVar("sm_skinchooser_mapbased","1", "0 = Disabled , 1 = Enables usage of mapbased inis.", _, true, 0.0, true, 1.0);	
+	g_autodisplay = CreateConVar("sm_skinchooser_autodisplay","1", "0 = Disabled , 1 = Enables Menu Auto popup.", _, true, 0.0, true, 1.0);
+	g_displaytimer = CreateConVar("sm_skinchooser_displaytimer","0", "0 = Disabled , 1 = Enables the Delay when Menu should auto popup.", _, true, 0.0, true, 1.0);
+	g_menustarttime = CreateConVar("sm_skinchooser_menustarttime" , "5.0", "Time in seconds when Menu should be started", _, true, 0.0, true, 1000.0);	
+	g_AdminGroup = CreateConVar("sm_skinchooser_admingroup","1", "0 = Disabled , 1 = Enables the Groupsystem.", _, true, 0.0, true, 1.0);
+	g_AdminOnly = CreateConVar("sm_skinchooser_adminonly","0", "0 = Disabled , 1 = Enabled for Admins only.", _, true, 0.0, true, 1.0);
+	g_PlayerSpawnTimer = CreateConVar("sm_skinchooser_playerspawntimer","0", "0 = Disabled , 1 = Enables the spawntimer.", _, true, 0.0, true, 1.0);
+	g_CommandCountsEnabled = CreateConVar("sm_skinchooser_commandcountsenabled", "0", "Enables the CommandCounter.", _, true, 0.0, true, 1.0);	
+	g_CommandCounts = CreateConVar("sm_skinchooser_commandcounts", "1", "How many times users should be able to use the !models command.", _, true, 0.0, true, 1000.0);
+	g_CloseMenuTimer = CreateConVar("sm_skinchooser_closemenutimer" , "30", "Seconds when the Menu should be closed", _, true, 0.0, true, 1000.0);	
+	g_ForcePlayerSkin = CreateConVar("sm_skinchooser_forceplayerskin" , "0", "0 = Disabled , 1 = Enabled , should Players get automaticly a Model?", _, true, 0.0, true, 1.0);
+	g_SkinBots = CreateConVar("sm_skinchooser_skinbots","0", "0 = Disabled , 1 = Enabled , should Bots have  a custom Model?", _, true, 0.0, true, 1.0);
+	g_SkinAdmin = CreateConVar("sm_skinchooser_skinadmin","0", "0 = Disabled , 1 = Enabled , should Admins get automaticly a Model?", _, true, 0.0, true, 1.0);	
+	
+	// Create the model menu command
+	RegConsoleCmd("sm_models", Command_Model);
+	
+	GetGameFolderName(Game, sizeof(Game));
+	
+	// Hook the spawn event
+	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
+	HookEvent("player_team", Event_PlayerTeam, EventHookMode_Post);
+	
+	if (StrEqual(Game, "dod"))	
+	{
+		HookEvent("dod_round_start", Event_RoundStart, EventHookMode_Post);
+	}
+	else
+	{
+		HookEvent("round_start", Event_RoundStart, EventHookMode_Post);
+	}	
+	
+	AutoExecConfig(true, "sm_skinchooser");	
+
 
 } 
 
@@ -2313,25 +2634,25 @@ public bool:TraceEntityFilterPlayer(entity, contentsMask) {
 ReadL() {
 	
 	
-	decl Handle:kv;
+	decl Handle:laserkv;
 	g_sprayCount = 1;
 	decl String:buffer[PLATFORM_MAX_PATH];
 
-	kv = CreateKeyValues("Lasers");
-	FileToKeyValues(kv, path_decals);
+	laserkv = CreateKeyValues("Lasers");
+	FileToKeyValues(laserkv, path_decals);
 
-	if (!KvGotoFirstSubKey(kv)) {
+	if (!KvGotoFirstSubKey(laserkv)) {
 
 		SetFailState("CFG File not found: %s", path_decals);
-		CloseHandle(kv);
+		CloseHandle(laserkv);
 	}
 	do {
 
-		KvGetSectionName(kv, buffer, sizeof(buffer));
+		KvGetSectionName(laserkv, buffer, sizeof(buffer));
 		Format(g_sprays[g_sprayCount][Nombre], 32, "%s", buffer);
 		
 		decl String:color[64][4];
-		KvGetString(kv, "color", buffer, 64);
+		KvGetString(laserkv, "color", buffer, 64);
 		ExplodeString(buffer, " ", color, 4, 64);
 		
 		g_sprays[g_sprayCount][colors][0] = StringToInt(color[0]);
@@ -2340,8 +2661,8 @@ ReadL() {
 		g_sprays[g_sprayCount][colors][3] = StringToInt(color[3]);
 		
 		g_sprayCount++;
-	} while (KvGotoNextKey(kv));
-	CloseHandle(kv);
+	} while (KvGotoNextKey(laserkv));
+	CloseHandle(laserkv);
 }
 
 public Action:GetSpray(client, args)
