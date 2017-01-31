@@ -262,7 +262,7 @@ public Action CKTimer2(Handle timer)
 			//spec hud
 			// if (g_bHideLeftHud[i])
 			// {
-				SpecListMenuAlive(i);
+			SpecListMenuAlive(i);
 			// } else 
 			// {
 			// 	LeftHudAlive(i);
@@ -345,7 +345,7 @@ public Action BonusReplayTimer(Handle timer, Handle pack)
 {
 	ResetPack(pack);
 	int client = GetClientOfUserId(ReadPackCell(pack));
-	int zGrp = ReadPackCell(pack);
+	// int zGrp = ReadPackCell(pack);
 
 	if (IsValidClient(client) && !IsFakeClient(client)){
 	}

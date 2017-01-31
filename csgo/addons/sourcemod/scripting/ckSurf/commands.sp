@@ -569,14 +569,10 @@ public void ListStageRecords(int client, int type)
 
 	if (type == 1)
 	{
-	PrintToChat(client, "Entra aca porlomeno.type1 ");
-
 		listStagesMenu = new Menu(MenuHandler_SelectStageTop);
 	}
 	else
 	{
-	PrintToChat(client, "Entra aca porlomeno.type2");
-
 		listStagesMenu = new Menu(MenuHandler_SelectStageTop);
 	}
 	
@@ -612,14 +608,10 @@ public int MenuHandler_SelectStageTop(Menu sMenu, MenuAction action, int client,
 			char aID[3];
 			GetMenuItem(sMenu, item, aID, sizeof(aID));
 			int zoneGrp = StringToInt(aID);
-			PrintToChat(client, "Entra aca porlomeno. %i" ,zoneGrp);
-
 			db_selectStageTopSurfers(client, g_szMapName, zoneGrp);
 		}
 		case MenuAction_End:
 		{
-	PrintToChat(client, "end2");
-
 			delete sMenu;
 		}
 	}
@@ -691,11 +683,10 @@ public Action Command_ToBonus(int client, int args)
 
 public Action Command_GoBack(int client, int args)
 {
-  int StageId = g_iClientInZone[client][1];
-  int previousStage = g_Stage[g_iClientInZone[client][2]][client]-1;
-  g_stageTimerActivated[client] = false;
-  teleportClient(client, 0, previousStage, false);
-  return Plugin_Handled;
+	int previousStage = g_Stage[g_iClientInZone[client][2]][client]-1;
+	g_stageTimerActivated[client] = false;
+	teleportClient(client, 0, previousStage, false);
+	return Plugin_Handled;
 }
 
 public Action Command_SelectStage(int client, int args)
@@ -1828,7 +1819,7 @@ public int CompareSelectMenuHandler(Menu menu, MenuAction action, int param1, in
 			if (IsValidClient(i) && i != param1)
 			{
 				GetClientName(i, szPlayerName, MAX_NAME_LENGTH);
-					if (StrEqual(info, szPlayerName))
+				if (StrEqual(info, szPlayerName))
 				{
 					db_viewPlayerRank2(param1, g_szSteamID[param1]);
 				}
@@ -2046,10 +2037,9 @@ public Action Client_StageStats(int client, int args)
 {
 
 	char szValue[128];
-	// char szTime[32];
 	char szSteamId[32];
 	getSteamIDFromClient(client, szSteamId, 32);
-	int i,b;
+	int i;
 	char szPlayerName[MAX_NAME_LENGTH];
 	GetClientName(client, szPlayerName, MAX_NAME_LENGTH);
 	Menu mapInfoMenu = new Menu(MapMenuHandler1);
@@ -2060,14 +2050,11 @@ public Action Client_StageStats(int client, int args)
 
 	for (i= 1; i<=stageCount; i++){
 		float stageTime = g_fPersonalRecordStage[i][client];
-		LogError("Aca vamo a ver porque se ormpe todo %f, ITERATOR %i", stageTime, i);
-		// Format(szTime, 32, "Time: %f", stageTime);
 		if (stageTime>0){
 			Format(szValue, 128, "[Stage %i Time]: %s | Rank %i/%i", (i), g_szPersonalRecordStage[i][client], g_MapRankStage[i][client], g_iStageCount[i]);
 			mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
 		}
 		PushArrayString(stringArray, szValue);
-		b=i;
 	}
 
 	char title[64];
@@ -2114,7 +2101,7 @@ public void DisplayMapStats(int client){
 	mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
 
 	int bonusCount = g_mapZoneGroupCount;
-	int i,b;
+	int i;
 	for (i= 1; i<=bonusCount; i++){
 		float bonusTime = g_fPersonalRecordBonus[i][client];
 		if (bonusTime>0) {
@@ -2127,22 +2114,17 @@ public void DisplayMapStats(int client){
 		
 	}
 
-	
-
 	// Counts stages and creates strings
 	int stageCount = (g_mapZonesTypeCount[g_iClientInZone[client][2]][3] + 1);
 	Handle stringArray = CreateArray(stageCount);
 
 	for (i= 1; i<=stageCount; i++){
 		float stageTime = g_fPersonalRecordStage[i][client];
-		LogError("Aca vamo a ver porque se ormpe todo %f, ITERATOR %i", stageTime, i);
-		// Format(szTime, 32, "Time: %f", stageTime);
 		if (stageTime>0){
 			Format(szValue, 128, "[Stage %i Time]: %s | Rank %i/%i", (i), g_szPersonalRecordStage[i][client], g_MapRankStage[i][client], g_iStageCount[i]);
 			mapInfoMenu.AddItem(szSteamId, szValue, ITEMDRAW_DEFAULT);
 		}
 		PushArrayString(stringArray, szValue);
-		b=i;
 	}
 
 	char title[64];
@@ -2449,7 +2431,7 @@ public Action Client_Stop(int client, int args)
 	{
 		//PlayerPanel(client);
 		g_stageTimerActivated[client] = false;
-        g_stageStartTime[client] = -1.0;
+		g_stageStartTime[client] = -1.0;
 		g_bTimeractivated[client] = false;
 		g_fStartTime[client] = -1.0;
 		g_fCurrentRunTime[client] = -1.0;
@@ -3019,7 +3001,7 @@ public Action Command_Replay(int client, int args)
 	// {
 	// 	menu.AddItem("map", "Select Stage (VIP ONLY)", ITEMDRAW_DISABLED);
 	// } else {
-		menu.AddItem("map", "Select Stage");
+	menu.AddItem("map", "Select Stage");
 	// }
 
 
@@ -3071,8 +3053,6 @@ public Action StageBotMenu(int client, int args)
 	// }
 	Menu menu = new Menu(StageBotMenu_Handler);
 	menu.SetTitle("Select a stage to replay");
-	char panelName[64];
-	char panelItemName[64];
 	char buffer[3];
 
 	
