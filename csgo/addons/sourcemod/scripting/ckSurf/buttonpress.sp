@@ -594,8 +594,6 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 	// If he did, it's calculated on surfzones.sp, StartTouch method (Please don't hate me.)
 	if (!g_passedThroughStageEnd[client]){
 		g_stageFinalTime[client] = GetGameTime() - g_stageStartTime[client];
-		g_fFinalTime[client] = g_stageFinalTime[client];
-
 		FormatTimeFloat(client, g_stageFinalTime[client], 3, g_stageFinalTimeStr[client], 32);
 	} else {
 		g_passedThroughStageEnd[client] = false;
@@ -617,7 +615,6 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 		g_stagePBRecord[client] = false;
 		g_stageSRVRecord[client] = false;
 		g_OldMapRankStage[zGroup][client] = g_MapRankStage[zGroup][client];	
-		g_szFinalTime[client] = g_stageFinalTimeStr[client];
 		g_szStageZone[client] = g_doingStage[client];
 
 		diff = g_fPersonalRecordStage[zGroup][client] - g_stageFinalTime[client];
@@ -657,21 +654,21 @@ public void CL_OnEndStageTimerPressStageStart(int client)
 
 		if (g_fPersonalRecordStage[zGroup][client] == 0.0)
 		{  // Clients first record
-			g_fPersonalRecordStage[zGroup][client] = g_fFinalTime[client];
+			g_fPersonalRecordStage[zGroup][client] = g_stageFinalTime[client];
 			FormatTimeFloat(1, g_fPersonalRecordStage[zGroup][client], 3, g_szPersonalRecordStage[zGroup][client], 64);
 			
 			g_stageFirstRecord[client] = true;
 			g_pr_showmsg[client] = true;
-			db_insertStageRecord(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
+			db_insertStageRecord(client, g_szSteamID[client], szName, g_stageFinalTime[client], zGroup);
 		}
 		else if (diff > 0.0)
 		{  // client's new record
-			g_fPersonalRecordStage[zGroup][client] = g_fFinalTime[client];
+			g_fPersonalRecordStage[zGroup][client] = g_stageFinalTime[client];
 			FormatTimeFloat(1, g_fPersonalRecordStage[zGroup][client], 3, g_szPersonalRecordStage[zGroup][client], 64);
 			
 			g_stagePBRecord[client] = true;
 			g_pr_showmsg[client] = true;
-			db_updateStageRecord(client, g_szSteamID[client], szName, g_fFinalTime[client], zGroup);
+			db_updateStageRecord(client, g_szSteamID[client], szName, g_stageFinalTime[client], zGroup);
 		}
 	}
 

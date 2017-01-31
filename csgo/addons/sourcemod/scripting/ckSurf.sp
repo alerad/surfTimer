@@ -2450,10 +2450,6 @@ public void OnPluginStart()
 	
 	GetGameFolderName(Game, sizeof(Game));
 	
-	// Hook the spawn event
-	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
-	HookEvent("player_team", Event_PlayerTeam, EventHookMode_Post);
-	
 	if (StrEqual(Game, "dod"))	
 	{
 		HookEvent("dod_round_start", Event_RoundStart, EventHookMode_Post);

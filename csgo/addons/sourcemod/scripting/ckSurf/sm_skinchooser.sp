@@ -1099,7 +1099,7 @@ public Action Timer_Menu(Handle timer, any client)
 
 public Action Command_Model(int client,int args)
 {
-	if(GetConVarInt(g_enabled) == 1 && !IsFakeClient(client))	
+	if(GetConVarInt(g_enabled) == 1 && !IsFakeClient(client) && g_bflagTitles[client][0])	
 	{
 		if(GetConVarInt(g_CommandCountsEnabled) == 1)	
 		{
@@ -1157,6 +1157,8 @@ public Action Command_Model(int client,int args)
 				DisplayMenu(mainmenu, client, GetConVarInt(g_CloseMenuTimer));
 			}
 		}
+	} else {
+		PrintToChat(client, "This is a VIP command");
 	}
 	return Plugin_Handled;	
 }
