@@ -1227,7 +1227,11 @@ public void LimitSpeed(int client, bool isEnteringZone)
 		return;
 		
 	float speedCap = 0.0, CurVelVec[3];
-	
+
+	float vPlayerVelocity[3];
+	GetEntPropVector(client, Prop_Data, "m_vecVelocity", vPlayerVelocity);
+
+
 	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0)
 		speedCap = GetConVarFloat(g_hBonusPreSpeed);
 	else
@@ -1257,9 +1261,15 @@ public void LimitSpeed(int client, bool isEnteringZone)
 	if (CurVelVec[2] == 0.0)
 		CurVelVec[2] = 1.0;
 	
+	bool limitZVel = false;
+ 	if (CurVelVec[2] < -330.0) {
+ 		limitZVel = true;
+ 		CurVelVec[2] = -300.0;
+	}
+
 	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
 	
-	if (currentspeed > speedCap)
+	if (currentspeed > speedCap || limitZVel)
 	{
 		NormalizeVector(CurVelVec, CurVelVec);
 		ScaleVector(CurVelVec, speedCap);

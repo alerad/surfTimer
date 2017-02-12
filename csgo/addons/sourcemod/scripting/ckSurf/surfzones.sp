@@ -133,7 +133,7 @@ public Action EndTouchTrigger(int caller, int activator)
 	}
 	
 	char sTargetName[256];
-	int action[3];
+	int action[4];
 	GetEntPropString(caller, Prop_Data, "m_iName", sTargetName, sizeof(sTargetName));
 	ReplaceString(sTargetName, sizeof(sTargetName), "sm_ckZone ", "");
 	
@@ -142,7 +142,8 @@ public Action EndTouchTrigger(int caller, int activator)
 	action[0] = g_mapZones[id][zoneType];
 	action[1] = g_mapZones[id][zoneTypeId];
 	action[2] = g_mapZones[id][zoneGroup];
-
+	action[3] = id;
+	
 	if (action[2] != g_iClientInZone[activator][2] || action[0] == 6 || action[0] == 8 || action[0] != g_iClientInZone[activator][0]) // Ignore end touches in other zonegroups, zones that teleports away or multiple zones on top of each other 
 		return Plugin_Handled;
 
@@ -319,7 +320,7 @@ public void StartTouch(int client, int action[3])
 	}
 }
 
-public void EndTouch(int client, int action[3])
+public void EndTouch(int client, int action[4])
 {
 	if (IsValidClient(client))
 	{
@@ -363,6 +364,16 @@ public void EndTouch(int client, int action[3])
 					if (g_PlayerJumpsInStage[client] > 1 && GetConVarFloat(g_hStagePreSpeed) < 400) {
 						ForceSpeedLimit(client, 255.0);
 					}
+					float vLowestCorner[3];
+					if (g_mapZones[action[3]][PointA][2] > g_mapZones[action[3]][PointB][2])
+						Array_Copy(g_mapZones[action[3]][PointB], vLowestCorner, 3);
+					else
+						Array_Copy(g_mapZones[action[3]][PointA], vLowestCorner, 3);
+
+					// Check if the player jumped from an high platform
+					if (g_vLastGroundTouch[client][2] > (vLowestCorner[2] + 25.0)) 
+						PrintToChat(client, "[%cSurf Timer%c] %cYou jumped from way too high.", MOSSGREEN, WHITE, LIGHTRED); 
+
 					g_doingStage[client] = action[1] + 2;
 					g_stageStartTime[client] = GetGameTime();
 					g_stageFinalTime[client] = 0.0;

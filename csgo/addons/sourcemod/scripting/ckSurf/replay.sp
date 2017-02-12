@@ -872,10 +872,6 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 				if (hAdditionalTeleport != null && g_bReplayingStage){
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndexStage[client], iAT, 10);
 				} else if (hAdditionalTeleport != null) {
-					if (g_CurrentAdditionalTeleportIndex == null){
-						g_BotMimicTick = 99999;
-						return;
-					}
 					GetArrayArray(hAdditionalTeleport, g_CurrentAdditionalTeleportIndex[client], iAT, 10);
 				}
 				

@@ -35,7 +35,7 @@
 #pragma semicolon 1
 
 // Plugin info
-#define VERSION "1.18"
+#define VERSION "2"
 #define PLUGIN_VERSION 118
 
 // Database definitions
@@ -568,6 +568,8 @@ int g_MapTimesCount; 											// How many times the map has been beaten
 int g_MapRank[MAXPLAYERS + 1]; 									// Clients rank in current map
 int g_OldMapRank[MAXPLAYERS + 1];								// Clients old rank
 char g_szRecordPlayer[MAX_NAME_LENGTH];							// Current map's record player's name
+int g_clientBonusCount[MAXPLAYERS + 1]; 						// How many bonus the client passed
+
 
 /*----------  Stage Record Variables ----------*/
 float g_stageStartTime[MAXPLAYERS +1];                          // When the player started a stage
@@ -668,6 +670,8 @@ char g_BlockedChatText[256][256];								// Blocked chat commands
 float g_fLastOverlay[MAXPLAYERS + 1];							// Last time an overlay was displayed
 bool g_bPlayerIsJumping[MAXPLAYERS+1];							// Checks if player is jumping
 int g_PlayerJumpsInStage[MAXPLAYERS + 1];						// Amount of jumps in stage
+float g_vLastGroundTouch[MAXPLAYERS+1][3];						// Last ground touch
+int g_RepeatStage[MAXPLAYERS+1] = {-1, ...};					
 
 
 /*----------  Player location restoring  ----------*/
@@ -1421,6 +1425,9 @@ public void OnClientPutInServer(int client)
 	
 	//get client steamID
 	GetClientAuthId(client, AuthId_Steam2, g_szSteamID[client], MAX_NAME_LENGTH, true);
+
+	//Sets g_clientBonusCount
+	getBonusCountForSteamId(g_szSteamID[client], client);
 	
 	// ' char fix
 	FixPlayerName(client);

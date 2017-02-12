@@ -85,6 +85,7 @@ char sql_selectPlayerRankBonus[] = "SELECT name FROM ck_bonus WHERE runtime <= (
 char sql_selectFastestBonus[] = "SELECT name, MIN(runtime), zonegroup FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup;";
 char sql_deleteBonus[] = "DELETE FROM ck_bonus WHERE mapname = '%s'";
 char sql_selectAllBonusTimesinMap[] = "SELECT zonegroup, runtime from ck_bonus WHERE mapname = '%s';";
+char sql_getBonusCountForSteamId[] = "SELECT COUNT(*) FROM ck_bonus WHERE steamid = '%s';"
 char sql_selectTopBonusSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ck_bonus as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
 
 //TABLE CHECKPOINTS
@@ -7424,4 +7425,21 @@ public void Delete_Announcement_Callback(Handle owner, Handle hndl, const char[]
 		LogError("[SurfLatam] SQL Error (DB_DELETEANNOUNCEMENT): %s", error);
 		return;
 	}
+}
+
+public void getBonusCountForSteamId(char steamId[32], int client) {
+	char szQuery[256];
+	Format(szQuery, 256, sql_getBonusCountForSteamId, steamId);
+	SQL_TQuery(g_hDb, GetBonusCountCallback, szQuery, client, DBPrio_Low);
+}
+
+public void GetBonusCountCallback(Handle owner, Handle hndl, const char[] error, any data) {
+	if (hndl == null)
+	{
+		LogError("[SurfLatam] error getting bonus count: %s", error);
+		return;
+	}
+
+	int bonusCount = SQL_FetchInt(hndl, 0);
+	g_clientBonusCount[data] = bonusCount;
 }
