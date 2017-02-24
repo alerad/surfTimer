@@ -1,3 +1,9 @@
+public Action Admin_StopBot(int client, int args)
+{
+	StopReplayBot(g_RecordBot);
+	return Plugin_Handled;
+}
+
 public Action Admin_giveTitle(int client, int args)
 {
 	if (!IsValidClient(client))

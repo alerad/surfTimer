@@ -1232,7 +1232,7 @@ public void LimitSpeed(int client, bool isEnteringZone)
 	GetEntPropVector(client, Prop_Data, "m_vecVelocity", vPlayerVelocity);
 
 
-	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0)
+	if (g_iClientInZone[client][0] == 1 && g_iClientInZone[client][2] > 0 && ((GetEntityFlags(client) & FL_ONGROUND) || isEnteringZone))
 		speedCap = GetConVarFloat(g_hBonusPreSpeed);
 	else
 		if (g_iClientInZone[client][0] == 1 && ((GetEntityFlags(client) & FL_ONGROUND) || isEnteringZone))
@@ -1245,7 +1245,7 @@ public void LimitSpeed(int client, bool isEnteringZone)
 				else
 					speedCap = GetConVarFloat(g_hStartPreSpeed); // If noclipping, top speed at normal start zone speed
 			} else {
-				if (g_iClientInZone[client][0] == 3)
+				if (g_iClientInZone[client][0] == 3 && ((GetEntityFlags(client) & FL_ONGROUND)))
 					speedCap = GetConVarFloat(g_hStagePreSpeed);
 			}
 	
@@ -1269,7 +1269,7 @@ public void LimitSpeed(int client, bool isEnteringZone)
 
 	float currentspeed = SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0));
 	
-	if (currentspeed > speedCap || limitZVel)
+	if (currentspeed > speedCap)
 	{
 		NormalizeVector(CurVelVec, CurVelVec);
 		ScaleVector(CurVelVec, speedCap);

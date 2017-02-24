@@ -137,7 +137,6 @@ public void SaveRecording(int client, int zgroup, bool isStage)
 	strcopy(iHeader[view_as<int>(FH_Playername)], 32, szName);
 	iHeader[view_as<int>(FH_Checkpoints)] = 0; // So that KZTimers replays work
 
-	
 
 	//This variables are used for whole map recording, if i reset them everything goes to shit.
 	if (!isStage){
@@ -348,7 +347,6 @@ public void PlayRecord(int client, int type, bool isStage)
 	} else if (isStage){
 		Format(sPath, sizeof(sPath), "%s%s_stage_%i.rec", CK_REPLAY_PATH, g_szMapName, type+1);
 	}
-	PrintToServer(sPath);
 	// He's currently recording. Don't start to play some record on him at the same time.
 	if (g_hRecording[client] != null || !IsFakeClient(client))
 		return;
@@ -726,6 +724,7 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 
 			// Check for additional Teleports
 			if (g_hRecording[client] != null){
+
 				if (GetArraySize(g_hRecordingAdditionalTeleport[client]) > g_CurrentAdditionalTeleportIndex[client] && g_hRecording[client] != null)
 				{
 					int iAT[AdditionalTeleport]; 
@@ -739,6 +738,7 @@ public void RecordReplay (int client, int &buttons, int &subtype, int &seed, int
 			
 			if (g_hRecordingStage[client]!=null)
 			{
+
 				if (GetArraySize(g_hRecordingAdditionalTeleportStage[client]) > g_CurrentAdditionalTeleportIndexStage[client] && g_hRecordingStage[client] != null)
 				{
 					int iAT[AdditionalTeleport];
@@ -808,20 +808,7 @@ public void PlayReplay(int client, int &buttons, int &subtype, int &seed, int &i
 			if ((GetEngineTime() - g_fReplayRestarted[client]) < (BEAMLIFE))
 				return;
 
-			SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
-			g_bReplayAtEnd[client] = false;
-			g_bReplayingStage = false;
-			g_BotMimicTick[client] = 0;
-			g_CurrentAdditionalTeleportIndex[client] = 0;
-			g_CurrentAdditionalTeleportIndexStage[client] = 0;
-
-			g_fLastReplayRequested[g_ReplayRequester] = GetGameTime();
-			g_bIsPlayingReplay = false;
-
-			CS_SetClientClanTag(g_RecordBot, "Latam");
-			// SetEntPropFloat(g_RecordBot, Prop_Data, "m_flLaggedMovementValue", 0.0);
-			Command_Restart(g_RecordBot, 1);
-			SetClientName(g_RecordBot, "Press E While Spectating");
+			StopReplayBot(client);
 			return;
 		}
 		
@@ -1034,4 +1021,21 @@ public void StopRecordingStage(int client)
 	g_RecordedTicksStage[client] = 0;
 	g_CurrentAdditionalTeleportIndexStage[client] = 0;
 	g_OriginSnapshotInterval[client] = 0;
+}
+
+public void StopReplayBot(int client){
+		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", 1.0);
+		g_bReplayAtEnd[client] = false;
+		g_bReplayingStage = false;
+		g_BotMimicTick[client] = 0;
+		g_CurrentAdditionalTeleportIndex[client] = 0;
+		g_CurrentAdditionalTeleportIndexStage[client] = 0;
+
+		g_fLastReplayRequested[g_ReplayRequester] = GetGameTime();
+		g_bIsPlayingReplay = false;
+
+		CS_SetClientClanTag(g_RecordBot, "Latam");
+		// SetEntPropFloat(g_RecordBot, Prop_Data, "m_flLaggedMovementValue", 0.0);
+		Command_Restart(g_RecordBot, 1);
+		SetClientName(g_RecordBot, "Press E While Spectating");
 }

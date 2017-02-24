@@ -85,7 +85,7 @@ char sql_selectPlayerRankBonus[] = "SELECT name FROM ck_bonus WHERE runtime <= (
 char sql_selectFastestBonus[] = "SELECT name, MIN(runtime), zonegroup FROM ck_bonus WHERE mapname = '%s' GROUP BY zonegroup;";
 char sql_deleteBonus[] = "DELETE FROM ck_bonus WHERE mapname = '%s'";
 char sql_selectAllBonusTimesinMap[] = "SELECT zonegroup, runtime from ck_bonus WHERE mapname = '%s';";
-char sql_getBonusCountForSteamId[] = "SELECT COUNT(*) FROM ck_bonus WHERE steamid = '%s';"
+char sql_getBonusCountForSteamId[] = "SELECT COUNT(*) FROM ck_bonus WHERE steamid = '%s';";
 char sql_selectTopBonusSurfers[] = "SELECT db2.steamid, db1.name, db2.runtime as overall, db1.steamid, db2.mapname FROM ck_bonus as db2 INNER JOIN ck_playerrank as db1 on db2.steamid = db1.steamid WHERE db2.mapname LIKE '%c%s%c' AND db2.runtime > -1.0 AND zonegroup = %i ORDER BY overall ASC LIMIT 100;";
 
 //TABLE CHECKPOINTS
@@ -269,29 +269,30 @@ public void db_setupDatabase()
 void txn_addExtraCheckpoints()
 {
 	// Add extra checkpoints to Checkpoints and add new primary key:
-	if (!SQL_FastQuery(g_hDb, "SELECT cp35 FROM ck_checkpoints;"))
-	{
-		PrintToServer("---------------------------------------------------------------------------");
-		disableServerHibernate();
-		PrintToServer("[SurfLatam] Started to make changes to database. Updating from 1.17 -> 1.18.");
-		PrintToServer("[SurfLatam] WARNING: DO NOT CONNECT TO THE SERVER, OR CHANGE MAP!");
-		PrintToServer("[SurfLatam] Adding extra checkpoints... (1 / 6)");
+	// if (!SQL_FastQuery(g_hDb, "SELECT cp35 FROM ck_checkpoints;"))
+	// {
+	// 	PrintToServer("---------------------------------------------------------------------------");
+	// 	disableServerHibernate();
+	// 	PrintToServer("[SurfLatam] Started to make changes to database. Updating from 1.17 -> 1.18.");
+	// 	PrintToServer("[SurfLatam] WARNING: DO NOT CONNECT TO THE SERVER, OR CHANGE MAP!");
+	// 	PrintToServer("[SurfLatam] Adding extra checkpoints... (1 / 6)");
 
-		g_bInTransactionChain = true;
-		Transaction h_checkpoint = SQL_CreateTransaction();
+	// 	g_bInTransactionChain = true;
+	// 	Transaction h_checkpoint = SQL_CreateTransaction();
 		
-		SQL_AddQuery(h_checkpoint, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpoints_temp;");
-		SQL_AddQuery(h_checkpoint, sql_createCheckpoints);
-		SQL_AddQuery(h_checkpoint, "INSERT INTO ck_checkpoints(steamid, mapname, zonegroup, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20) SELECT steamid, mapname, 0, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20 FROM ck_checkpoints_temp GROUP BY mapname, steamid;");
-		SQL_AddQuery(h_checkpoint, "DROP TABLE ck_checkpoints_temp;");
+	// 	SQL_AddQuery(h_checkpoint, "ALTER TABLE ck_checkpoints RENAME TO ck_checkpoints_temp;");
+	// 	SQL_AddQuery(h_checkpoint, sql_createCheckpoints);
+	// 	SQL_AddQuery(h_checkpoint, "INSERT INTO ck_checkpoints(steamid, mapname, zonegroup, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20) SELECT steamid, mapname, 0, cp1, cp2, cp3, cp4, cp5, cp6, cp7, cp8, cp9, cp10, cp11, cp12, cp13, cp14, cp15, cp16, cp17, cp18, cp19, cp20 FROM ck_checkpoints_temp GROUP BY mapname, steamid;");
+	// 	SQL_AddQuery(h_checkpoint, "DROP TABLE ck_checkpoints_temp;");
 		
-		SQL_ExecuteTransaction(g_hDb, h_checkpoint, SQLTxn_Success, SQLTxn_TXNFailed, 1);
-	}
-	else
-	{
-		PrintToServer("[SurfLatam] No database update needed!");
-		return;
-	}
+	// 	SQL_ExecuteTransaction(g_hDb, h_checkpoint, SQLTxn_Success, SQLTxn_TXNFailed, 1);
+	// }
+	// else
+	// {
+	// 	PrintToServer("[SurfLatam] No database update needed!");
+	// 	return;
+	// }
+	return;
 }
 
 void txn_addZoneGroups()
@@ -1241,6 +1242,14 @@ public void RecalcPlayerRank(int client, char steamid[128])
 //
 public void CalculatePlayerRank(int client)
 {
+	if (client <= MAXPLAYERS) {
+ 		if (isCalculatingPlayerRank[client])
+			return;
+ 
+ 		isCalculatingPlayerRank[client] = true;
+ 	}
+	
+
 	
 	char szQuery[255];
 	char szSteamId[32];
@@ -1456,10 +1465,9 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 		return;
 	}
 	
-	
 	char szMap[128], szSteamId[32], szMapName2[128];
 	int totalplayers, rank;
-
+	isCalculatingPlayerRank[client] = true;
 	getSteamIDFromClient(client, szSteamId, 32);
 	int check=0;
 	if (SQL_HasResultSet(hndl))
@@ -1514,6 +1522,7 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 				{
 					float percentage = 1.0 + ((1.0 / float(totalplayers)) - (float(rank) / float(totalplayers)));
 					g_pr_points[client] += RoundToCeil(50.0 * percentage);
+					alreadyAdded = true;
 					switch (rank)
 					{
 						case 1:g_pr_points[client] += 55;
@@ -1544,10 +1553,11 @@ public void sql_CountFinishedStageCallback(Handle owner, Handle hndl, const char
 
 		}
 	}
+
 	// Next up: Points from maps
 	char szQuery[512];
 	Format(szQuery, 512, "SELECT mapname, (select count(1)+1 from ck_playertimes b where a.mapname=b.mapname and a.runtimepro > b.runtimepro) AS rank, (SELECT count(1) FROM ck_playertimes b WHERE a.mapname = b.mapname) as total FROM ck_playertimes a where steamid = '%s';", szSteamId);
-	SQL_TQuery(g_hDb, sql_CountFinishedMapsCallback, szQuery, client, DBPrio_Low);
+	SQL_TQuery(g_hDb, sql_CountFinishedMapsCallback, szQuery, client, DBPrio_High);
 }
 
 //
@@ -1637,7 +1647,7 @@ public void db_updatePoints(int client)
 	{
 		SQL_EscapeString(g_hDb, g_pr_szName[client], szName, MAX_NAME_LENGTH * 2 + 1);
 		Format(szQuery, 512, sql_updatePlayerRankPoints, szName, g_pr_points[client], g_pr_finishedmaps[client], g_Challenge_WinRatio[client], g_Challenge_PointsRatio[client], g_pr_szSteamID[client]);
-		SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, client, DBPrio_Low);
+		SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, client, DBPrio_High);
 	}
 	else
 	{
@@ -1647,7 +1657,7 @@ public void db_updatePoints(int client)
 			GetClientAuthId(client, AuthId_Steam2, szSteamId, MAX_NAME_LENGTH, true);
 			//GetClientAuthString(client, szSteamId, MAX_NAME_LENGTH);		
 			Format(szQuery, 512, sql_updatePlayerRankPoints2, szName, g_pr_points[client], g_pr_finishedmaps[client], g_Challenge_WinRatio[client], g_Challenge_PointsRatio[client], g_szCountry[client], szSteamId);
-			SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, client, DBPrio_Low);
+			SQL_TQuery(g_hDb, sql_updatePlayerRankPointsCallback, szQuery, client, DBPrio_High);
 		}
 	}
 }
@@ -1663,6 +1673,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 		return;
 	}
 	
+
 	// If was recalculating points, go to the next player, announce or end calculating
 	if (data > MAXPLAYERS && g_pr_RankingRecalc_InProgress || data > MAXPLAYERS && g_bProfileRecalc[data])
 	{
@@ -1707,6 +1718,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 	}
 	else // Gaining points normally
 	{
+		isCalculatingPlayerRank[data] = false;
 		// Player recalculated own points in !profile
 		if (g_bRecalcRankInProgess[data] && data <= MAXPLAYERS)
 		{
@@ -1722,9 +1734,7 @@ public void sql_updatePlayerRankPointsCallback(Handle owner, Handle hndl, const 
 			int diff = g_pr_points[data] - g_pr_oldpoints[data];
 			if (diff > 0) // if player earned points -> Announce
 			{
-				for (int i = 1; i <= MaxClients; i++)
-					if (IsValidClient(i))
-						PrintToChat(i, "%t", "EarnedPoints", MOSSGREEN, WHITE, PURPLE, szName, GRAY, PURPLE, diff, GRAY, PURPLE, g_pr_points[data], GRAY);
+				PrintToChat(data, "[%cSurf Timer%c] You earned %c%d %cpoints (%c%d %cTotal)", MOSSGREEN, WHITE, ORANGE, diff, WHITE, ORANGE, g_pr_points[data], WHITE);
 			}
 			g_pr_showmsg[data] = false;
 			db_CalculatePlayersCountGreater0();

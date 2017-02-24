@@ -744,6 +744,7 @@ char g_pr_szName[MAX_PR_PLAYERS + 1][64];						// Used to update client's name i
 char g_pr_szSteamID[MAX_PR_PLAYERS + 1][32];					// steamid of client being recalculated
 
 
+bool isCalculatingPlayerRank[MAXPLAYERS + 1];
 /*---------- Replay Bot ---------------*/
 bool g_bIsPlayingReplay = false;
 int g_CurrentReplay = -1;
@@ -2293,6 +2294,7 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_replay", Command_Replay, "[SurfLatam] use replay bot ");
 	
 	RegAdminCmd("sm_ckadmin", Admin_ckPanel, g_AdminMenuFlag, "[SurfLatam] Displays the ckSurf menu panel");
+	RegAdminCmd("sm_stopbot", Admin_StopBot, ADMFLAG_ROOT, "[SurfLatam] Force-stops replay bot");
 	RegAdminCmd("sm_refreshprofile", Admin_RefreshProfile, g_AdminMenuFlag, "[SurfLatam] Recalculates player profile for given steam id");
 	RegAdminCmd("sm_resetchallenges", Admin_DropChallenges, ADMFLAG_ROOT, "[SurfLatam] Resets all player challenges (drops table challenges) - requires z flag");
 	RegAdminCmd("sm_resettimes", Admin_DropAllMapRecords, ADMFLAG_ROOT, "[SurfLatam] Resets all player times (drops table playertimes) - requires z flag");
